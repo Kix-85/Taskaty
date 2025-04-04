@@ -1,0 +1,196 @@
+.registerPage {
+    box-sizing: border-box;
+  background: linear-gradient(300.6deg, #6F3BF4 6.24%, #1D36F8 31.09%, #5D49DD 56.26%, #0E073E 74.67%, #0E0656 100%), #010009;;
+  height: 100vh;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.registerPage header{
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+    height: 108px;
+}
+
+.registerPage header .leftHeaderPart{
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    margin: 30px 50px;
+}
+
+.registerPage header .leftHeaderPart .headerList{
+    box-sizing: border-box;
+    display: flex;
+    list-style-type: none;
+}
+
+.registerPage header .leftHeaderPart .headerList li{
+    box-sizing: border-box;
+    margin: 0 20px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.registerPage header .leftHeaderPart .headerList li a{
+    box-sizing: border-box;
+    text-decoration: none;
+    color: #fff;
+    text-transform: capitalize;
+}
+
+.registerPage header .rightHeaderPart{
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    margin: 30px 50px;
+    border: 2px solid #fff;
+    border-radius: 30px;
+    padding: 0 10px;
+    cursor: pointer;
+}
+
+.registerPage header .rightHeaderPart div{
+    box-sizing: border-box;
+    margin: 0 6px;
+    font-weight: 500;
+}
+
+.registerPage header .rightHeaderPart h4{
+    box-sizing: border-box;
+    color: #fff;
+    font-size: 14px;
+}
+
+/* bd68ff */
+
+/* 5d6aff */
+
+.registerPage main{
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 108px);
+}
+
+.registerPage main .mainContainer{
+    box-sizing: border-box;
+    width: 856px;
+    height: 80%;
+    display: flex;
+    justify-content: center;
+    background-color:rgba(1, 0, 9, 0.622);
+    /* rgba(9, 10, 36, 0.4) */
+    border: 2px solid #cf68ff;
+    border-radius: 24px;
+}
+
+.registerPage main .mainContainer .leftMainPart{
+    box-sizing: border-box;
+    width: 52%;
+    margin-left: 20px;
+}
+
+.registerPage main .mainContainer .leftMainPart .content h1{
+    box-sizing: border-box;
+    font-size: 50px;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.registerPage main .mainContainer .leftMainPart .content h1 span{
+    box-sizing: border-box;
+    color: #5d6afe;
+}
+
+.registerPage main .mainContainer .leftMainPart .content p{
+    box-sizing: border-box;
+    font-size: 16px;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+.registerPage main .mainContainer .rightMainPart{
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(1, 0, 9, 0.15);
+    padding: 48px 32px;
+    width: 356px;
+    box-sizing: border-box;
+    gap: 32.03px;
+    isolation: isolate;
+    border: 0.5px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(29px);
+    border-radius: 16px;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+}
+
+.registerPage main .mainContainer .rightMainPart h2{
+    box-sizing: border-box;
+    margin: 0px;
+    color: #fff;
+}
+
+.registerPage main .mainContainer .rightMainPart .label{
+    color: #95accb;
+    margin: 0px;
+}
+
+.registerPage main .mainContainer .rightMainPart form{
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.registerPage main .mainContainer .rightMainPart form .labelContainer{
+    margin-top: 10px;
+}
+
+.registerPage main .mainContainer .registerButton{
+    width: 320px;
+    height: 40px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    background-color: #1d39c4;
+    color: #fff;
+    border: none;
+    margin-top: 24px;
+    cursor: pointer;
+}
+
+.registerPage main .mainContainer .googleRegisterButton{
+    width: 320px;
+    height: 40px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    background-color: #212750;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.registerPage main .mainContainer p{
+    color: #95accb;
+    font-size: 13px;
+}
+
+.registerPage main .mainContainer p button{
+    background: none;
+    border: none;
+    color: #85a5ff;
+    cursor: pointer;
+}

@@ -1,0 +1,11 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Prevent horizontal overflow */
+  }
+  
+  /* Optionally, you can also set body font-family and other base styles here */
+  body {
+    font-family: Arial, sans-serif;
+  }
