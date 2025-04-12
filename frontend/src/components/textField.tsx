@@ -5,14 +5,9 @@ import { useState } from "react";
 import crossIcon from "../../public/textFieldassets/close_circle.png";
 import searchIcon from "../../public/textFieldassets/search_normal.svg";
 
-
-
 type TextFieldProps = {
     placeholder: string;
 };
-
-
-
 
 function TextField(props: TextFieldProps){
     function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
