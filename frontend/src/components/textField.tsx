@@ -12,8 +12,6 @@ type TextFieldProps = {
 };
 
 
-
-
 function TextField(props: TextFieldProps){
     function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
         setInputValue(event.target.value);

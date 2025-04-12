@@ -1,6 +1,6 @@
 "use client";
 import TextField from "@/components/textField";
-import {SearchField} from "@/components/textField";
+// import {SearchField} from "@/components/textField";
 import styles from "./page.module.css";
 import myLogo from "../../public/assets/imgs/logo.png";
 import userAccount from "../../public/assets/imgs/userAccount.png";
@@ -9,6 +9,8 @@ import googleIcon from "../../public/assets/imgs/googleIcon.png";
 import Image from "next/image";
 import "./styles/global.css";
 import { useState } from "react";
+import DashBoard from "../components/dashBoard";
+// import myImage from '../../public/assets/imgs/myImage.svg';
 
 // Welcome Back 
 // Dear Friend
@@ -27,6 +29,14 @@ export default function Home() {
   return (
     <>
       <div className={styles.registerPage}>
+        <div className={styles.imageContainer}>
+          {/* <Image 
+                className="myImage" 
+                src={myImage} 
+                alt="clear input"
+                width={500}     
+            /> */}
+        </div>
         <header>
           <div className={styles.leftHeaderPart}>
             <div className="logo"><Image 
@@ -107,7 +117,7 @@ export default function Home() {
                 </div>
               
                 <button className={styles.registerButton}>
-                  {isRegistered ? "want to Register Account" : "want to Login"}
+                  {isRegistered ? "Login" : "Register"}
                 </button>
                 <p>{isRegistered ? "You don't have an account - ":"Already Have An Account - "}<button onClick={handleRegister}>{isRegistered ? "Register Here" : "Sign In Here"}</button></p>
                 <button className={styles.googleRegisterButton}><Image 

@@ -1,11 +1,18 @@
+*{
+  box-sizing: border-box; /* Include padding and border in element's total width and height */
+  margin: 0; /* Remove default margin from all elements */
+  padding: 0; /* Remove default padding from all elements */
+}
+
+
 html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden; /* Prevent horizontal overflow */
-  }
-  
-  /* Optionally, you can also set body font-family and other base styles here */
-  body {
-    font-family: Arial, sans-serif;
-  }
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Prevent horizontal overflow */
+}
+
+/* Optionally, you can also set body font-family and other base styles here */
+body {
+  font-family: Arial, sans-serif;
+}
