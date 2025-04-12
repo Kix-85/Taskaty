@@ -3,8 +3,7 @@ import "./textField.css";
 import Image from "next/image";
 import { useState } from "react";
 import crossIcon from "../../public/textFieldassets/close_circle.png";
-import searchIcon from "../../public/textFieldassets/search_normal.svg";
-
+import searchIcon from "../../public/textFieldassets/search_normal.png";
 type TextFieldProps = {
     placeholder: string;
 };
@@ -43,7 +42,7 @@ function TextField(props: TextFieldProps){
     );
 }
 
-export function SearchField(){
+export function SearchField() {
     const [inputValue, setInputValue] = useState("");
 
     function handleChange(event: React.ChangeEvent<HTMLInputElement>) {

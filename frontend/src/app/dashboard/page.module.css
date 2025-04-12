@@ -1,184 +1,64 @@
-
-.dashboard {
-  min-height: 100vh;
-  width: 350px;
-  background: #0e0f1f;
-  padding: 0 12px;
-}
-
-.dashboard .title{
+.home{
     display: flex;
-    align-items: center;
-    padding-top: 20px;
 }
 
-.dashboard .title .content{
+.main{
+    display: inline-block;
+    background-color: #0e0d16;
+    width: calc(100vw - 350px);
+    min-height: 100vh;
+}
+
+.main header{
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    margin-left: 10px;
-    height: 100%;
-    width: 100%;
-    padding: 10px 0px;
-}
-
-.dashboard .title .content h3{
-    font-size: 20px;
-    color: #fff;
-}
-
-.dashboard .title .content p{
-    color: #95accb;
-    padding-top: 5px;
-}
-
-/* make a horizontal line after title in new line */
-
-.dashboard span::after{
-    content: '';
-    width: 100%;
-    height: 1.2px;
-    background-color: #95accb;
-    margin: 10px 0px;
-    opacity: 0.4;
-    display: block;
-    margin-top: 20px;
-    /* border-radius: 5px;
-    box-shadow: 10px 2px 5px rgba(199, 176, 176, 0.484); */
-}  
-
-.dashboard .mm{
-    color: #657997;
-    font-weight: 700;
-    font-size: 16px;
-    margin: 20px 0;
-    margin-left: 12px;
-}
-
-.dashboard nav{
-    padding: 0px 12px;
-}
-
-.dashboard nav .navList{
-    list-style-type: none;
-    padding: 0px;
-    margin: 0px;
-}
-
-.dashboard nav .navList .navElementContainer{
-    padding: 6px 8px;
-    border-radius: 12px;
-    margin: 8px 0px;
-    transition: 0.5s;
-}
-
-.dashboard nav .navList .navElementContainer:hover{
-    background-color: #151f5b;
-    cursor: pointer;
-}
-
-
-.dashboard nav .navList .navElementContainer a{
-    text-decoration: none;
-    color: #95accb;
-    font-size: 18px;
-    font-weight: 500;
-    margin-left: 18px;
-    transition: 0.5s;
-}
-
-.dashboard nav .navList .navElementContainer:hover a{
-    color: #fff;
-}
-
-/* Try to style <Image /> color */
-
-/* .dashboard nav .navList .navElementContainer:hover .dashIcon{
-    color: #fff;
-    font-weight: 700;
-} */
-
-.dashboard .projects{
-    padding: 0px 12px;
-}
-
-.dashboard .projects .projectsHead{
-    display: flex;
-    align-items: center;
     justify-content: space-between;
-    margin-top: 50px;
-    margin-bottom: 10px;
-    padding: 0px 12px;
+    align-items: center;
+    padding: 20px 40px;
+    background-color: #0e0d16;
 }
 
-.dashboard .projects .projectsHead .addIcon{
-    cursor: pointer;
-}
-
-.dashboard .projects .projectsHead p{
-    color: #657997;
-    font-size: 16px;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.dashboard .projects .projectsElementContainer{
+.main header .leftHeaderPart{
     display: flex;
     align-items: center;
-    padding: 10px 12px;
-    border-radius: 12px;
-    margin: 0px;
+    padding: 20px 0px;
+    margin-left: 20px;
 }
 
-.dashboard .projects .projectsElementContainer h3{
-    color: #95accb;
-    font-size: 18px;
-    font-weight: 500;
-    margin-left: 12px;
-}
-
-.dashboard .card{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 24px 16px 16px 16px;
-    border: 1px solid #3b4b91;
-    border-radius: 28px;
-}
-
-.dashboard .card h3{
-    color: #fff;
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
-
-.dashboard .card p{
-    color: #657997;
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 10px;
-    text-align: center;
-    line-height: 20px;
-}
-
-.dashboard .card button{
+.main header .leftHeaderPart .dashHomeIcon{
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
     background-color: #1d39c4;
+    border-radius: 7px;
+}
+
+.main header .leftHeaderPart h2{
+    font-size: 30px;
     color: #fff;
-    font-size: 16px;
-    font-weight: 700;
-    padding: 14px 24px;
-    border-radius: 12px;
+    margin-left: 10px;
+}
+
+.main header .rightHeaderPart{
+    display: flex;
+    align-items: center;
+    padding: 20px 0px;
+    margin-right: 20px;
+}
+
+.main header .rightHeaderPart button{
+    background-color: #1d39c4;
+    padding: 12px 24px;
     border: none;
-    cursor: pointer;
-    transition: 0.5s;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-left: 20px;
+    cursor: pointer;
 }
 
-.dashboard .card button .starStick{
+.main header .rightHeaderPart button .addTaskIcon{
     margin-right: 5px;
 }

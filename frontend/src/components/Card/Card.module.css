@@ -1,0 +1,18 @@
+.card {
+    background-color: #070b2e;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+    width: 260px;
+    height: 137px;
+}
+
+.title {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0px;
+}

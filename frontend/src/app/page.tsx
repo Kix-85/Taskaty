@@ -10,6 +10,7 @@ import Image from "next/image";
 import "./styles/global.css";
 import { useState } from "react";
 import DashBoard from "../components/dashBoard";
+import Card from "../components/Card/Card";
 // import myImage from '../../public/assets/imgs/myImage.svg';
 
 // Welcome Back 
@@ -61,6 +62,7 @@ export default function Home() {
                     width={22}
                 />
             </div>
+            {/* Yousef Ebada */}
             <h4>Account</h4>
             <div className={styles.downArrow}>
               <Image 
@@ -135,6 +137,7 @@ export default function Home() {
         {/* <TextField/>
         <SearchField /> */}
       </div>
+      {/* <Card type={1} title={"Task 1"} status={"In Progress"} id={1} subscribes={1}/> */}
     </>
   );
 }

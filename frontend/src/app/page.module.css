@@ -7,7 +7,7 @@
     padding: 0;
     box-sizing: border-box;
     background: linear-gradient(300.6deg, #6F3BF4 6.24%, #1D36F8 31.09%, #5D49DD 56.26%, #28198c 74.67%, #211969 100%), #131744;
-    background-image: url('/assets/imgs/myImage.svg');
+    /* background-image: url('/assets/imgs/myImage.svg'); */
     /* background:  */
     /* linear-gradient(300.6deg, #6F3BF4 6.24%, #1D36F8 31.09%, #5D49DD 56.26%, #0E073E 74.67%, #0E0656 100%),
     url('../../public/assets/imgs/myImage.svg');  */
@@ -114,6 +114,10 @@
     box-sizing: border-box;
     width: 52%;
     margin-left: 20px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .registerPage main .mainContainer .leftMainPart .content h1{
