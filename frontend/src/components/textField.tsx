@@ -9,6 +9,10 @@ type TextFieldProps = {
     placeholder: string;
 };
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> a28cdcaf956400493b238fb738579f2bb7b87702
 function TextField(props: TextFieldProps){
     function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
         setInputValue(event.target.value);
