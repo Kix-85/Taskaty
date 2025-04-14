@@ -138,8 +138,8 @@ function DashBoard() {
                         <h3>Youtube</h3>
                     </div>
                     <div className={styles.card}>
-                        <h3>Let's start!</h3>
-                        <p>Creating or adding new tasks couldn't be easier</p>
+                        <h3>Let&apos;s start!</h3>
+                        <p>Creating or adding new tasks couldn&apos;t be easier</p>
                         <button className={styles.button}><Image 
                             className={styles.starStick}
                             src={starStick}
