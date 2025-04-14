@@ -1,0 +1,22 @@
+.div {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 5px;
+}
+
+.low {
+    background-color: cyan;
+}
+
+.medium {
+    background-color: #d4b106;
+}
+
+.high {
+    background-color: #fa541c;
+}
