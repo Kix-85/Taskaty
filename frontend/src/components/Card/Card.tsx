@@ -1,7 +1,7 @@
 "use client";
 import Badge from "../Badge/Badge";
 import styles from "./Card.module.css";
-import { useState } from "react";
+// import { useState } from "react";
 
 type CardProps = {
     type: number;
@@ -13,6 +13,8 @@ type CardProps = {
 
 export default function Card({type, title, status, id, subscribes}: CardProps) {
     const date = new Date();
+    console.log(type)
+    console.log(subscribes)
     const formattedDate = date.toLocaleString("en-US", {
       month: "short", 
       day: "2-digit", 

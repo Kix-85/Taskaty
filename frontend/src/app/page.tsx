@@ -9,7 +9,7 @@ import googleIcon from "../../public/assets/imgs/googleIcon.png";
 import Image from "next/image";
 import "./styles/global.css";
 import { useState } from "react";
-import DashBoard from "../components/dashBoard";
+// import DashBoard from "../components/dashBoard";
 import Card from "../components/Card/Card";
 // import myImage from '../../public/assets/imgs/myImage.svg';
 
@@ -137,7 +137,7 @@ export default function Home() {
         {/* <TextField/>
         <SearchField /> */}
       </div>
-      <Card type={1} title={"Task 1"} status={"In Progress"} id={1} subscribes={1}/>
+      <Card type={1} title={"Task 1"} status={"low"} id={1} subscribes={1}/>
     </>
   );
 }
