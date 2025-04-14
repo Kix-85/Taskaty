@@ -9,7 +9,7 @@ import "../styles/global.css";
 
 function Home() {
     return (
-       <span className={styles.home}>
+        <span className={styles.home}>
         <DashBoard />
         <main className={styles.main}>
             <header>
@@ -23,15 +23,8 @@ function Home() {
                 </div>
             </header>
         </main>
-       </span>
+        </span>
     );
 }
 
 export default Home;
-
-
-
-
-
-
-

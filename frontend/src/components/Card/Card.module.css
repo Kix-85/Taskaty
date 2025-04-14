@@ -16,3 +16,25 @@
     font-weight: 700;
     margin: 0px;
 }
+
+.date {
+    color: white;
+}
+
+.id {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 5px;
+    background-color: #172473;
+}
+
+.inline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
