@@ -9,7 +9,7 @@ import googleIcon from "../../public/assets/imgs/googleIcon.png";
 import Image from "next/image";
 import "./styles/global.css";
 import { useState } from "react";
-import DashBoard from "../components/dashBoard";
+// import DashBoard from "../components/dashBoard";
 import Card from "../components/Card/Card";
 // import myImage from '../../public/assets/imgs/myImage.svg';
 
