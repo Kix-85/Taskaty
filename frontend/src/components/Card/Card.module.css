@@ -36,5 +36,12 @@
 .inline {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    padding: 0;
+}
+
+.space {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }

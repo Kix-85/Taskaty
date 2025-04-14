@@ -1,7 +1,5 @@
-"use client";
 import Badge from "../Badge/Badge";
 import styles from "./Card.module.css";
-import { useState } from "react";
 
 type CardProps = {
     type: number;
@@ -16,17 +14,19 @@ export default function Card({type, title, status, id, subscribes}: CardProps) {
     const formattedDate = date.toLocaleString("en-US", {
       month: "short", 
       day: "2-digit", 
-    }).toUpperCase(); 
+    }); 
 
     return (
         <div className={styles.card}>
             <h3 className={styles.title}>{title}</h3>
             <div className={styles.inline}>
                 <Badge status={status}/>
-                <div className={styles.id}>{id}</div>
+                <div className={styles.id}>#{id}</div>
             </div>
-            {/* <div className={styles.id}>{subscribes}</div> */}
-            <p className={styles.date}>{formattedDate}</p>
+            <div className={styles.space}>
+                <div className={styles.id}>{subscribes}</div>
+                <p className={styles.date}>{formattedDate}</p>
+            </div>
         </div>
     );
 }
