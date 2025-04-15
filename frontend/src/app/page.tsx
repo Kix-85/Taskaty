@@ -12,6 +12,7 @@ import { useState } from "react";
 // import DashBoard from "../components/dashBoard";
 // import Card from "../components/Card/Card";
 import Button from "@/components/Button/Button";
+import Card from "@/components/Card/Card";
 // import myImage from '../../public/assets/imgs/myImage.svg';
 
 // Welcome Back
