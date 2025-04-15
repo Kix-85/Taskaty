@@ -144,6 +144,7 @@ export default function Home() {
         {/* <TextField/>
         <SearchField /> */}
       </div>
+      <Card type={1} title={"Task 1"} status={`low`} id={2456} subscribes={18908}/>
     </>
   );
 }
