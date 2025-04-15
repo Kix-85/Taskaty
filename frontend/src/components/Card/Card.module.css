@@ -8,6 +8,36 @@
     gap: 8px;
     width: 260px;
     height: 137px;
+    margin: 10px;
+}
+
+.card2 {
+    height: 80px;
+}
+
+.card3 {
+    position:relative;
+    height: 50px;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    color: #fff;
+    padding: 10px;
+    border-radius: 12px;
+    background-color: #070b2e;
+    margin: 20px;
+}
+
+.content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image {
+    margin-right: 10px;
 }
 
 .title {
@@ -15,4 +45,35 @@
     font-size: 18px;
     font-weight: 700;
     margin: 0px;
+}
+
+.date {
+    color: white;
+    margin: 0 10px;
+}
+
+.id {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 5px;
+    background-color: #172473;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.inline {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0;
+}
+
+.space {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }

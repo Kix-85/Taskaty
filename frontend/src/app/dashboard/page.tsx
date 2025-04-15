@@ -5,10 +5,10 @@ import homeIcon from "../../../public/assets/imgs/homeIcon.png";
 import styles from "./page.module.css";
 import addTask from "../../../public/assets/imgs/addTask.png";
 import {SearchField} from "../../components/textField";
-import "../styles/global.css";
-import TotalThing from "@/components/total/totalThing";
+import TotalThing from "../../components/total/totalThing";
 
-function Home() {
+
+export default function Home() {
     return (
         <span className={styles.home}>
         <DashBoard />
@@ -31,15 +31,6 @@ function Home() {
                 <TotalThing title="In Progress Tasks" count={2} rate={3}/>
             </div>
         </main>
-       </span>
+        </span>
     );
 }
-
-export default Home;
-
-
-
-
-
-
-

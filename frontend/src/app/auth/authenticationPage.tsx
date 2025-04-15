@@ -1,27 +1,32 @@
 "use client";
-<<<<<<< HEAD
 import TextField from "@/components/textField";
 // import {SearchField} from "@/components/textField";
-import styles from "./page.module.css";
-import myLogo from "../../public/assets/imgs/logo.png";
-import userAccount from "../../public/assets/imgs/userAccount.png";
-import downArrow from "../../public/assets/imgs/downArrow.png";
-import googleIcon from "../../public/assets/imgs/googleIcon.png";
+import styles from "../page.module.css";
+import myLogo from "../../../public/assets/imgs/logo.png";
+import userAccount from "../../../public/assets/imgs/userAccount.png";
+import downArrow from "../../../public/assets/imgs/downArrow.png";
+import googleIcon from "../../../public/assets/imgs/googleIcon.png";
 import Image from "next/image";
 import "./styles/global.css";
 import { useState } from "react";
+// import { useEffect, useState } from "react";
 // import DashBoard from "../components/dashBoard";
-import Card from "../components/Card/Card";
+// import Card from "../components/Card/Card";
+// import Card from "@/components/Card/Card";
+// import { Button } from "@mui/material";
+// import myImage from '../../public/assets/imgs/myImage.svg';
 
-// Sign In To Your Account
-=======
->>>>>>> cfa5cca63cb4d00f6213929d77c0866ea311d09c
-
-export default function Home() {
-
-  return (
-    <>
-<<<<<<< HEAD
+function AuthenticationPage(){
+    const [isRegistered, setIsRegistered] = useState(false); // State to track registration status
+  const handleRegister = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    console.log("Register button clicked");
+    console.log(isRegistered);
+    setIsRegistered((prev) => !prev); // Toggle the registration status
+  };
+    return(
+        <>
+      
       <div className={styles.registerPage}>
         <div className={styles.imageContainer}>
           {/* <Image 
@@ -130,11 +135,8 @@ export default function Home() {
         {/* <TextField/>
         <SearchField /> */}
       </div>
-      {/* <Card type={0} title={"card1"} status={"test"} id={0} subscribes={0} /> */}
-=======
-      {/*don't play here*/}
->>>>>>> cfa5cca63cb4d00f6213929d77c0866ea311d09c
     </>
-  );
+    )
 }
 
+export default AuthenticationPage;

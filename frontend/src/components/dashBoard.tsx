@@ -12,7 +12,7 @@ import youtube from "../../public/assets/imgs/youtube.png";
 import starStick from "../../public/assets/imgs/starStick.png";
 import Image from "next/image";
 import styles from "./DashBoard.module.css";
-import "../app/styles/global.css";
+// import "../app/styles/global.css";
 
 
 
@@ -138,8 +138,8 @@ function DashBoard() {
                         <h3>Youtube</h3>
                     </div>
                     <div className={styles.card}>
-                        <h3>Let's start!</h3>
-                        <p>Creating or adding new tasks couldn't be easier</p>
+                        <h3>Let&apos;s start!</h3>
+                        <p>Creating or adding new tasks couldn&apos;t be easier</p>
                         <button className={styles.button}><Image 
                             className={styles.starStick}
                             src={starStick}
