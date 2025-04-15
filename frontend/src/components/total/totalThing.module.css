@@ -1,0 +1,63 @@
+.titleContainer{
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.titleContainer h4{
+    font-size: 20px;
+    font-weight: 500;
+    color: #95accb;
+}
+
+.titleContainer .rateStatus p{
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+
+.titleContainer .rateStatus .positive{
+    color: #9eff00;
+}
+
+.titleContainer .rateStatus .negative{
+    color: #fa541c;
+}
+
+.total_thing .count{
+    font-size: 30px;
+    font-weight: 500;
+    color: #fff;
+}
+
+.total_thing{
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 20px;
+    position: relative;
+    width: fit-content;
+    padding-right: 50px;
+}
+
+/* make Vertical line after .total_thing using ::after */
+
+.total_thing::after{
+    content: '';
+    position: absolute;
+    top: 0;
+    right:  0; /* أو left حسب مكان الخط */
+    width: 3px;
+    height: 100%;
+    background-color: #26252d;
+}
+
+
+
+
+
+
+
+
+

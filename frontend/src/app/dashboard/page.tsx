@@ -6,10 +6,11 @@ import styles from "./page.module.css";
 import addTask from "../../../public/assets/imgs/addTask.png";
 import {SearchField} from "../../components/textField";
 import "../styles/global.css";
+import TotalThing from "@/components/total/totalThing";
 
 function Home() {
     return (
-       <span className={styles.home}>
+        <span className={styles.home}>
         <DashBoard />
         <main className={styles.main}>
             <header>
@@ -22,6 +23,13 @@ function Home() {
                     <button><Image src={addTask} alt="addTask" className={styles.addTaskIcon} width={17}/>New Task</button>
                 </div>
             </header>
+            <div className={styles.mmContainer}>
+                <TotalThing title="Total Tasks" count={2} rate={-7}/>
+                <TotalThing title="Completed Tasks" count={1} rate={5}/>
+                <TotalThing title="Pending Tasks" count={1} rate={-2}/>
+                <TotalThing title="Overdue Tasks" count={14} rate={12}/>
+                <TotalThing title="In Progress Tasks" count={2} rate={3}/>
+            </div>
         </main>
        </span>
     );

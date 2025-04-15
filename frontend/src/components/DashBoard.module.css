@@ -101,6 +101,7 @@ padding: 0 12px;
 
 .dashboard .projects{
     padding: 0px 12px;
+    /* position: relative; */
 }
 
 .dashboard .projects .projectsHead{
@@ -146,6 +147,9 @@ padding: 0 12px;
     padding: 24px 16px 16px 16px;
     border: 1px solid #3b4b91;
     border-radius: 28px;
+    position: absolute;
+    bottom: 3%;
+    left: 0;
 }
 
 .dashboard .card h3{
