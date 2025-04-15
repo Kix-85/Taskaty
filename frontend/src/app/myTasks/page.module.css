@@ -1,11 +1,36 @@
 .board{
-    background-color: #0000009b;
+    background-color: rgba(0, 0, 0,0.4);;
     border-radius: 20px;
+    width: 90%;
+    padding:20px;
+    display: flex;
+    flex-direction: column;
+    gap:10px;
+    justify-content: center;
+    align-items: center;
 }
 .listGroup{
-
+    background-color: rgba(0, 0, 0,0.2);
+    width: 95%;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.listGroup h3{
+    align-self: flex-start;
+    color:#95accb;
+    margin:0;
+    margin-bottom: 5px;
 }
 .screen{
     background-color: #030852;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap:5px;
+    justify-content: center;
+    align-items: center;
 }

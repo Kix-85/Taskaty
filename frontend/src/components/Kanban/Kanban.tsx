@@ -45,7 +45,7 @@ function Kanban() {
     return (
         <div className={styles.div}>
             <DragDropContext onDragEnd={onDragEnd}>
-                <Box sx={{ display: "flex", gap: 3, padding: 4, overflowX: "auto" }}>
+                <Box sx={{ display: "flex", gap: 3, padding: 4, overflowX: "auto", backgroundColor: "rgba(0, 0, 0,0.2);" }}>
                     {Object.entries(columns).map(([columnId, tasks]) => (
                         <KanbanColumn key={columnId} title={columnId} columnId={columnId}>
                             {tasks.map((task, index) => (
