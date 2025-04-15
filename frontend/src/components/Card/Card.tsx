@@ -13,17 +13,18 @@ type CardProps = {
 }
 
 export default function Card({type, title, status, id, subscribes}: CardProps) {
-    // Put the date logic here to prevent hydration mismatch error
+    // Put the date logic with useEffect to prevent hydration mismatch error
     const [date, setDate] = useState('');
     useEffect(() => {
         const now = new Date();
         const formattedDate = now.toLocaleString("en-US", {
             month: "short", 
             day: "2-digit", 
-          }); 
-          setDate(formattedDate);
+        }); 
+        setDate(formattedDate);
     }, [])
 
+    // For Client side rendering
     if (!date) return null;
 
     return (
