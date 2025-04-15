@@ -16,8 +16,9 @@
 }
 
 .card3 {
+    position:relative;
     height: 50px;
-    width: 70%;
+    width: 100vw;
     display: flex;
     align-items: center;
     justify-content: space-between;

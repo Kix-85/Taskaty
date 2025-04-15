@@ -12,7 +12,7 @@ import youtube from "../../public/assets/imgs/youtube.png";
 import starStick from "../../public/assets/imgs/starStick.png";
 import Image from "next/image";
 import styles from "./DashBoard.module.css";
-import "../app/styles/global.css";
+// import "../app/styles/global.css";
 
 
 

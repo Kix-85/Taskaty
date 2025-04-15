@@ -5,7 +5,7 @@ import homeIcon from "../../../public/assets/imgs/homeIcon.png";
 import styles from "./page.module.css";
 import addTask from "../../../public/assets/imgs/addTask.png";
 import {SearchField} from "../../components/textField";
-import "../styles/global.css";
+// import "../styles/global.css";
 
 function Home() {
     return (
