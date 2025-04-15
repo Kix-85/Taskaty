@@ -10,10 +10,11 @@ import Image from "next/image";
 import "./styles/global.css";
 import { useState } from "react";
 // import DashBoard from "../components/dashBoard";
-import Card from "../components/Card/Card";
+// import Card from "../components/Card/Card";
+import Button from "@/components/Button/Button";
 // import myImage from '../../public/assets/imgs/myImage.svg';
 
-// Welcome Back 
+// Welcome Back
 // Dear Friend
 
 // Sign In To Your Account
@@ -28,7 +29,13 @@ export default function Home() {
     setIsRegistered((prev) => !prev); // Toggle the registration status
   };
   return (
+    
     <>
+      <div className={styles.masa2}>
+        <Button size="large" color="success" text="Hello" loading={true}></Button>
+        <Button size="large" color="success" text="Hello"></Button>  
+      </div>
+      
       <div className={styles.registerPage}>
         <div className={styles.imageContainer}>
           {/* <Image 
@@ -137,7 +144,6 @@ export default function Home() {
         {/* <TextField/>
         <SearchField /> */}
       </div>
-      <Card type={1} title={"Task 1"} status={"low"} id={1} subscribes={1}/>
     </>
   );
 }
