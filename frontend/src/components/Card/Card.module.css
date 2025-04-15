@@ -18,16 +18,16 @@
 .card3 {
     position:relative;
     height: 50px;
-    width: 100vw;
+    width: 95%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 5px;
     color: #fff;
     padding: 10px;
     border-radius: 12px;
     background-color: #070b2e;
-    margin: 20px;
+    margin: 5px;
 }
 
 .content {
