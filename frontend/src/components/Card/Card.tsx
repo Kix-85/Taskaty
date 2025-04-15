@@ -7,8 +7,8 @@ import Image from "next/image";
 type CardProps = {
     type: number;
     title: string;
-    status: 'low' | 'medium' | 'high';
-    id: number;
+    status: "low" | "medium" | "high" | string;
+    id: string;
     subscribes: number;
 }
 
