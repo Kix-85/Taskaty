@@ -7,7 +7,7 @@ import userAccount from "../../../public/assets/imgs/userAccount.png";
 import downArrow from "../../../public/assets/imgs/downArrow.png";
 import googleIcon from "../../../public/assets/imgs/googleIcon.png";
 import Image from "next/image";
-import "./styles/global.css";
+// import "./styles/global.css";
 import { useState } from "react";
 // import { useEffect, useState } from "react";
 // import DashBoard from "../components/dashBoard";
