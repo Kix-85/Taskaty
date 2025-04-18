@@ -33,7 +33,6 @@ export default function Card({type, title, status, id, subscribes}: CardProps) {
             {/* first type */}
             {type === 1 && (
                 <div className={styles.card}>
-
                     <h3 className={styles.title}>{title}</h3>
                     <div className={styles.inline}>
                         <Badge status={status} />
