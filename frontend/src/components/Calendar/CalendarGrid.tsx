@@ -31,7 +31,7 @@ const CalendarGrid: React.FC<CalendarGridProps> = ({ tasks, currentMonth, curren
     const daysOfTheWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
     return (
-        <div className="grid grid-cols-7 p-4">
+        <div className="grid grid-cols-7 p-4 h-full">
             {/* Days of week headers */}
             {daysOfTheWeek.map((day, index) => (
                 <div key={index} className="text-white font-sm font-lighter pl-2 border border-white/10 backdrop-filter backdrop-blur-md">{day}</div>

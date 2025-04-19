@@ -35,7 +35,7 @@ const List = () => {
         }
     };
     return (
-
+        <div className={style.div}>
         <DragDropContext onDragEnd={onDragEnd}>
                 <div className={style.board}>
                     {Object.entries(columns).map(([columnId, tasks]) => (
@@ -74,7 +74,7 @@ const List = () => {
                     ))}
                 </div>
         </DragDropContext>
-
+        </div>
 
     )
 

@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from 'react';
 import CalendarGrid from '../../components/Calendar/CalendarGrid';
-
 const Calendar: React.FC = () => {
     // State for managing the selected view (Kanban, List, Calendar, etc.)
 
@@ -36,7 +35,7 @@ const Calendar: React.FC = () => {
     console.log(handleMonthChange)
 
     return (
-        <div className="bg-gray-900 min-h-screen flex flex-col p-2">
+        <div className=" min-h-screen flex flex-col p-2 bg-black/20">
             {/* You can add your header and pass the handle methods as props to change the props internally */}
 
             <div className="mt-4">
