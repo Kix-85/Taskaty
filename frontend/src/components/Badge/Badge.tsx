@@ -6,7 +6,7 @@ type Badgeprops = {
 
 const Badge: React.FC<Badgeprops> = ({status}) => {
     return (
-        <div className={`${styles.div} ${styles[status]}`}>{status}</div>
+        <div className={`${styles.div} ${styles[status]} ${styles.badge}`}>{status}</div>
     )
 }
 

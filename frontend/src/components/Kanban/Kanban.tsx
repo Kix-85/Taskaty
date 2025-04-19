@@ -1,4 +1,3 @@
-// components/KanbanBoard.tsx
 "use client";
 
 import { DragDropContext, Draggable, DropResult } from "@hello-pangea/dnd";
@@ -7,6 +6,7 @@ import { useState } from "react";
 import styles from './Kanban.module.css';
 import KanbanColumn from "@/components/KanColumn/KanColumn";
 import Card from "@/components/Card/Card";
+import "../../styles/globals.css"
 
 const initialData = {
     todo: [{ id: "1", content: "Task 1", status: "low" }, { id: "2", content: "Task 2", status: "high" }],
@@ -25,7 +25,6 @@ function Kanban() {
         const sourceCol = [...columns[source.droppableId as keyof typeof columns]];
         const destCol = [...columns[destination.droppableId as keyof typeof columns]];
         const [movedItem] = sourceCol.splice(source.index, 1);
-
         if (source.droppableId === destination.droppableId) {
             sourceCol.splice(destination.index, 0, movedItem);
             setColumns((prev) => ({
@@ -45,7 +44,7 @@ function Kanban() {
     return (
         <div className={styles.div}>
             <DragDropContext onDragEnd={onDragEnd}>
-                <Box sx={{ display: "flex", gap: 3, padding: 4, overflowX: "auto", backgroundColor: "rgba(0, 0, 0,0.2);" }}>
+                <Box sx={{ display: "flex", gap: 3, padding: 4, overflowX: "auto", backgroundColor: "rgba(0, 0, 0,0.2);", borderRadius:"24px"}} >
                     {Object.entries(columns).map(([columnId, tasks]) => (
                         <KanbanColumn key={columnId} title={columnId} columnId={columnId}>
                             {tasks.map((task, index) => (
@@ -55,6 +54,7 @@ function Kanban() {
                                             ref={provided.innerRef}
                                             {...provided.draggableProps}
                                             {...provided.dragHandleProps}
+                                            className="w-95/100 items-center rounded-xl"
                                         >
                                             <Card type={1} title={task.content} status={task.status}  id={task.id} subscribes={2345}/>
                                         </div>
