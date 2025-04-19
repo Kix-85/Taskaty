@@ -4,7 +4,6 @@ import CalendarGrid from '../../components/Calendar/CalendarGrid';
 
 const Calendar: React.FC = () => {
     // State for managing the selected view (Kanban, List, Calendar, etc.)
-    const [selectedView, setSelectedView] = useState('Calendar');
 
     // State for managing the current month and year
     const [currentMonth, setCurrentMonth] = useState(2);
@@ -25,9 +24,7 @@ const Calendar: React.FC = () => {
     };
 
     // Handler for switching between views (Kanban, List, Calendar, etc.)
-    const handleTabChange = (view: string) => {
-        setSelectedView(view);
-    };
+    
 
     // Handler for changing the month and year
     const handleMonthChange = (month: number, year: number) => {
@@ -36,19 +33,18 @@ const Calendar: React.FC = () => {
     };
 
     console.log('Calendar view')
+    console.log(handleMonthChange)
 
     return (
         <div className="bg-gray-900 min-h-screen flex flex-col p-2">
             {/* You can add your header and pass the handle methods as props to change the props internally */}
 
             <div className="mt-4">
-                {selectedView === 'Calendar' && (
                     <CalendarGrid
                         tasks={tasks}
                         currentMonth={currentMonth}
                         currentYear={currentYear}
                     />
-                )}
             </div>
         </div>
 

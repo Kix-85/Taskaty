@@ -37,7 +37,6 @@ const List = () => {
     return (
 
         <DragDropContext onDragEnd={onDragEnd}>
-            <div className={style.screen}>
                 <div className={style.board}>
                     {Object.entries(columns).map(([columnId, tasks]) => (
                         <Droppable droppableId={columnId} key={columnId}>
@@ -50,12 +49,12 @@ const List = () => {
                                     <h3>{columnId} {tasks.length}</h3>
                                     {tasks.map((task, index) => (
                                         <Draggable key={task.id} draggableId={task.id} index={index}>
-                                            {(provided) => (
+                                            {(provided,snapshot) => (
                                                 <div
                                                     ref={provided.innerRef}
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
-                                                    className={style.dashed}
+                                                    className={`${style.dashed} ${snapshot.isDragging?style.dragging:style.dashed} ${style.smoothDnd}`}
                                                 >
                                                     <Card
                                                         type={3}
@@ -74,7 +73,6 @@ const List = () => {
                         </Droppable>
                     ))}
                 </div>
-            </div>
         </DragDropContext>
 
 

@@ -1,13 +1,15 @@
 .board{
     background-color: rgba(0, 0, 0,0.4);;
     border-radius: 24px;
-    width: 90%;
+    width: 100%;
     padding:20px;
     display: flex;
     flex-direction: column;
     gap:10px;
     justify-content: center;
     align-items: center;
+
+    height: 100vh;
 }
 .listGroup{
     background-color: rgba(0, 0, 0,0.2);
@@ -26,18 +28,18 @@
     margin:0;
     margin-bottom: 5px;
 }
-.screen{
-    background-color: #030852;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap:5px;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
+
 .dashed{
     border-radius: 12px;
     border-style: rgba(0, 0, 0, 0.451) dashed;
     width: 100%;
 }
+.dragging {
+    z-index: 1000;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    transform: scale(1.02);
+}
+.smoothDnd {
+    transition: transform 0.02s ease-in-out;
+}
+  

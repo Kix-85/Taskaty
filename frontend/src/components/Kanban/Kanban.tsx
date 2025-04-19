@@ -46,15 +46,15 @@ function Kanban() {
             <DragDropContext onDragEnd={onDragEnd}>
                 <Box sx={{ display: "flex", gap: 3, padding: 4, overflowX: "auto", backgroundColor: "rgba(0, 0, 0,0.2);", borderRadius:"24px"}} >
                     {Object.entries(columns).map(([columnId, tasks]) => (
-                        <KanbanColumn key={columnId} title={columnId} columnId={columnId}>
+                        <KanbanColumn key={columnId} title={`${columnId} ${tasks.length}`} columnId={columnId}>
                             {tasks.map((task, index) => (
                                 <Draggable key={task.id} draggableId={task.id} index={index}>
-                                    {(provided) => (
+                                    {(provided,snapshot) => (
                                         <div
                                             ref={provided.innerRef}
                                             {...provided.draggableProps}
                                             {...provided.dragHandleProps}
-                                            className="w-95/100 items-center rounded-xl"
+                                            className={`${styles.dashed} ${snapshot.isDragging?styles.dragging:styles.dashed} ${styles.smoothDnd} "w-95/100 items-center rounded-xl"`}
                                         >
                                             <Card type={1} title={task.content} status={task.status}  id={task.id} subscribes={2345}/>
                                         </div>
