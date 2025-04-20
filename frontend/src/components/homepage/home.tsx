@@ -1,9 +1,8 @@
 import ListView from '@/components/ListView/List';
 import DropdownOptions from '@/components/Dropdown/DropdownOptions';
 import styles from './home.module.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLock } from '@fortawesome/free-solid-svg-icons';
 import ProjectCard  from '../projectCard/projectCard';
+import { FaLock } from "react-icons/fa";
 import ContributerCard from '../contributerCard/ContributerCard';
 function HomePage() {
     return (
@@ -55,7 +54,7 @@ function HomePage() {
                     <div className={styles.titleContainer}>
                         <div className={`flex justify-between items-center p-4`}>
                             <h3 className='text-[20px] text-white'>Private Notepad</h3>
-                            <FontAwesomeIcon className='w-[20px] text-[#657997] cursor-pointer ' icon={faLock} />
+                            <FaLock size={20} color='slategrey'/>
                         </div>
                     </div>
                     <div className="textArea h-[68%]">
