@@ -1,0 +1,11 @@
+.textField{
+    position: relative;
+    width: fit-content;
+    margin-top: 20px;
+}
+
+.searchField{
+    position: relative;
+    width: fit-content;
+    margin-top: 20px;
+}
