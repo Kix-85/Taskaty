@@ -1,6 +1,6 @@
 "use client";
 
-import TextField from '../TextField/TextField';
+import FormField from '../FormField/FormField';
 import Button from '@mui/material/Button';
 import GoogleSignUp from '../GoogleSignUpBtn/GoogleSignUpBtn';
 
@@ -19,20 +19,20 @@ const AuthForm = ({ auth, onChange, changeView }: AuthFormProps) => {
 
             <div className="w-full space-y-4">
                 {auth === 'register' && (
-                    <TextField 
+                    <FormField 
                         label="Full Name" 
                         type="text" 
                         placeholder="Enter your full name" 
                         onChange={onChange} 
                     />
                 )}
-                <TextField 
+                <FormField 
                     label="Email" 
                     type="email" 
                     placeholder="Enter your email" 
                     onChange={onChange} 
                 />
-                <TextField 
+                <FormField 
                     label="Password" 
                     type="password" 
                     placeholder="Enter your password" 
