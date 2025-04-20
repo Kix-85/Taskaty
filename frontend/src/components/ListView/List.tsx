@@ -1,3 +1,4 @@
+"use client"
 import Card from "../Card/Card"
 import { DragDropContext, Draggable, Droppable, DropResult } from "@hello-pangea/dnd";
 import style from "./List.module.css"
