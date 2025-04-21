@@ -9,8 +9,12 @@ import {
   Smartphone,
   Settings,
 } from 'lucide-react';
+import { useState } from 'react';
 
 const MainSettings = () => {
+  const [computerSound, setComputerSound] = useState(true);
+  const [mobileSound, setMobileSound] = useState(true);
+
   return (
     <section className="w-full h-full p-6 md:p-10 bg-gradient-to-br from-[#5a56a8] to-[#0D1122] rounded-3xl text-white shadow-xl">
       {/* Header */}
@@ -89,19 +93,42 @@ const MainSettings = () => {
         <h2 className="text-2xl text-gray-400 mb-2">Sound of task completion</h2>
         <p className="text-2xl text-gray-500 mb-4">Sound signal when task is completed.</p>
         <div className="flex flex-col md:flex-row gap-4">
+          {/* Computer Toggle */}
           <div className="flex items-center gap-3">
-            <input type="checkbox" id="computer" defaultChecked className="toggle-input hidden" />
-            <span className="relative w-10 h-5 bg-blue-600 rounded-full cursor-pointer">
-              <span className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform transform translate-x-5" />
-            </span>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={computerSound}
+                onChange={() => setComputerSound(!computerSound)}
+              />
+              <div className={`w-10 h-5 rounded-full transition-colors duration-300 ${computerSound ? 'bg-blue-600' : 'bg-gray-600'}`} />
+              <div
+                className={`absolute left-1 top-1 w-3.5 h-3.5 bg-white rounded-full transition-transform duration-300 ${
+                  computerSound ? 'translate-x-5' : ''
+                }`}
+              />
+            </label>
             <Laptop2 size={20} />
             <label className="text-lg">Computer and Web</label>
           </div>
+
+          {/* Mobile Toggle */}
           <div className="flex items-center gap-3">
-            <input type="checkbox" id="mobile" defaultChecked className="toggle-input hidden" />
-            <span className="relative w-10 h-5 bg-blue-600 rounded-full cursor-pointer">
-              <span className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform transform translate-x-5" />
-            </span>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={mobileSound}
+                onChange={() => setMobileSound(!mobileSound)}
+              />
+              <div className={`w-10 h-5 rounded-full transition-colors duration-300 ${mobileSound ? 'bg-blue-600' : 'bg-gray-600'}`} />
+              <div
+                className={`absolute left-1 top-1 w-3.5 h-3.5 bg-white rounded-full transition-transform duration-300 ${
+                  mobileSound ? 'translate-x-5' : ''
+                }`}
+              />
+            </label>
             <Smartphone size={18} />
             <label className="text-lg">Mobile device</label>
           </div>
