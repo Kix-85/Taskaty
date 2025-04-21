@@ -14,7 +14,7 @@ export default function SettingsPage() {
   const handleTabChange = (event: React.MouseEvent<HTMLElement>, view: string) => {
     setSelectedView(view);
   };
-
+/*shahd */
   return (
     <div className="flex min-h-screen bg-[#16182b] w-full">
       {/* Sidebar */}
