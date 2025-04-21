@@ -4,7 +4,7 @@ import Image from "next/image";
 import homeIcon from "@assets/imgs/homeIcon.png";
 import styles from "./page.module.css";
 import addTask from "../../../public/assets/imgs/addTask.png";
-import {SearchField} from "../../components/textField";
+import {SearchField} from "../../components/textFieldalt";
 import TotalThing from "../../components/total/totalThing";
 
 
