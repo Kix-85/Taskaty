@@ -4,7 +4,7 @@ import SideBarProjects from "./SideBar-components/SideBarProjects";
 
 const SideBar=()=>{
     return(
-        <div className="w-2/10 min-h-full p-2 py-4 bg-blue-950">
+        <div className="w-2/10 rounded-3xl min-h-full p-2 py-4 bg-indigo-950">
             <SideBarAccount/>
             <SideBarMain/>
             <SideBarProjects/>
