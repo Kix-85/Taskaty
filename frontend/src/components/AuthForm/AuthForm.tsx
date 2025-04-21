@@ -1,6 +1,10 @@
 "use client";
 
+<<<<<<< HEAD
+import TextField from "@mui/material/TextField";
+=======
 import FormField from '../FormField/FormField';
+>>>>>>> fbd7e5d3a69b8ddf1405324362846369642f2365
 import Button from '@mui/material/Button';
 import GoogleSignUp from '../GoogleSignUpBtn/GoogleSignUpBtn';
 
