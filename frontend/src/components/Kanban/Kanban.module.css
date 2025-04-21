@@ -1,6 +1,8 @@
 .div {
     background-color: #070b2e;
     border-radius: 24px;
+    height: 100%;
+    width: 100%;
 }
 .column{
     background-color: rgba(0, 0, 0,0.2);

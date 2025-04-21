@@ -4,8 +4,9 @@ import Image from "next/image";
 import homeIcon from "@assets/imgs/homeIcon.png";
 import styles from "./page.module.css";
 import addTask from "../../../public/assets/imgs/addTask.png";
-import {SearchField} from "../../components/textFieldalt";
+// import {SearchField} from "../../components/textField";
 import TotalThing from "../../components/total/totalThing";
+import { SearchField } from "@/components/textFieldalt/yousefTextField";
 
 
 export default function Home() {
@@ -19,7 +20,7 @@ export default function Home() {
                     <h2>Dashboard</h2>
                 </div>
                 <div className={styles.rightHeaderPart}>
-                    <SearchField/>
+                    <SearchField placeholder={"Hello"}/>
                     <button><Image src={addTask} alt="addTask" className={styles.addTaskIcon} width={17}/>New Task</button>
                 </div>
             </header>

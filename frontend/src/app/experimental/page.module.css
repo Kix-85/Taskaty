@@ -35,13 +35,11 @@
     align-items: center;
 }
 .myTask{
-    background-color: #03085278;
+    background-color: #030852;
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap:5px;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    height: 100%;
 }
