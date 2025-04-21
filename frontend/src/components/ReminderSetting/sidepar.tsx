@@ -26,13 +26,7 @@ const Sidebar = () => {
           </div>
         </div>
 
-        <nav className="flex flex-col gap-4 text-2xl">
-          <SidebarItem icon={<Home size={20} />} text="Home" />
-          <SidebarItem icon={<ListChecks size={20} />} text="My Tasks" />
-          <SidebarItem icon={<FolderKanban size={20} />} text="Projects" />
-          <SidebarItem icon={<MessageCircle size={20} />} text="Message" />
-          <SidebarItem icon={<Settings size={20} />} text="Settings" active />
-        </nav>
+       
 
         {/* Connected Apps */}
         <div className="mt-10">
