@@ -1,6 +1,6 @@
 "use client";
 
-import TextField from '../TextField/TextField';
+import TextField from "@mui/material/TextField";
 import Button from '@mui/material/Button';
 import GoogleSignUp from '../GoogleSignUpBtn/GoogleSignUpBtn';
 
