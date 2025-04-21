@@ -10,8 +10,6 @@ type TotalThingProps = {
    rate: number;
 };
 
-
-
 function TotalThing(props: TotalThingProps) {
   const { title, count, rate} = props;
   return (
@@ -47,6 +45,8 @@ function TotalThing(props: TotalThingProps) {
     </div>
   );
 }
+
+
 
 
 

@@ -8,8 +8,11 @@
     gap:10px;
     justify-content: center;
     align-items: center;
+    /* kareem height  */
+    /* height: 100vh; */
 
-    height: 100vh;
+    /* yousef edit */
+    height: 100%;
 }
 .div {
     background-color: #070b2e;
