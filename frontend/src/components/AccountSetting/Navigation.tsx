@@ -1,4 +1,4 @@
-import { User, Settings, BellRing, AlarmCheck, Palette } from 'lucide-react';
+import { User, Settings, BellRing, AlarmCheck } from 'lucide-react';
 
 interface NavigationProps {
   selectedView: string;
