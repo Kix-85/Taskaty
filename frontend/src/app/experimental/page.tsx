@@ -20,18 +20,19 @@ export default function MyTasks() {
 
   return (
     <div className={style.myTask}>
-      <ToggleButtonGroup
-        color="primary"
-        value={selectedView}
-        exclusive
-        onChange={handleTabChange}
-        aria-label="view"
-      >
-        <ToggleButton value="Kanban"><TbLayoutKanban color="white" /></ToggleButton>
-        <ToggleButton value="List"><HiOutlineQueueList color="white" /></ToggleButton>
-        <ToggleButton value="Calendar"><FaCalendarDays color="white" /></ToggleButton>
-      </ToggleButtonGroup>
-
+      <div className="w-full flex items-center justify-center">
+        <ToggleButtonGroup
+          color="primary"
+          value={selectedView}
+          exclusive
+          onChange={handleTabChange}
+          aria-label="view"
+        >
+          <ToggleButton value="Kanban"><TbLayoutKanban color="white" /></ToggleButton>
+          <ToggleButton value="List"><HiOutlineQueueList color="white" /></ToggleButton>
+          <ToggleButton value="Calendar"><FaCalendarDays color="white" /></ToggleButton>
+        </ToggleButtonGroup>
+      </div>
 
       {selectedView === 'Kanban' && (
         <div className="w-full">

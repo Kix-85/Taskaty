@@ -19,21 +19,23 @@ const geistMono = Geist_Mono({
     subsets: ["latin"],
 });
 export default function RootLayout({ children, title, Icon }: LayoutProps) {
-    Icon=Bs0CircleFill;
+    Icon = Bs0CircleFill;
     return (
         <html lang="en">
             <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen w-screen overflow-hidden flex bg-slate-900`}
+                className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen w-screen overflow-hidden flex`}
             >
-                {/* Sidebar Section */}
-                <SideBar />
+                <div className="bg-slate-900 flex justify-center items-center p-4 w-full h-full">
+                    {/* Sidebar Section */}
+                    <SideBar />
 
-                {/* Main Panel Section */}
-                <div className="h-full bg-indigo-950 w-full mx-3 p-3 flex flex-col items-center rounded-3xl">
-                    <TopBar title={title} Icon={Icon} />
-                    <hr className="w-full border-gray-700 my-2" />
-                    <div className="w-full h-full bg-transparent">
-                        {children}
+                    {/* Main Panel Section */}
+                    <div className="h-full bg-indigo-950 w-full mx-3 p-3 flex flex-col items-center rounded-3xl">
+                        <TopBar title={title} Icon={Icon} />
+                        <hr className="w-full  border-gray-700 my-2" />
+                        <div className="w-full h-full bg-transparent overflow-auto">
+                            {children}
+                        </div>
                     </div>
                 </div>
             </body>
