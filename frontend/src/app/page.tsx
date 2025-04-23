@@ -1,6 +1,6 @@
 "use client";
 
-// import SideBar from "@/components/SideBar/SideBar";
+import SideBar from "@/components/SideBar/SideBar";
 import "./globals.css"
 // import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 // import { faCoffee, faHeart, faCircleXmark } from '@fortawesome/free-solid-svg-icons'; // Import specific icons
