@@ -35,7 +35,7 @@ const Calendar: React.FC = () => {
     console.log(handleMonthChange)
 
     return (
-        <div className=" min-h-screen flex flex-col p-2 bg-black/20">
+        <div className=" h-full flex flex-col p-2 bg-black/20">
             {/* You can add your header and pass the handle methods as props to change the props internally */}
 
             <div className="mt-4">
