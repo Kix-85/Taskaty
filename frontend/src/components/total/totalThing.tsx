@@ -1,7 +1,7 @@
 import styles from "./totalThing.module.css";
 import Image from "next/image";
-import arrowUp from "../../../public/assets/imgs/Up.png";
-import arrowDown from "../../../public/assets/imgs/down.png";
+import arrowUp from "../../../public/assets/imgs/arrowUp.png";
+import arrowDown from "../../../public/assets/imgs/arrowDown.png";
 
 
 type TotalThingProps = {

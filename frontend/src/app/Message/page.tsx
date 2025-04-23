@@ -8,6 +8,10 @@ import { IoSend } from "react-icons/io5";
 import EmojiPicker from "emoji-picker-react";
 import { EmojiClickData } from "emoji-picker-react";
 import React, { useState, useEffect, useRef } from 'react';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
+import { faPhone } from "@fortawesome/free-solid-svg-icons/faPhone";
+import { faVideo } from "@fortawesome/free-solid-svg-icons/faVideo";
 
 const App: React.FC = () => {
 const [messages, setMessages] = useState([
@@ -78,7 +82,7 @@ const toggleEmojiPicker = () => {
 setShowEmojiPicker(!showEmojiPicker);
 };
 return (
-<div className="flex h-screen bg-[#1D2032] text-white font-sans">
+<div className="flex h-screen bg-[#1D2032] w-full text-white font-sans">
 {/* Left Sidebar */}
 <div className="w-64 border-r border-gray-700 flex flex-col">
 {/* User Profile */}
@@ -191,6 +195,7 @@ className="w-full bg-gray-800 rounded-lg py-2 pl-9 pr-4 text-sm border-none focu
 {/* Filter */}
 <div className="px-4 pb-2 flex items-center justify-between">
 <div className="font-medium">Message</div>
+{/* <button className="text-gray-400 hover:text-white cursor-pointer flex items-center space-x-1 !rounded-button whitespace-nowrap"> */}
 <button className="text-gray-400 hover:text-white cursor-pointer flex items-center space-x-1 !rounded-button whitespace-nowrap">
 <span>Filter</span>
 <i className="fas fa-filter text-xs"></i>
@@ -247,10 +252,15 @@ className="w-10 h-10 rounded-full object-cover"
 <p className="text-xs text-green-500">Online</p>
 </div>
 </div>
-<button className="bg-blue-600 text-white text-sm py-1.5 px-3 rounded-lg flex items-center space-x-1 !rounded-button whitespace-nowrap">
-<i className="fas fa-paperclip text-xs"></i>
-<span>Attach Task</span>
-</button>
+    <div className="flex items-center space-x-2">
+        <FontAwesomeIcon icon={ faVideo} className="text-[20px] cursor-pointer mr-[20px]" />
+        {/* i need phone icon */}
+        <FontAwesomeIcon icon={faPhone} className="text-[20px] cursor-pointer" />      
+        <button className="bg-[#155dfc] transition-all duration-300 cursor-pointer hover:bg-[#1d39c4] ml-[8px] text-white py-2 px-4 rounded-lg flex items-center space-x-2 !rounded-button whitespace-nowrap">        
+            <i className="fas fa-paperclip text-xs"></i>
+            <span>Attach Task</span>
+        </button>
+    </div>
 </div>
 {/* Chat Messages */}
 <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -282,6 +292,12 @@ className="w-full bg-gray-800 rounded-lg py-3 px-4 pr-12 text-sm min-h-[50px] ma
 />
 <div className="absolute right-2 bottom-2 flex items-center space-x-2">
 <button
+// onClick={toggleEmojiPicker}
+className="text-gray-400 hover:text-white cursor-pointer !rounded-button whitespace-nowrap"
+>
+    <FontAwesomeIcon icon={faPaperclip} />
+</button>
+<button
 onClick={toggleEmojiPicker}
 className="text-gray-400 hover:text-white cursor-pointer !rounded-button whitespace-nowrap"
 >
@@ -289,7 +305,7 @@ className="text-gray-400 hover:text-white cursor-pointer !rounded-button whitesp
 </button>
 <button
 onClick={handleSendMessage}
-className="bg-blue-600 text-white p-2 rounded-lg !rounded-button whitespace-nowrap"
+className="bg-blue-600 text-white p-2 cursor-pointer rounded-lg !rounded-button whitespace-nowrap"
 >
 <IoSend />
 </button>

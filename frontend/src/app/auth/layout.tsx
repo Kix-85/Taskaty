@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
     return (
-        <div className="h-screen">
-            <main className="flex h-96 items-center justify-center bg-gradient-to-r from-zinc-900 to-indigo-900 p-4">
+        <div className="h-screen  w-full">
+            <main className="flex h-full items-center justify-center bg-gradient-to-r from-zinc-900 to-indigo-900 p-4">
                 <div className="w-full max-w-md lg:max-w-6xl backdrop-filter backdrop-blur-sm border border-indigo-900/30 shadow-xl rounded-xl grid grid-cols-1 lg:grid-cols-2">
                     {/* Left Panel - Hidden on mobile */}
                     <div className="hidden lg:flex flex-col justify-center items-start rounded-lg p-8 bg-gradient-to-br from-indigo-900/50 to-zinc-900/80 text-white">

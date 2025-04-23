@@ -1,100 +1,11 @@
-.home{
-    display: flex;
-}
-
-.main{
-    display: inline-block;
-    background-color: #0e0d16;
-    width: calc(100vw - 350px);
-    min-height: 100vh;
-}
-
-.main header{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 40px;
-    background-color: #0e0d16;
-}
-
-.main header .leftHeaderPart{
-    display: flex;
-    align-items: center;
-    padding: 20px 0px;
-    margin-left: 20px;
-}
-
-.main header .leftHeaderPart .dashHomeIcon{
-    width: 50px;
-    height: 50px;
-    margin-right: 10px;
-    background-color: #1d39c4;
-    border-radius: 7px;
-}
-
-.main header .leftHeaderPart h2{
-    font-size: 30px;
-    color: #fff;
-    margin-left: 10px;
-}
-
-.main header .rightHeaderPart{
-    display: flex;
-    align-items: center;
-    padding: 20px 0px;
-    margin-right: 20px;
-}
-
-.main header .rightHeaderPart button{
-    background-color: #1d39c4;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 12px;
-    color: #fff;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 20px;
-    cursor: pointer;
-}
-
-.main header .rightHeaderPart button .addTaskIcon{
-    margin-right: 5px;
-}
-
-/* Horizontal line before and after container*/
-.main .mmContainer{
-    width: 100%;
+.mmContainer{
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
-    padding-top: 20px;
+    flex-wrap: wrap;
 }
 
-
-.main .mmContainer::before{
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background-color: #26252d;
-    transform: translateY(-50%);
-    
+.myHome{
+    display: flex;
+    width: 100vw;
 }
-
-/* after line */
-.main .mmContainer::after{
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background-color: #26252d;
-    transform: translateY(50%);
-}
-
