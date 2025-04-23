@@ -8,7 +8,7 @@ import {
 
 export default function SettingsPanel() {
   return (
-    <div className="w-full h-full p-6 md:p-10 bg-gradient-to-br from-[#5a56a8] to-[#0D1122] rounded-3xl text-white shadow-xl">
+    <div className="  overflow-auto w-full h-full p-6 md:p-10 bg-gradient-to-br from-[#5a56a8] to-[#0D1122] rounded-3xl text-white shadow-xl">
       {/* Header */}
       <h2 className="text-2xl sm:text-3xl font-bold mb-6 flex items-center gap-3">
         <User size={28} />

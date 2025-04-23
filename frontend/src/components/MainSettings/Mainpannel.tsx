@@ -16,7 +16,7 @@ const MainSettings = () => {
   const [mobileSound, setMobileSound] = useState(true);
 
   return (
-    <section className="w-full h-full p-6 md:p-10 bg-gradient-to-br from-[#5a56a8] to-[#0D1122] rounded-3xl text-white shadow-xl">
+    <section className="overflow-auto w-full h-full p-6 md:p-10 bg-gradient-to-br from-[#5a56a8] to-[#0D1122] rounded-3xl text-white shadow-xl">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8 text-3xl">
         <Settings size={22} className="text-white" />

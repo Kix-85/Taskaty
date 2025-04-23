@@ -16,7 +16,7 @@ export default function SettingsPage() {
   };
 /*shahd */
   return (
-    <div className="flex min-h-screen bg-[#16182b] w-full">
+    <div className="flex h-full bg-[#16182b] w-full overflow-hidden">
       {/* Sidebar */}
       <Navigation selectedView={selectedView} onTabChange={handleTabChange} />
 
