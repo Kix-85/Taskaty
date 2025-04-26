@@ -137,7 +137,7 @@ function HomePage() {
           </div>
           <div className="textArea h-[68%]">
             <textarea
-              className="w-full h-[100%] sm:min-h-[300px] outline-none bg-[#121638] p-[18px] pr-[28px] border-0 text-gray-50 rounded-[12px]"
+              className="w-full sm:min-h-[300px] outline-none bg-[#121638] p-[18px] pr-[28px] border-0 text-gray-50 rounded-[12px]"
               placeholder="Write your notes here..."
             ></textarea>
           </div>

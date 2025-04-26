@@ -54,25 +54,25 @@ import Sidebar from "@/components/SideBar/SideBar";
 
 export default function Home() {
   return (
-    <span className={`${styles.myHome} lg:overflow-y-hidden`}>
-      <Sidebar />
+    <span className={`${styles.myHome} h-full lg:overflow-y-hidden`}>
+      {/* <Sidebar /> */}
       {/* <DashBoard /> */}
-      <main className="bg-[#0e0d16] w-4/5 lg:overflow-y-hidden h-[100vh] overflow-y-scroll">
-        {/* Header */}
+      <main className="bg-[#0e0d16] w-full lg:overflow-y-hidden">
+        {/* Header
         <header className="flex justify-between items-center px-10 py-5 bg-[#0e0d16]">
-          {/* Left Header Part */}
-          <div className="flex items-center space-x-2 ml-4">
+          Left Header Part */}
+          {/* <div className="flex items-center space-x-2 ml-4">
             <FontAwesomeIcon icon={faHouse} className="text-[#fff] text-[25px]" />
             <h2 className="text-white text-[25px]">Dashboard</h2>
-          </div>
+          </div> */}
 
-          {/* Right Header Part */}
+          {/* Right Header Part
           <div className="flex items-center space-x-4 mr-4">
             <SearchField placeholder="Search" />
-            {/* <button className="bg-[#1d39c4] px-6 py-3 rounded-[12px] text-white text-[14px] flex items-center justify-center space-x-2 cursor-pointer">
+            <button className="bg-[#1d39c4] px-6 py-3 rounded-[12px] text-white text-[14px] flex items-center justify-center space-x-2 cursor-pointer">
               <FontAwesomeIcon icon={faPlus} className="text-[20px]" />
               <span>Add Task</span>
-            </button> */}
+            </button>
           </div>
         </header>
 
