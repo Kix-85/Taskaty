@@ -15,7 +15,7 @@ const Navigation: React.FC<NavigationProps> = ({ selectedView, onTabChange }) =>
   ];
 
   return (
-    <aside className="w-80 min-h-screen bg-gradient-to-b from-[#11132C] to-[#0E1122] p-6 text-white rounded-tr-2xl rounded-br-2xl shadow-lg">
+    <aside className="w-80 h-full bg-gradient-to-b from-[#11132C] to-[#0E1122] p-6 text-white rounded-tr-2xl rounded-br-2xl shadow-lg">
       <h2 className="text-xl font-semibold mb-6 tracking-wide text-gray-300">Navigation</h2>
       
       <ul className="space-y-3">
