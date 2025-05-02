@@ -1,19 +1,19 @@
-"use client";
-
-import TextField from "@mui/material/TextField";
+// import TextField from "@mui/material/TextField";
 import FormField from '../FormField/FormField';
 import Button from '@mui/material/Button';
 import GoogleSignUp from '../GoogleSignUpBtn/GoogleSignUpBtn';
+import React from 'react';
 
 type AuthFormProps = {
     auth: string,
-    changeView: (e: string) => void,
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+    changeView: (e: 'login' | 'register') => void,
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+    submitForm: (e: React.FormEvent<HTMLFormElement>) => void,
 }
 
-const AuthForm = ({ auth, onChange, changeView }: AuthFormProps) => {
+const AuthForm = ({ auth, onChange, changeView, submitForm }: AuthFormProps) => {
     return (
-        <form className="w-full max-w-md flex flex-col items-center justify-center p-4 sm:p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-lg">
+        <form onSubmit={submitForm} className="w-full max-w-md flex flex-col items-center justify-center p-4 sm:p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 shadow-lg">
             <h1 className='mb-4 text-white font-bold text-xl sm:text-2xl text-center'>
                 {auth === 'login' ? 'Sign In To Your Account' : 'Create Your Account'}
             </h1>
@@ -43,6 +43,7 @@ const AuthForm = ({ auth, onChange, changeView }: AuthFormProps) => {
 
             <Button 
                 variant='contained' 
+                type="submit"
                 className="w-full mt-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
             >
                 {auth === 'login' ? 'Sign In' : 'Register'}

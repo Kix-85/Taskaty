@@ -3,6 +3,7 @@ type InputProps = {
     placeholder: string,
     type: string,
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void,
+    name: string
 }
 
 const FormField = ({ label, type = "text", onChange, placeholder }: InputProps) => {
@@ -14,6 +15,7 @@ const FormField = ({ label, type = "text", onChange, placeholder }: InputProps) 
                 onChange={onChange}
                 placeholder={placeholder}
                 className="w-full mt-1 px-3 py-2 border border-gray-500 rounded-2xl focus:outline-none focus:ring ring-indigo-950"
+                name={name} // Convert label to lowercase and remove spaces for the name attribute
             />
         </label>
     );
