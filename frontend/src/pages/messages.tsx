@@ -1,355 +1,228 @@
-"use client";
-import React, { useState } from 'react';
+import { FaRegSmile } from "react-icons/fa";
+import { IoSend } from "react-icons/io5";
+import EmojiPicker from "emoji-picker-react";
+import { EmojiClickData } from "emoji-picker-react";
+import React, { useState, useEffect, useRef } from 'react';
+
 const App: React.FC = () => {
-const [isMessageOpen, setIsMessageOpen] = useState(false);
-const toggleMessage = () => {
-setIsMessageOpen(!isMessageOpen);
+const [messages, setMessages] = useState([
+{ id: 1, sender: 'Jenny Wilson', time: '2 min ago', text: 'Hey there!', avatar: 'https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20woman%20with%20short%20blonde%20hair%2C%20business%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=1&orientation=squarish' },
+{ id: 2, sender: 'Cody Fisher', time: '22 min ago', text: 'Hey there!', avatar: 'https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20man%20with%20brown%20hair%2C%20business%20casual%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=2&orientation=squarish' },
+{ id: 3, sender: 'Wade Warren', time: '35 min ago', text: 'Online', avatar: 'https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20man%20with%20dark%20hair%20and%20glasses%2C%20business%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=3&orientation=squarish' },
+{ id: 4, sender: 'Kristin Watson', time: '1 days ago', text: 'Hey there!', avatar: 'https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20woman%20with%20brown%20hair%2C%20business%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=4&orientation=squarish' },
+{ id: 5, sender: 'Guy Hawkins', time: '2 days ago', text: 'Hey there!', avatar: 'https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20man%20with%20dark%20hair%2C%20business%20casual%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=5&orientation=squarish' },
+{ id: 6, sender: 'Esther Howard', time: '2 days ago', text: 'Hey there!', avatar: 'https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20woman%20with%20curly%20hair%2C%20business%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=6&orientation=squarish' },
+{ id: 7, sender: 'Floyd Miles', time: '3 days ago', text: 'Hey there!', avatar: 'https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20man%20with%20short%20hair%2C%20business%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=7&orientation=squarish' },
+]);
+const [activeChat, setActiveChat] = useState(3);
+const [newMessage, setNewMessage] = useState('');
+const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+const [chatMessages, setChatMessages] = useState([
+{ id: 1, sender: 'Wade Warren', time: '21 min ago', text: 'Hi DJ! 👋', avatar: 'https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20man%20with%20dark%20hair%20and%20glasses%2C%20business%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=3&orientation=squarish', isMe: false },
+{ id: 2, sender: 'D Smoaki', time: '20 min ago', text: "How's the work on the direction selection screen going?", avatar: 'https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20man%20with%20beard%2C%20business%20casual%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=8&orientation=squarish', isMe: true },
+{ id: 3, sender: 'D Smoaki', time: '20 min ago', text: "Perfect! I have already created some of mockups. I think we should focus on visual elements so they can be easily distinguished from each other.", avatar: 'https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20man%20with%20beard%2C%20business%20casual%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=8&orientation=squarish', isMe: true },
+{ id: 4, sender: 'Wade Warren', time: '21 min ago', text: "I agree. I also thought that it would be worth adding filters to identify user, for example, team members, executives, active users. This will simplify the search.", avatar: 'https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20man%20with%20dark%20hair%20and%20glasses%2C%20business%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=3&orientation=squarish', isMe: false },
+{ id: 5, sender: 'D Smoaki', time: '20 min ago', text: "Great idea!", avatar: 'https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20man%20with%20beard%2C%20business%20casual%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=8&orientation=squarish', isMe: true },
+{ id: 6, sender: 'D Smoaki', time: '20 min ago', text: "I can make a drop-down menu with these filters. How about adding the ability to save favorite combinations?", avatar: 'https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20man%20with%20beard%2C%20business%20casual%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=8&orientation=squarish', isMe: true },
+{ id: 7, sender: 'Wade Warren', time: '21 min ago', text: "Yes, that would be useful. We definitely need filters to sort between them. There will be tabs for saving user presets for favorites.", avatar: 'https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20man%20with%20dark%20hair%20and%20glasses%2C%20business%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=3&orientation=squarish', isMe: false },
+]);
+const chatEndRef = useRef<HTMLDivElement>(null);
+const emojiPickerRef = useRef<HTMLDivElement>(null);
+useEffect(() => {
+scrollToBottom();
+}, [chatMessages]);
+useEffect(() => {
+function handleClickOutside(event: MouseEvent) {
+if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
+setShowEmojiPicker(false);
+}
+}
+document.addEventListener('mousedown', handleClickOutside);
+return () => {
+document.removeEventListener('mousedown', handleClickOutside);
+};
+}, []);
+const scrollToBottom = () => {
+chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+};
+const handleSendMessage = () => {
+if (newMessage.trim() === '') return;
+const newChatMessage = {
+id: chatMessages.length + 1,
+sender: 'D Smoaki',
+time: 'Just now',
+text: newMessage,
+avatar: 'https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20man%20with%20beard%2C%20business%20casual%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=8&orientation=squarish',
+isMe: true
+};
+setChatMessages([...chatMessages, newChatMessage]);
+setNewMessage('');
+setShowEmojiPicker(false);
+};
+const handleKeyDown = (e: React.KeyboardEvent) => {
+if (e.key === 'Enter' && !e.shiftKey) {
+e.preventDefault();
+handleSendMessage();
+}
+};
+const addEmoji = (emoji: string) => {
+setNewMessage(prev => prev + emoji);
+setShowEmojiPicker(false);
+};
+const toggleEmojiPicker = () => {
+setShowEmojiPicker(!showEmojiPicker);
 };
 return (
-<div className="flex h-screen bg-white text-gray-800 overflow-hidden">
-{/* Sidebar */}
-<div className="w-64 bg-gray-50 flex flex-col h-full border-r border-gray-200">
-{/* User Profile */}
-<div className="p-4 flex items-center space-x-3 border-b border-gray-200">
-<div className="relative">
-<img
-src="https://readdy.ai/api/search-image?query=professional%20headshot%20photo%20of%20a%20business%20person%20in%20formal%20attire%20with%20neutral%20background%2C%20high%20quality%20corporate%20portrait&width=40&height=40&seq=123&orientation=squarish"
-alt="User Profile"
-className="w-10 h-10 rounded-full object-cover"
-/>
-<div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-</div>
-<div>
-<h3 className="font-medium">John Smith</h3>
-<p className="text-xs text-gray-500">Project Manager</p>
-</div>
-</div>
-{/* Navigation */}
-<nav className="flex-1 py-4 overflow-y-auto">
-<ul className="space-y-1 px-3">
-<li>
-<a href="#" className="flex items-center px-4 py-2.5 text-gray-600 rounded-lg hover:bg-gray-100 cursor-pointer">
-<i className="fas fa-home w-5 text-center"></i>
-<span className="ml-3">Home</span>
-</a>
-</li>
-<li>
-<a href="#" className="flex items-center px-4 py-2.5 text-gray-600 rounded-lg hover:bg-gray-100 cursor-pointer">
-<i className="fas fa-tasks w-5 text-center"></i>
-<span className="ml-3">My Tasks</span>
-</a>
-</li>
-<li>
-<a href="#" className="flex items-center px-4 py-2.5 text-gray-600 rounded-lg hover:bg-gray-100 cursor-pointer">
-<i className="fas fa-project-diagram w-5 text-center"></i>
-<span className="ml-3">Projects</span>
-</a>
-</li>
-<li>
-<button
-onClick={toggleMessage}
-className={`flex items-center w-full px-4 py-2.5 rounded-lg hover:bg-gray-100 cursor-pointer ${isMessageOpen ? 'bg-gray-100 text-blue-600' : 'text-gray-600'}`}
->
-<i className="fas fa-comment w-5 text-center"></i>
-<span className="ml-3">Messages</span>
-</button>
-</li>
-<li>
-<a href="#" className="flex items-center px-4 py-2.5 text-gray-600 rounded-lg hover:bg-gray-100 cursor-pointer">
-<i className="fas fa-cog w-5 text-center"></i>
-<span className="ml-3">Settings</span>
-</a>
-</li>
-</ul>
-{/* Integrated Apps */}
-<div className="mt-8 px-6">
-<h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Integrated Apps</h3>
-<ul className="space-y-2">
-<li className="flex items-center text-gray-600 py-1.5 cursor-pointer">
-<div className="w-6 h-6 rounded bg-yellow-500 flex items-center justify-center mr-3">
-<i className="fas fa-brain text-xs text-white"></i>
-</div>
-<span className="text-sm">Therapy App</span>
-</li>
-<li className="flex items-center text-gray-600 py-1.5 cursor-pointer">
-<div className="w-6 h-6 rounded bg-blue-500 flex items-center justify-center mr-3">
-<i className="fab fa-paypal text-xs text-white"></i>
-</div>
-<span className="text-sm">PayPal App</span>
-</li>
-<li className="flex items-center text-gray-600 py-1.5 cursor-pointer">
-<div className="w-6 h-6 rounded bg-red-500 flex items-center justify-center mr-3">
-<i className="fab fa-youtube text-xs text-white"></i>
-</div>
-<span className="text-sm">YouTube</span>
-</li>
-</ul>
-</div>
-</nav>
-{/* Bottom Button */}
-<div className="p-4 border-t border-gray-200">
-<button className="flex items-center justify-center w-full py-2 px-4 bg-blue-600 text-white rounded-lg !rounded-button whitespace-nowrap cursor-pointer">
-<i className="fas fa-chart-line mr-2"></i>
-<span>Improvements</span>
-</button>
-</div>
-</div>
-{/* Main Content */}
-<div className="flex-1 flex flex-col h-full">
+<div className="flex h-screen bg-[#1D2032] text-white font-sans">
+
+{/* Middle Column - Chat List */}
+<div className="w-72 border-r border-gray-700 flex flex-col">
 {/* Header */}
-<div className="bg-white py-4 px-6 border-b border-gray-200 flex justify-between items-center">
-<h1 className="text-xl font-semibold">Messages / Chat</h1>
+<div className="p-4 border-b border-gray-700 flex items-center justify-between">
+<div className="flex items-center space-x-2">
+<i className="fas fa-comment-dots text-blue-500"></i>
+<h2 className="font-medium">Message</h2>
+<span className="bg-gray-700 text-xs px-2 py-0.5 rounded-full">5</span>
 </div>
-{/* Message Content */}
-<div className="flex-1 overflow-hidden">
-{isMessageOpen ? (
-<div className="flex h-full">
-{/* Contacts List */}
-<div className="w-72 border-r border-gray-700 overflow-y-auto">
-<div className="p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+</div>
+{/* Search */}
+<div className="p-4">
 <div className="relative">
 <input
 type="text"
-placeholder="Search..."
-className="w-full bg-gray-50 border border-gray-200 text-sm text-gray-600 py-2 pl-10 pr-4 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+placeholder="Search"
+className="w-full bg-gray-800 rounded-lg py-2 pl-9 pr-4 text-sm border-none focus:outline-none focus:ring-2 focus:ring-blue-500"
 />
-<i className="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+<i className="fas fa-search absolute left-3 top-3 text-gray-400"></i>
 </div>
 </div>
-<div className="divide-y divide-gray-200">
-<div className="p-3 hover:bg-gray-50 cursor-pointer">
-<div className="flex items-start">
-<img
-src="https://readdy.ai/api/search-image?query=professional%20business%20portrait%20of%20a%20woman%20in%20corporate%20attire%20with%20neutral%20background%2C%20high%20quality%20headshot&width=40&height=40&seq=124&orientation=squarish"
-alt="Jenny Wilson"
-className="w-10 h-10 rounded-full object-cover"
-/>
-<div className="ml-3 flex-1">
-<div className="flex justify-between">
-<h3 className="font-medium">Jenny Wilson</h3>
-<span className="text-xs text-gray-500">3 mins</span>
-</div>
-<p className="text-sm text-gray-500 truncate">Designer</p>
-</div>
-</div>
-</div>
-<div className="p-3 hover:bg-[#232738] cursor-pointer">
-<div className="flex items-start">
-<img
-src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20middle%20eastern%20man%20with%20modern%20suit%2C%20corporate%20photo%20with%20dark%20blue%20background%2C%20high%20quality%20professional%20photo&width=40&height=40&seq=125&orientation=squarish"
-alt="Cody Fisher"
-className="w-10 h-10 rounded-full object-cover"
-/>
-<div className="ml-3 flex-1">
-<div className="flex justify-between">
-<h3 className="font-medium">Cody Fisher</h3>
-<span className="text-xs text-gray-400">12 mins</span>
-</div>
-<p className="text-sm text-gray-400 truncate">Developer</p>
-</div>
-</div>
-</div>
-<div className="p-3 bg-[#232738] cursor-pointer">
-<div className="flex items-start">
-<img
-src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20middle%20eastern%20man%20with%20beard%20and%20business%20attire%2C%20corporate%20photo%20with%20dark%20blue%20background%2C%20high%20quality%20professional%20photo&width=40&height=40&seq=126&orientation=squarish"
-alt="Wade Warren"
-className="w-10 h-10 rounded-full object-cover"
-/>
-<div className="ml-3 flex-1">
-<div className="flex justify-between">
-<h3 className="font-medium">Wade Warren</h3>
-<span className="text-xs text-gray-400">30 mins</span>
-</div>
-<div className="relative group">
-<p id="jobTitle" className="text-sm text-gray-400 truncate hover:text-blue-400 transition-colors">Marketing Manager</p>
-<div className="absolute left-0 top-full mt-2 w-72 bg-white rounded-lg shadow-lg p-4 hidden group-hover:block z-50">
-<div className="text-gray-800">
-<h4 className="font-semibold mb-2">Job Details</h4>
-<div className="space-y-2 text-sm">
-<p><span className="font-medium">Responsibilities:</span> Develop and implement marketing strategies, manage advertising campaigns, analyze data and optimize performance</p>
-<p><span className="font-medium">Skills:</span> Digital Marketing, Social Media, Data Analytics, Project Management</p>
-<p><span className="font-medium">Experience:</span> 5+ years in Digital Marketing</p>
-</div>
-<button className="mt-3 text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center">
-View Full Profile
-<i className="fas fa-arrow-right ml-1"></i>
+{/* Filter */}
+<div className="px-4 pb-2 flex items-center justify-between">
+<div className="font-medium">Message</div>
+<button className="text-gray-400 hover:text-white cursor-pointer flex items-center space-x-1 !rounded-button whitespace-nowrap">
+<span>Filter</span>
+<i className="fas fa-filter text-xs"></i>
 </button>
 </div>
-<div className="absolute w-3 h-3 bg-white transform rotate-45 -top-1.5 left-4"></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div className="p-3 hover:bg-[#232738] cursor-pointer">
-<div className="flex items-start">
+{/* Chat List */}
+<div className="flex-1 overflow-y-auto">
+{messages.map((message) => (
+<div
+key={message.id}
+className={`p-4 hover:bg-gray-800 cursor-pointer flex items-center space-x-3 ${activeChat === message.id ? 'bg-gray-800' : ''}`}
+onClick={() => setActiveChat(message.id)}
+>
+<div className="relative">
 <img
-src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20middle%20eastern%20woman%20with%20modern%20style%2C%20corporate%20photo%20with%20dark%20blue%20background%2C%20high%20quality%20professional%20photo&width=40&height=40&seq=127&orientation=squarish"
-alt="Kristin Watson"
+src={message.avatar}
+alt={message.sender}
 className="w-10 h-10 rounded-full object-cover"
 />
-<div className="ml-3 flex-1">
-<div className="flex justify-between">
-<h3 className="font-medium">Kristin Watson</h3>
-<span className="text-xs text-gray-400">1 hour</span>
+{message.id === 3 && (
+<div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-[#1D2032]"></div>
+)}
 </div>
-<p className="text-sm text-gray-400 truncate">Product Manager</p>
+<div className="flex-1 min-w-0">
+<div className="flex justify-between items-center">
+<h3 className="font-medium truncate">{message.sender}</h3>
+<span className="text-xs text-gray-400">{message.time}</span>
 </div>
-</div>
-</div>
-<div className="p-3 hover:bg-[#232738] cursor-pointer">
-<div className="flex items-start">
-<img
-src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20middle%20eastern%20man%20with%20glasses%20and%20formal%20attire%2C%20corporate%20photo%20with%20dark%20blue%20background%2C%20high%20quality%20professional%20photo&width=40&height=40&seq=128&orientation=squarish"
-alt="Guy Hawkins"
-className="w-10 h-10 rounded-full object-cover"
-/>
-<div className="ml-3 flex-1">
-<div className="flex justify-between">
-<h3 className="font-medium">Guy Hawkins</h3>
-<span className="text-xs text-gray-400">2 hours</span>
-</div>
-<p className="text-sm text-gray-400 truncate">Analyst</p>
+<p className="text-sm text-gray-400 truncate">{message.text}</p>
 </div>
 </div>
+))}
+</div>
+{/* New Task Button */}
+<div className="p-4">
+<button className="bg-blue-600 text-white py-2 px-4 rounded-lg w-full flex items-center justify-center space-x-2 !rounded-button whitespace-nowrap">
+<i className="fas fa-plus"></i>
+<span>New Task</span>
+</button>
 </div>
 </div>
-</div>
-{/* Chat Area */}
+{/* Right Column - Chat Window */}
 <div className="flex-1 flex flex-col">
 {/* Chat Header */}
-<div className="p-4 border-b border-gray-700 flex justify-between items-center">
-<div className="flex items-center">
+<div className="p-4 border-b border-gray-700 flex items-center justify-between">
+<div className="flex items-center space-x-3">
 <img
-src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20middle%20eastern%20man%20with%20beard%20and%20business%20attire%2C%20corporate%20photo%20with%20dark%20blue%20background%2C%20high%20quality%20professional%20photo&width=40&height=40&seq=126&orientation=squarish"
+src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20man%20with%20dark%20hair%20and%20glasses%2C%20business%20attire%2C%20neutral%20background%2C%20high%20quality%20portrait%2C%20professional%20lighting%2C%20clear%20facial%20features&width=40&height=40&seq=3&orientation=squarish"
 alt="Wade Warren"
 className="w-10 h-10 rounded-full object-cover"
 />
-<div className="ml-3">
-<h3 className="font-medium">وايد وارن</h3>
-<p className="text-xs text-gray-400">آخر ظهور: 5 دقائق مضت</p>
+<div>
+<h3 className="font-medium">Wade Warren</h3>
+<p className="text-xs text-green-500">Online</p>
 </div>
 </div>
-<button className="bg-blue-600 text-white px-3 py-1.5 rounded-lg !rounded-button whitespace-nowrap text-sm cursor-pointer">
-<i className="fas fa-plus mr-1"></i>
-Add Task
+<button className="bg-blue-600 text-white text-sm py-1.5 px-3 rounded-lg flex items-center space-x-1 !rounded-button whitespace-nowrap">
+<i className="fas fa-paperclip text-xs"></i>
+<span>Attach Task</span>
 </button>
 </div>
-{/* Messages */}
-<div className="flex-1 p-4 overflow-y-auto">
-<div className="space-y-6">
-{/* Received Message */}
-<div className="flex items-end">
+{/* Chat Messages */}
+<div className="flex-1 overflow-y-auto p-4 space-y-4">
+{chatMessages.map((msg) => (
+<div key={msg.id} className={`flex ${msg.isMe ? 'justify-end' : 'justify-start'}`}>
+<div className={`flex ${msg.isMe ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2 ${msg.isMe ? 'space-x-reverse' : ''} max-w-[80%]`}>
 <img
-src="https://readdy.ai/api/search-image?query=professional%20business%20portrait%20of%20a%20person%20in%20formal%20attire%20with%20neutral%20background%2C%20high%20quality%20headshot&width=32&height=32&seq=126&orientation=squarish"
-alt="Wade Warren"
+src={msg.avatar}
+alt={msg.sender}
 className="w-8 h-8 rounded-full object-cover"
 />
-<div className="ml-2 max-w-[70%]">
-<div className="bg-gray-100 p-3 rounded-lg rounded-bl-none">
-<p className="text-sm">Is the work on the homepage design in progress?</p>
-</div>
-<p className="text-xs text-gray-500 mt-1">11:30 AM</p>
-</div>
-</div>
-{/* Sent Message */}
-<div className="flex items-end justify-end">
-<div className="mr-2 max-w-[70%]">
-<div className="bg-blue-600 p-3 rounded-lg rounded-br-none">
-<p className="text-sm text-white">Yes, I just finished updating the design according to the latest feedback. I'll send you the link right away.</p>
-</div>
-<div className="flex justify-end mt-1">
-<p className="text-xs text-gray-500">11:32 AM</p>
-<i className="fas fa-check-double text-xs text-blue-500 ml-1"></i>
+<div className={`${msg.isMe ? 'bg-blue-600' : 'bg-gray-700'} p-3 rounded-lg rounded-bl-none max-w-md`}>
+<p className="text-sm">{msg.text}</p>
 </div>
 </div>
 </div>
-{/* Received Message */}
-<div className="flex items-end">
-<img
-src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20middle%20eastern%20man%20with%20beard%20and%20business%20attire%2C%20corporate%20photo%20with%20dark%20blue%20background%2C%20high%20quality%20professional%20photo&width=32&height=32&seq=126&orientation=squarish"
-alt="Wade Warren"
-className="w-8 h-8 rounded-full object-cover"
-/>
-<div className="ml-2 max-w-[70%]">
-<div className="bg-gray-100 p-3 rounded-lg rounded-bl-none">
-<p className="text-sm">I think we should have an option to add links for users. Can you add that? It would be helpful for search.</p>
-</div>
-<p className="text-xs text-gray-500 mt-1">11:35 AM</p>
-</div>
-</div>
-{/* Sent Message */}
-<div className="flex items-end justify-end">
-<div className="mr-2 max-w-[70%]">
-<div className="bg-blue-600 p-3 rounded-lg rounded-br-none">
-<p className="text-sm text-white">Sure, I'll add the links option with icons. How many links would you like per user?</p>
-</div>
-<div className="flex justify-end mt-1">
-<p className="text-xs text-gray-500">11:40 AM</p>
-<i className="fas fa-check-double text-xs text-blue-500 ml-1"></i>
-</div>
-</div>
-</div>
-{/* Received Message */}
-<div className="flex items-end">
-<img
-src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20middle%20eastern%20man%20with%20beard%20and%20business%20attire%2C%20corporate%20photo%20with%20dark%20blue%20background%2C%20high%20quality%20professional%20photo&width=32&height=32&seq=126&orientation=squarish"
-alt="Wade Warren"
-className="w-8 h-8 rounded-full object-cover"
-/>
-<div className="ml-2 max-w-[70%]">
-<div className="bg-gray-100 p-3 rounded-lg rounded-bl-none">
-<p className="text-sm">I think three links would be enough. Can we also add an option to access the profile page?</p>
-</div>
-<p className="text-xs text-gray-500 mt-1">11:45 AM</p>
-</div>
-</div>
-</div>
+))}
+<div ref={chatEndRef}></div>
 </div>
 {/* Message Input */}
-<div className="p-4 border-t border-gray-200">
-<div className="flex items-center">
-<div className="flex-1 relative">
-<input
-type="text"
-placeholder="Type a message..."
-className="w-full bg-gray-50 border border-gray-200 text-sm text-gray-600 py-3 px-4 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+<div className="p-4 border-t border-gray-700">
+<div className="relative">
+<textarea
+value={newMessage}
+onChange={(e) => setNewMessage(e.target.value)}
+onKeyDown={handleKeyDown}
+placeholder="Write a message..."
+className="w-full bg-gray-800 rounded-lg py-3 px-4 pr-12 text-sm min-h-[50px] max-h-32 border-none focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
 />
-<div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-2">
-<button className="text-gray-400 hover:text-gray-600 cursor-pointer">
-<i className="far fa-smile"></i>
-</button>
-<button className="text-gray-400 hover:text-gray-600 cursor-pointer">
-<i className="fas fa-paperclip"></i>
-</button>
-</div>
-</div>
-<button className="ml-3 bg-blue-600 text-white p-3 rounded-full !rounded-button cursor-pointer">
-<i className="fas fa-paper-plane"></i>
-</button>
-</div>
-</div>
-</div>
-</div>
-) : (
-<div className="flex items-center justify-center h-full">
-<div className="text-center">
-<div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-<i className="fas fa-comments text-3xl text-gray-400"></i>
-</div>
-<h2 className="text-xl font-semibold mb-2">Message Center</h2>
-<p className="text-gray-500 max-w-md">Click the "Messages" button in the sidebar to start conversations with your team</p>
+<div className="absolute right-2 bottom-2 flex items-center space-x-2">
 <button
-onClick={toggleMessage}
-className="mt-6 bg-blue-600 text-white px-6 py-2.5 rounded-lg !rounded-button whitespace-nowrap cursor-pointer"
+onClick={toggleEmojiPicker}
+className="text-gray-400 hover:text-white cursor-pointer !rounded-button whitespace-nowrap"
 >
-<i className="fas fa-comment mr-2"></i>
-Open Messages
+<FaRegSmile />
+</button>
+<button
+onClick={handleSendMessage}
+className="bg-blue-600 text-white p-2 rounded-lg !rounded-button whitespace-nowrap"
+>
+<IoSend />
 </button>
 </div>
+{/* Emoji Picker */}
+{showEmojiPicker && (
+<div
+ref={emojiPickerRef}
+className="absolute bottom-14 right-0 z-10"
+>
+<EmojiPicker
+onEmojiClick={(emojiData: EmojiClickData) => {
+addEmoji(emojiData.emoji);
+}}
+width={320}
+height={400}
+searchDisabled={false}
+skinTonesDisabled={true}
+previewConfig={{
+showPreview: false
+}}
+/>
 </div>
 )}
+</div>
 </div>
 </div>
 </div>
