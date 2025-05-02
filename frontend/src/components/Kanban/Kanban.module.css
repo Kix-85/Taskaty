@@ -1,0 +1,24 @@
+.div {
+    background-color: #070b2e;
+    border-radius: 24px;
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+.column{
+    background-color: rgba(0, 0, 0,0.2);
+}
+.dashed{
+    border-radius: 12px;
+    border-style: rgba(0, 0, 0, 0.451) dashed;
+    width: 100%;
+}
+.dragging {
+    z-index: 1000;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    transform: scale(1.02);
+}
+.smoothDnd {
+    transition: transform 0.02s ease-in-out;
+}
+  
