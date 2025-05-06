@@ -1,17 +1,141 @@
-@import "tailwindcss";
 
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+ 
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+ 
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+ 
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+ 
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+ 
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --ring: 215 20.2% 65.1%;
+ 
+    --radius: 0.5rem;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+    --sidebar-background: 60 56% 91%; /* #F5F5DC for light mode */
+    --sidebar-foreground: 222.2 47.4% 11.2%;
+    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar-accent: 210 40% 96.1%;
+    --sidebar-accent-foreground: 222.2 47.4% 11.2%;
+    --sidebar-ring: 215 20.2% 65.1%;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    --code-bg: 210 40% 96.1%;
+    --code-fg: 222.2 47.4% 11.2%;
+    --code-border: 214.3 31.8% 91.4%;
+  }
+ 
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 213 31% 91%;
+ 
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+ 
+    --popover: 222 45% 7%;
+    --popover-foreground: 215 20.2% 65.1%;
+ 
+    --card: 222 47% 10%;
+    --card-foreground: 213 31% 91%;
+ 
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+ 
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+ 
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --ring: 216 34% 17%;
+
+    --sidebar-background: 248 27% 7%; /* #0e0d16 dark color for dark mode */
+    --sidebar-foreground: 213 31% 91%;
+    --sidebar-border: 216 34% 17%;
+    --sidebar-accent: 222.2 47.4% 11.2%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-ring: 216 34% 17%;
+
+    --code-bg: 222 47% 8%;
+    --code-fg: 213 31% 91%;
+    --code-border: 216 34% 17%;
+  }
+}
+ 
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
+  }
 }
 
+@layer components {
+  .bg-sidebar {
+    @apply bg-[hsl(var(--sidebar-background))];
+  }
+  
+  .sidebar-link {
+    @apply flex items-center space-x-3 text-base text-sidebar-foreground/70 hover:text-sidebar-foreground rounded-md px-2 py-2 hover:bg-sidebar-accent transition-all duration-150;
+  }
+  
+  .sidebar-link.active {
+    @apply bg-sidebar-accent text-sidebar-accent-foreground;
+  }
+  
+  .task-card {
+    @apply transition-all duration-200 hover:shadow-md p-4 bg-background rounded-lg border;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .glass-effect {
+    @apply bg-background/80 backdrop-blur-sm border border-border;
+  }
+  
+  .page-header {
+    @apply sticky top-0 z-10 bg-background/90 backdrop-blur-sm px-4 py-3 border-b;
+  }
+  
+  .content-area {
+    @apply p-4 overflow-auto;
+  }
+}
