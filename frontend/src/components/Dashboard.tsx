@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { TaskCard } from "@/components/TaskCard";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronRight } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // Mock data - in a real app you'd fetch this from an API
 const tasks = [
@@ -148,10 +149,12 @@ export function Dashboard() {
         </div>
       </div>
 
-      <div className="p-6 flex-1 overflow-auto">
+      {/* overflow-auto */}
+      <div className="p-6 flex-1 overflow-hidden flex flex-col md:flex-row gap-6">
+      <ScrollArea className="flex-1">
         <div className="grid grid-cols-1 gap-6">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 sticky top-0 bg-card z-10">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div className="space-y-1">
                 <CardTitle>Today's Tasks</CardTitle>
                 <CardDescription>Your tasks that require attention today.</CardDescription>
@@ -178,7 +181,7 @@ export function Dashboard() {
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2 sticky top-0 bg-card z-10">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
               <div className="space-y-1">
                 <CardTitle>Upcoming Tasks</CardTitle>
                 <CardDescription>Tasks scheduled for the coming days.</CardDescription>
@@ -204,6 +207,7 @@ export function Dashboard() {
             </CardContent>
           </Card>
         </div>
+      </ScrollArea>
       </div>
     </div>
   );

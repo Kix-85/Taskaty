@@ -34,8 +34,8 @@ export default function Settings() {
   
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <div className="flex flex-1 ml-0 md:ml-12 transition-all duration-300">
+      {/* <Sidebar /> */}
+      <div className="flex flex-1 ml-0 transition-all duration-300">
         <div className="hidden md:block">
           <Navigation />
         </div>

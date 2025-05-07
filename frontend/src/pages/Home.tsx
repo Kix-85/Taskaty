@@ -3,7 +3,8 @@ import { Dashboard } from "@/components/Dashboard";
 
 const Home = () => {
   return (
-    <div className="h-full bg-background">
+    // Edit Overflow to hidden
+    <div className="h-full bg-background flex flex-col">
       <Dashboard />
     </div>
   );

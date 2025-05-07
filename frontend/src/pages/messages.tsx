@@ -29,7 +29,7 @@ const Messages = () => {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar />
+      {/* <Sidebar /> */}
       <main className="flex-1 ml-0 md:ml-16 transition-all duration-300 flex flex-col h-screen">
         {currentContact ? (
           <>
