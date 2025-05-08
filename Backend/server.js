@@ -3,7 +3,13 @@ const http = require('http');
 const { Server } = require('socket.io');
 const app = express();
 require('dotenv').config();
+const cors = require('cors');
 
+app.use(cors({
+    origin: '*',
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {

@@ -1,24 +1,29 @@
 const express = require('express');
 const router = express.Router();
-const verifyToken = require('../middleware/verifyToken');
-const { getMyTasks, createTask, getTask, updateTask, deleteTask, createComment, deleteComment} = require('../controllers/task.controller');
+const verifyToken = require('../middlewares/verifyToken.middleware');
+const { getMyTasks, createTask, getTask, updateTask, deleteTask, createComment, deleteComment } = require('../controllers/task.controller');
 
 // Ensure that only authenticated users can access them
 router.use(verifyToken);
 
+// Get user's tasks
 router.get('/me', getMyTasks);
 
-router.post('/me', createTask);
+// Create new task
+router.post('/', createTask);
 
+// Get specific task
 router.get('/:taskID', getTask);
 
+// Update task
 router.put('/:taskID', updateTask);
 
+// Delete task
 router.delete('/:taskID', deleteTask);
 
-router.post('/create-comment/:taskID', createComment);
-
-router.delete('/delete-comment/:taskID', deleteComment);
+// Comment routes
+router.post('/:taskID/comments', createComment);
+router.delete('/:taskID/comments/:commentID', deleteComment);
 
 // Optional: search tasks
 // router.get('/search', searchTask);

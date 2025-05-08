@@ -1,80 +1,31 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
-import axios from "axios";
 import Kanban from "@/components/taskComponents/Kanban";
 import List from "@/components/taskComponents/List";
 import Calendar from "@/components/taskComponents/Calendar";
 import { Button } from "@/components/ui/button";
 import { Kanban as KanbanIcon, List as ListIcon, CalendarDays } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Task, TaskGroups } from "@/types/task";
+import { useTaskStore } from "@/services/taskApi";
 
 const MyTasks = () => {
   const [selectedView, setSelectedView] = useState<string>('Calendar');
-  const [tasks, setTasks] = useState<TaskGroups>({
-    "To Do": [],
-    "In Progress": [],
-    "Done": []
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { tasks, isLoading, error, fetchTasks, moveTask } = useTaskStore();
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const response = await axios.get('/api/tasks');
-        // Ensure each group is an array
-        const formattedTasks: TaskGroups = {
-          "To Do": Array.isArray(response.data["To Do"]) ? response.data["To Do"] : [],
-          "In Progress": Array.isArray(response.data["In Progress"]) ? response.data["In Progress"] : [],
-          "Done": Array.isArray(response.data["Done"]) ? response.data["Done"] : []
-        };
-        setTasks(formattedTasks);
-      } catch (err) {
-        setError('Failed to fetch tasks. Please try again later.');
-        console.error('Error fetching tasks:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchTasks();
-  }, []);
+  }, [fetchTasks]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleTaskMove = async (result: any) => {
-    try {
-      // Optimistically update the UI
-      const { source, destination } = result;
-      if (!destination) return;
+    const { source, destination } = result;
+    if (!destination) return;
 
-      const sourceCol = [...tasks[source.droppableId as keyof TaskGroups]];
-      const destCol = [...tasks[destination.droppableId as keyof TaskGroups]];
-      const [movedItem] = sourceCol.splice(source.index, 1);
-      
-      const newTasks = { ...tasks };
-      if (source.droppableId === destination.droppableId) {
-        sourceCol.splice(destination.index, 0, movedItem);
-        newTasks[source.droppableId as keyof TaskGroups] = sourceCol;
-      } else {
-        destCol.splice(destination.index, 0, movedItem);
-        newTasks[source.droppableId as keyof TaskGroups] = sourceCol;
-        newTasks[destination.droppableId as keyof TaskGroups] = destCol;
-      }
-      setTasks(newTasks);
-
-      // Send update to backend
-      await axios.put(`/api/tasks/${movedItem.id}`, {
-        status: destination.droppableId
-      });
-    } catch (err) {
-      // Revert the optimistic update on error
-      console.error('Error updating task:', err);
-      // You might want to refetch the tasks here to ensure sync
-      const response = await axios.get('/api/tasks');
-      setTasks(response.data);
-    }
+    await moveTask(
+      result.draggableId,
+      source.droppableId,
+      destination.droppableId,
+      destination.index
+    );
   };
 
   const renderContent = () => {
@@ -95,7 +46,7 @@ const MyTasks = () => {
           <Button 
             variant="outline" 
             className="mt-4"
-            onClick={() => window.location.reload()}
+            onClick={() => fetchTasks()}
           >
             Retry
           </Button>
