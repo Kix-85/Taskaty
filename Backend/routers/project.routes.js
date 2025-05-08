@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const verifyToken = require('../middleware/verifyToken');
-const { getMyProjects, createProject, getProject, updateProject, deleteProject} = require('../controllers/project.controller');
+const { getMyProjects, createProject, getProject, updateProject, deleteProject, searchProject} = require('../controllers/project.controller');
 
 // Ensure that only authenticated users can access them
 router.use(verifyToken);
@@ -16,7 +16,6 @@ router.put('/:projectID', updateProject);
 
 router.delete('/:projectID', deleteProject);
 
-// Optional: add search feature later
-// router.get('/search', searchProject);
+router.get('/search', searchProject);
 
 module.exports = router;
