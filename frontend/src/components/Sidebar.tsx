@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -20,7 +19,7 @@ interface SidebarProps {
 }
 
 const navItems = [
-  { icon: Home, label: "Home", href: "/" },
+  { icon: Home, label: "Dashboard", href: "/dashboard" },
   { icon: CheckSquare, label: "My Tasks", href: "/myTasks" },
   { icon: Folder, label: "Projects", href: "/projects" },
   { icon: MessageSquare, label: "Messages", href: "/messages" },
