@@ -14,8 +14,9 @@ const io = new Server(server, {
 }); 
 
 const auth = require('./routers/auth.routes');
-const tasks = require('./routers/task.routes');
-const users = require('./routers/user.routes');
+const task = require('./routers/task.routes');
+const user = require('./routers/user.routes');
+const project = require('./routers/project.routes');
 
 const connectDB = require('./config/db');
 const cookieParser = require('cookie-parser');
@@ -25,8 +26,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/auth', auth);
-app.use('/api/tasks', tasks);
-app.use('/api/users', users);
+app.use('/api/task', task);
+app.use('/api/user', user);
+app.use('/api/project', project)
 
 io.on('connection', socket => {
     console.log('User connected: ', socket.id);
