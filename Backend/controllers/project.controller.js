@@ -1,7 +1,7 @@
 const Project = require('../models/project.model');
 
-module.exports.getAllProjects = async (req, res) => {
-    const userID = req.params.userID;
+module.exports.getMyProjects = async (req, res) => {
+    const userID = req.user.id;
     try {
         const projects = await Project.find({ 
             $or: [
@@ -15,13 +15,11 @@ module.exports.getAllProjects = async (req, res) => {
             return res.status(404).json({ message: 'No projects found' });
         }
 
-        // Sort projects by lastViews in descending order
         projects.sort((a, b) => {
             const aLastView = a.lastViews.find(view => view.toString() === userID);
             const bLastView = b.lastViews.find(view => view.toString() === userID);
             return (bLastView ? bLastView.Date : 0) - (aLastView ? aLastView.Date : 0);
         });
-        
 
         res.status(200).json(projects);
     } catch (error) {
@@ -43,7 +41,7 @@ module.exports.getProject = async (req, res) => {
 }
 
 module.exports.createProject = async (req, res) => {
-    const userID = req.params.userID;
+    const userID = req.user.id;
     const { name, logo, description, status, activity, dueDate, teamMembers } = req.body;
     try {
         const project = await Project.create({ name, logo, description, status, activity, dueDate, leader: userID, teamMembers });
@@ -73,4 +71,3 @@ module.exports.deleteProject = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
-
