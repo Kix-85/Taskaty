@@ -1,12 +1,22 @@
-// routes/tasks.js
 const express = require('express');
 const router = express.Router();
-const tasksController = require('../controllers/task.controller');
+const verifyToken = require('../middleware/verifyToken');
+const { getAllTasks, createTask, getTask, updateTask, deleteTask,} = require('../controllers/task.controller');
 
-router.get('/', tasksController.getAllTasks);
-router.post('/', tasksController.createTask);
-router.put('/:id', tasksController.updateTask);
-router.delete('/:id', tasksController.deleteTask);
-router.get('/search', tasksController.searchTask);
+// Ensure that only authenticated users can access them
+router.use(verifyToken);
+
+router.get('/me', getMyTasks);
+
+router.post('/me', createTask);
+
+router.get('/:taskID', getTask);
+
+router.put('/:taskID', updateTask);
+
+router.delete('/:taskID', deleteTask);
+
+// Optional: search tasks
+// router.get('/search', searchTask);
 
 module.exports = router;

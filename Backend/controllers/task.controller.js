@@ -1,56 +1,87 @@
-let tasks = [
-    {
-        title: 'Study JS',
-        deadLine: '2022-01-01',
-        priority: 'high',
-        status: 'pending',
-        description: 'some description',
-        contributers: ["John", "Ali", "Ahmed"]
-    },
-    {
-        title: 'Study React',
-        deadLine: '2022-01-01',
-        priority: 'high',
-        status: 'pending',
-        description: 'some description',
-        contributers: ["John", "Ali", "Ahmed"]
-    }
-];
+const Task = require("../models/task.model");
+const Project = require("../models/project.model");
 
-exports.getAllTasks = (req, res) => {
-    res.json(tasks);
-};
+module.exports.getMyTasks = async (req, res) => {
+    const userID = req.user.id;
+    try {
+        const tasks = await Task.find({
+            $or: [
+                { assignedTo: userID },
+                { createdBy: userID },
+            ]
+        })
+            .populate('assignedTo', 'name email')
+            .populate('createdBy', 'name email')
+            .populate('project', 'name logo description status activity dueDate teamMembers leader')
+            .populate('comments.user', 'name email avatar')
+            .sort({ createdAt: -1 });
 
-exports.createTask = (req, res) => {
-    const task = req.body;
-    tasks.push(task);
-    res.status(201).json({ message: "Task created", task });
-};
+        if (!tasks) {
+            return res.status(404).json({ message: 'No tasks found' });
+        }
 
-exports.updateTask = (req, res) => {
-    const id = parseInt(req.params.id);
-    const updatedTask = req.body;
-
-    if (id >= 0 && id < tasks.length) {
-        tasks[id] = updatedTask;
-        res.json({ message: "Task updated", task: updatedTask });
-    } else {
-        res.status(404).json({ message: "Task not found" });
+        res.status(200).json(tasks);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 
-exports.deleteTask = (req, res) => {
-    const id = parseInt(req.params.id);
+module.exports.createTask = async (req, res) => {
+    const userID = req.user.id;
+    const { title, description, status, dueDate, project, assignedTo, progress, isRecurring, recurrencePattern } = req.body;
+    try {
+        const existingTask = await Task.findOne({ title, project });
+        if (existingTask) {
+            return res.status(400).json({ message: 'Task with the same title already exists in this project' });
+        }
 
-    if (id >= 0 && id < tasks.length) {
-        tasks.splice(id, 1);
-        res.json({ message: "Task deleted", tasks });
-    } else {
-        res.status(404).json({ message: "Task not found" });
+        // 1. Check if project exists
+        const targetProject = await Project.findById(project);
+        if (!targetProject) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
+
+        // 2. Check if the user is the leader of the project
+        if (targetProject.leader.toString() !== userID) {
+            return res.status(403).json({ message: 'Only the project leader can create tasks.' });
+        }
+
+        const task = await Task.create({ title, description, status, dueDate, project, assignedTo, createdBy: userID, progress, isRecurring, recurrencePattern });
+
+        await Project.findByIdAndUpdate(project, { $push: { tasks: task._id } });
+
+        res.status(201).json(task);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 
-exports.searchTask = (req, res) => {
-    const { name, age } = req.query;
-    res.send(`Hello ${name}, your age is ${age}`);
+module.exports.updateTask = async (req, res) => {
+    const taskID = req.params.taskID;
+    const { title, description, status, dueDate, project, assignedTo, progress, isRecurring, recurrencePattern } = req.body;
+    try {
+        const task = await Task.findByIdAndUpdate(taskID, { title, description, status, dueDate, project, assignedTo, progress, isRecurring, recurrencePattern }, { new: true });
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        await Project.findByIdAndUpdate(project, { $addToSet: { tasks: task._id } }, { new: true });
+
+        res.status(200).json(task);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports.deleteTask = async (req, res) => {
+    const taskID = req.params.taskID;
+    try {
+        const task = await Task.findByIdAndDelete(taskID);
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+        res.status(200).json({ message: 'Task deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
