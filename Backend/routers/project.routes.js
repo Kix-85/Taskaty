@@ -1,13 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const { getAllProjects, createProject, updateProject, deleteProject, searchProject } = require('../controllers/project.controller');
+const verifyToken = require('../middleware/verifyToken');
+const { getMyProjects, createProject, getProject, updateProject, deleteProject} = require('../controllers/project.controller');
 
-router.get('/:userID', getAllProjects);
-router.post('/:userID', createProject);
+// Ensure that only authenticated users can access them
+router.use(verifyToken);
+
+router.get('/me', getMyProjects);
+
+router.post('/me', createProject);
+
 router.get('/:projectID', getProject);
+
 router.put('/:projectID', updateProject);
+
 router.delete('/:projectID', deleteProject);
-// apply search if there is a query string in the url  (I will do it later)
-// router.get('/search/:projectID', searchProject);
+
+// Optional: add search feature later
+// router.get('/search', searchProject);
 
 module.exports = router;
