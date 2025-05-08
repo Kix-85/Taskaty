@@ -1,5 +1,6 @@
 const Task = require("../models/task.model");
 const Project = require("../models/project.model");
+const { createComment, deleteComment } = require("./comment.controller");
 
 module.exports.getMyTasks = async (req, res) => {
     const userID = req.user.id;
@@ -85,3 +86,6 @@ module.exports.deleteTask = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+module.exports.createComment = createComment;
+module.exports.deleteComment = deleteComment;

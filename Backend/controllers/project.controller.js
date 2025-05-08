@@ -72,3 +72,28 @@ module.exports.deleteProject = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+module.exports.searchProject = async (req, res) => {
+    const { name } = req.query;
+    const userID = req.user.id;
+    try {
+        const projects = await Project.find({ 
+            $or: [
+                {leader: userID},
+                {teamMembers: userID},
+            ],
+            name: { $regex: name, $options: 'i' }
+        })
+        .populate('teamMembers', 'name email')
+        .populate('leader', 'name email')
+        .populate('tasks')
+
+        if (!projects) {
+            return res.status(404).json({ message: 'No projects found' });
+        }
+
+        res.status(200).json(projects);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
