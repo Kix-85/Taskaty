@@ -1,27 +1,35 @@
-
 import React, { useState } from 'react';
 import CalendarGrid from './CalendarGrid';
+import { Task, TaskGroups } from '@/types/task';
 
-const Calendar: React.FC = () => {
-  // State for managing the current month and year
+type CalendarProps = {
+  tasks: TaskGroups;
+};
+
+const Calendar: React.FC<CalendarProps> = ({ tasks }) => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
-  // Example tasks data (you can replace this with API data later)
-  const tasks: Record<string, string[]> = {
-    '2024-04-01': ['Create a design system'],
-    '2024-04-04': ['API Integration: Connect services'],
-    '2024-04-05': ['Creating an interactive prototype'],
-    '2024-04-06': ['Performance Optimization'],
-    '2024-04-07': ['Design informative artboards'],
-    '2024-04-08': ['Pre-Publishing: Collect feedback'],
-    '2024-04-10': ['Audience analysis. Study user behavior'],
-    '2024-04-11': ['Design the application layout'],
-    '2024-04-12': ['Function Implementation'],
-    '2024-04-13': ['Multi-User Support: Implement features'],
-  };
+  // Convert task groups to calendar format, including both start and due dates
+  const calendarTasks = Object.values(tasks).reduce((acc, taskGroup) => {
+    taskGroup.forEach(task => {
+      // Add task to start date
+      if (!acc[task.startDate]) {
+        acc[task.startDate] = [];
+      }
+      acc[task.startDate].push(task);
 
-  // Handler for changing the month and year
+      // Add task to due date if different from start date
+      if (task.dueDate !== task.startDate) {
+        if (!acc[task.dueDate]) {
+          acc[task.dueDate] = [];
+        }
+        acc[task.dueDate].push(task);
+      }
+    });
+    return acc;
+  }, {} as Record<string, Task[]>);
+
   const handleMonthChange = (month: number, year: number) => {
     setCurrentMonth(month);
     setCurrentYear(year);
@@ -29,9 +37,28 @@ const Calendar: React.FC = () => {
 
   return (
     <div className="h-full flex flex-col rounded-lg border bg-card/50 backdrop-blur-sm shadow-sm">
-      <div className="flex-1">
+      <div className="flex items-center justify-between p-4 border-b">
+        <h2 className="text-xl font-semibold">
+          {new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' })}
+        </h2>
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleMonthChange(currentMonth - 1, currentYear)}
+            className="p-2 hover:bg-accent rounded-md transition-colors"
+          >
+            ←
+          </button>
+          <button
+            onClick={() => handleMonthChange(currentMonth + 1, currentYear)}
+            className="p-2 hover:bg-accent rounded-md transition-colors"
+          >
+            →
+          </button>
+        </div>
+      </div>
+      <div className="flex-1 overflow-auto">
         <CalendarGrid
-          tasks={tasks}
+          tasks={calendarTasks}
           currentMonth={currentMonth}
           currentYear={currentYear}
         />

@@ -54,7 +54,7 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users'
     }],
-    teams: [{
+    projects: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Projects'//Team
     }],
@@ -76,34 +76,6 @@ const userSchema = new mongoose.Schema({
         language: {
             type: String,
             default: 'en'
-        }
-    },
-    productivity: {
-        dailyGoal: {
-            type: Number,
-            default: 8, // hours
-            min: 0,
-            max: 24
-        },
-        weeklyGoal: {
-            type: Number,
-            default: 40, // hours
-            min: 0,
-            max: 168
-        },
-        focusMode: {
-            type: Boolean,
-            default: false
-        },
-        breakReminders: {
-            type: Boolean,
-            default: true
-        },
-        breakInterval: {
-            type: Number,
-            default: 25, // minutes
-            min: 5,
-            max: 120
         }
     },
     statistics: {

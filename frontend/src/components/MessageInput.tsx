@@ -29,6 +29,7 @@ export function MessageInput({ onSendMessage }: MessageInputProps) {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleEmojiSelect = (emoji: any) => {
     setMessage(prev => prev + emoji.native);
   };

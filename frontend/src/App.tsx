@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,14 +8,14 @@ import { Sidebar } from "@/components/Sidebar";
 import Home from "./pages/Home";
 import MyTasks from "./pages/MyTasks";
 import Projects from "./pages/Projects";
-import Messages from "./pages/Messages";
+import Messages from "./pages/messages";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+// const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+  // <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <TooltipProvider>
         <BrowserRouter>
@@ -38,7 +37,7 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
-  </QueryClientProvider>
+  // </QueryClientProvider>
 );
 
 export default App;

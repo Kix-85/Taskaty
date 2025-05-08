@@ -1,4 +1,3 @@
-
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -13,7 +12,7 @@ interface TaskCardProps {
   className?: string;
 }
 
-export function TaskCard({
+const TaskCard = ({
   title,
   description,
   dueDate,
@@ -21,7 +20,7 @@ export function TaskCard({
   progress,
   assignees,
   className,
-}: TaskCardProps) {
+}: TaskCardProps) => {
   const priorityColors = {
     low: "bg-green-100 text-green-800",
     medium: "bg-yellow-100 text-yellow-800",
@@ -60,4 +59,6 @@ export function TaskCard({
       </div>
     </div>
   );
-}
+};
+
+export default TaskCard;
