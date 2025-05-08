@@ -9,7 +9,8 @@ module.exports.getMyProjects = async (req, res) => {
                 {teamMembers: userID},
             ]})
         .populate('teamMembers', 'name email')
-        .populate('leader', 'name email');
+        .populate('leader', 'name email')
+        .populate('tasks')
 
         if (!projects) {
             return res.status(404).json({ message: 'No projects found' });
