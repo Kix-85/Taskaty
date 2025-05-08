@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, Grid3X3, List as ListIcon } from "lucide-react";
@@ -6,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { CreateProjectModal } from "@/components/CreateProjectModal";
 
 // Sample project data
 const projects = [
@@ -88,6 +88,7 @@ const projects = [
 const Projects = () => {
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
   // Filter projects based on search query
   const filteredProjects = projects.filter(project => 
@@ -118,7 +119,10 @@ const Projects = () => {
             <p className="text-muted-foreground">Manage your projects and team collaboration</p>
           </div>
           
-          <Button className="w-full md:w-auto">
+          <Button 
+            className="w-full md:w-auto"
+            onClick={() => setIsCreateModalOpen(true)}
+          >
             <Plus size={16} className="mr-2" />
             New Project
           </Button>
@@ -253,6 +257,11 @@ const Projects = () => {
           </div>
         )}
       </main>
+
+      <CreateProjectModal 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setIsCreateModalOpen(false)} 
+      />
     </div>
   );
 };

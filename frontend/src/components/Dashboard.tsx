@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { dashboardApi, Task, ProjectStats } from "@/services/dashboardApi";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CreateTaskModal } from "@/components/CreateTaskModal";
 
 const Dashboard = () => {
   const [projectStats, setProjectStats] = useState<ProjectStats | null>(null);
@@ -16,6 +17,7 @@ const Dashboard = () => {
   const [upcomingTasks, setUpcomingTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -89,7 +91,10 @@ const Dashboard = () => {
             <h1 className="text-2xl font-bold">Welcome back!</h1>
             <p className="text-muted-foreground">Here's an overview of your tasks.</p>
           </div>
-          <Button className="w-full md:w-auto">
+          <Button 
+            className="w-full md:w-auto"
+            onClick={() => setIsCreateModalOpen(true)}
+          >
             <Plus size={16} className="mr-2" />
             Add New Task
           </Button>
@@ -198,6 +203,7 @@ const Dashboard = () => {
           </div>
         </ScrollArea>
       </div>
+      <CreateTaskModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
     </div>
   );
 };

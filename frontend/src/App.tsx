@@ -13,7 +13,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/landPage";
 
-// const queryClient = new QueryClient();
+const queryClient = new QueryClient();
 
 const AppContent = () => {
   const location = useLocation();
@@ -40,7 +40,7 @@ const AppContent = () => {
 };
 
 const App = () => (
-  // <QueryClientProvider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <TooltipProvider>
         <BrowserRouter>
@@ -48,7 +48,7 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
-  // </QueryClientProvider>
+  </QueryClientProvider>
 );
 
 export default App;
