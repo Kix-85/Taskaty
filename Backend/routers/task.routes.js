@@ -6,7 +6,7 @@ const { getAllTasks, createTask, getTask, updateTask, deleteTask,} = require('..
 // Ensure that only authenticated users can access them
 router.use(verifyToken);
 
-router.get('/me', getAllTasks);
+router.get('/me', getMyTasks);
 
 router.post('/me', createTask);
 

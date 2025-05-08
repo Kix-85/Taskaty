@@ -1,7 +1,7 @@
 const Task = require("../models/task.model");
 
-module.exports.getAllTasks = async (req, res) => {
-    const userID = req.params.userID;
+module.exports.getMyTasks = async (req, res) => {
+    const userID = req.user.id;
     try {
         const tasks = await Task.find({ 
             $or: [
@@ -24,7 +24,7 @@ module.exports.getAllTasks = async (req, res) => {
 };
 
 module.exports.createTask = async (req, res) => {
-    const userID = req.params.userID;
+    const userID = req.user.id;
     const { title, description, status, dueDate, project, assignedTo, progress, isRecurring, recurrencePattern } = req.body;
     try {
         const task = await Task.create({ title, description, status, dueDate, project, assignedTo, createdBy: userID, progress, isRecurring, recurrencePattern });
@@ -59,4 +59,4 @@ module.exports.deleteTask = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
-};  
+};
