@@ -16,6 +16,12 @@ const userSchema = new mongoose.Schema({
         minlength: 3,
         maxlength: 50
     },
+    bio : {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: 200
+    },
     email: {
         type: String,
         required: true,
@@ -58,64 +64,29 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Projects'//Team
     }],
-    preferences: {
-        notifications: {
-            email: { type: Boolean, default: true },
-            push: { type: Boolean, default: true },
-            taskReminders: { type: Boolean, default: true }
-        },
-        theme: {
-            type: String,
-            enum: ['light', 'dark', 'system'],
-            default: 'system'
-        },
-        timezone: {
-            type: String,
-            default: 'UTC'
-        },
-        language: {
-            type: String,
-            default: 'en'
-        }
-    },
-    productivity: {
-        dailyGoal: {
-            type: Number,
-            default: 8, // hours
-            min: 0,
-            max: 24
-        },
-        weeklyGoal: {
-            type: Number,
-            default: 40, // hours
-            min: 0,
-            max: 168
-        },
-        focusMode: {
-            type: Boolean,
-            default: false
-        },
-        breakReminders: {
-            type: Boolean,
-            default: true
-        },
-        breakInterval: {
-            type: Number,
-            default: 25, // minutes
-            min: 5,
-            max: 120
-        }
-    },
+    // preferences: {
+    //     notifications: {
+    //         enabled: { type: Boolean, default: true },
+    //         email: { type: Boolean, default: true },
+    //         push: { type: Boolean, default: true },
+    //         taskReminders: { type: Boolean, default: true }
+    //     },
+    //     theme: {
+    //         type: String,
+    //         enum: ['light', 'dark', 'system'],
+    //         default: 'system'
+    //     },
+    //     timezone: {
+    //         type: String,
+    //         default: 'UTC'
+    //     },
+    //     language: {
+    //         type: String,
+    //         default: 'en'
+    //     }
+    // },
     statistics: {
         tasksCompleted: {
-            type: Number,
-            default: 0
-        },
-        totalFocusTime: {
-            type: Number,
-            default: 0 // in minutes
-        },
-        streakDays: {
             type: Number,
             default: 0
         },
@@ -151,5 +122,5 @@ userSchema.index({ username: 1 });
 userSchema.index({ status: 1 });
 userSchema.index({ 'statistics.lastActive': -1 });
 
-const User = mongoose.model("Users", userSchema);
+const User = mongoose.model("User", userSchema);
 module.exports = User;
