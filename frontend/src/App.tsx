@@ -12,10 +12,10 @@ import Messages from "./pages/messages";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
-// const queryClient = new QueryClient();
+const queryClient = new QueryClient();
 
 const App = () => (
-  // <QueryClientProvider client={queryClient}>
+  <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <TooltipProvider>
         <BrowserRouter>
@@ -37,7 +37,7 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>
-  // </QueryClientProvider>
+  </QueryClientProvider>
 );
 
 export default App;
