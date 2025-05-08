@@ -60,7 +60,7 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users'
     }],
-    teams: [{
+    projects: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Projects'//Team
     }],
