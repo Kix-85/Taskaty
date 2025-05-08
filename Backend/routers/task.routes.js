@@ -18,7 +18,7 @@ router.delete('/:taskID', deleteTask);
 
 router.post('/create-comment/:taskID', createComment);
 
-router.post('/delete-comment/:taskID', deleteComment);
+router.delete('/delete-comment/:taskID', deleteComment);
 
 // Optional: search tasks
 // router.get('/search', searchTask);
