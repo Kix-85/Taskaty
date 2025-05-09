@@ -5,19 +5,28 @@ const app = express();
 require('dotenv').config();
 const cors = require('cors');
 
+const allowedOrigins = ['http://localhost:8080', 'https://yourdomain.com'];
+
 app.use(cors({
-    origin: '*',
+    origin: function (origin, callback) {
+        if (allowedOrigins.includes(origin) || !origin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: '*',
+        // change after production
+        origin: 'http://localhost:8080', 
         methods: ['GET', 'POST'],
         credentials: true,
     },
-}); 
+});
 
 const auth = require('./routers/auth.routes');
 const task = require('./routers/task.routes');
