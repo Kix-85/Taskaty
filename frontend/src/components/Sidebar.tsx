@@ -11,7 +11,16 @@ import {
   MessageSquare, 
   Settings,
   Menu,
-  X
+  X,
+  ChevronDown,
+  FileText,
+  Layers,
+  HelpCircle,
+  Sliders,
+  Flag,
+  LogOut,
+  ChevronRight,
+  ChevronLeft
 } from "lucide-react";
 
 interface SidebarProps {
@@ -22,8 +31,17 @@ const navItems = [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
   { icon: CheckSquare, label: "My Tasks", href: "/myTasks" },
   { icon: Folder, label: "Projects", href: "/projects" },
-  { icon: MessageSquare, label: "Messages", href: "/messages" },
-  { icon: Settings, label: "Settings", href: "/settings" },
+  { 
+    icon: MessageSquare, 
+    label: "Messages", 
+    href: "/messages",
+    badge: "6"
+  },
+  { 
+    icon: Settings, 
+    label: "Settings", 
+    href: "/settings"
+  }
 ];
 
 export function Sidebar({ className }: SidebarProps) {
@@ -42,14 +60,13 @@ export function Sidebar({ className }: SidebarProps) {
 
   // Mobile toggle button
   const MobileToggle = () => (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="md:hidden fixed top-4 left-4 z-50 bg-primary text-primary-foreground hover:bg-primary/90"
+    <button
       onClick={toggleSidebar}
+      className="fixed top-1/2 -translate-y-1/2 left-0 z-50 inline-flex items-center justify-center w-6 h-12 text-sm text-gray-500 rounded-r-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600 bg-white dark:bg-gray-800 shadow-md"
     >
-      {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-    </Button>
+      <span className="sr-only">Toggle sidebar</span>
+      {mobileOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+    </button>
   );
 
   // Determine if sidebar should be shown
@@ -60,64 +77,87 @@ export function Sidebar({ className }: SidebarProps) {
       <MobileToggle />
       <aside
         className={cn(
-          "z-40 transition-all duration-300 ease-in-out",
+          "h-screen transition-all duration-300",
           showSidebar ? "translate-x-0" : "-translate-x-full",
+          "sm:translate-x-0",
           collapsed ? "w-16" : "w-64",
+          "fixed sm:relative z-50",
           className
         )}
+        aria-label="Sidebar"
       >
-        <div className="flex flex-col h-full bg-sidebar">
-          <div className="flex items-center justify-between p-3 border-b border-sidebar-border">
+        <div className="overflow-y-auto py-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          <div className={cn(
+            "flex items-center justify-between mb-5",
+            collapsed && "flex-col gap-2"
+          )}>
             {!collapsed && (
-              <h1 className="text-xl font-bold text-sidebar-foreground">Taskaty</h1>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">Taskaty</h1>
             )}
-            <div className="flex items-center">
+            <div className={cn(
+              "flex items-center gap-2",
+              collapsed && "flex-col"
+            )}>
               <ThemeToggle />
               {!isMobile && (
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-sidebar-foreground hover:bg-sidebar-accent ml-1"
+                  className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                   onClick={toggleSidebar}
                 >
-                  <Menu size={20} />
+                  <Menu className="w-5 h-5" />
                 </Button>
               )}
             </div>
           </div>
-          
-          <nav className="flex-1 px-1 py-4 space-y-2">
+
+          <ul className="space-y-2">
             {navItems.map((item) => (
-              <Link
-                key={item.label}
-                to={item.href}
-                className={cn(
-                  "sidebar-link",
-                  !collapsed ? "px-3 py-2" : "justify-center px-2 py-2",
-                  location.pathname === item.href && "active"
-                )}
-                title={collapsed ? item.label : ""}
-              >
-                <item.icon size={20} />
-                {!collapsed && <span>{item.label}</span>}
-              </Link>
+              <li key={item.label}>
+                <Link
+                  to={item.href}
+                  className={cn(
+                    "flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group",
+                    location.pathname === item.href && "bg-gray-100 dark:bg-gray-700"
+                  )}
+                >
+                  <item.icon className="w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                  {!collapsed && (
+                    <>
+                      <span className="ml-3">{item.label}</span>
+                      {item.badge && (
+                        <span className="inline-flex justify-center items-center w-5 h-5 text-xs font-semibold rounded-full text-primary-800 bg-primary-100 dark:bg-primary-200 dark:text-primary-800">
+                          {item.badge}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </Link>
+              </li>
             ))}
-          </nav>
-          
-          <div className="p-3 border-t border-sidebar-border">
-            <div className={cn(
-              "flex items-center gap-2 text-sidebar-foreground/70",
-              collapsed && "justify-center"
-            )}>
-              <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-medium">
-                U
-              </div>
-              {!collapsed && <span className="font-medium">User</span>}
-            </div>
-          </div>
+          </ul>
+        </div>
+
+        <div className={cn(
+          "hidden absolute bottom-0 left-0 justify-center p-4 w-full lg:flex bg-white dark:bg-gray-800 z-20 border-r border-gray-200 dark:border-gray-700",
+          collapsed ? "flex-col space-y-4" : "space-x-4"
+        )}>
+          <Button variant="ghost" size="icon">
+            <Sliders className="w-6 h-6" />
+          </Button>
+          <Button variant="ghost" size="icon">
+            <Settings className="w-6 h-6" />
+          </Button>
+          <Button variant="ghost" size="icon">
+            <Flag className="w-6 h-6" />
+          </Button>
+          <Button variant="ghost" size="icon">
+            <LogOut className="w-6 h-6" />
+          </Button>
         </div>
       </aside>
-      
+
       {/* Overlay for mobile */}
       {isMobile && mobileOpen && (
         <div
