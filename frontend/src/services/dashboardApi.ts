@@ -47,31 +47,31 @@ const mockProjectStats: ProjectStats = {
   overdueTask: 2,
 };
 
-const mockTasks: Task[] = [
-  {
-    id: "task-1",
-    title: "Redesign homepage",
-    description: "Update the homepage with new branding and improve user experience",
-    dueDate: "May 10",
-    priority: "high",
-    progress: 65,
-    assignees: [
-      { name: "Alex Johnson", initial: "A" },
-      { name: "Maria Garcia", initial: "M" }
-    ]
-  },
-  {
-    id: "task-2",
-    title: "Implement authentication",
-    description: "Set up OAuth and email registration flows with proper security measures",
-    dueDate: "May 15",
-    priority: "high",
-    progress: 30,
-    assignees: [
-      { name: "James Wilson", initial: "J" }
-    ]
-  }
-];
+// const mockTasks: Task[] = [
+//   {
+//     id: "task-1",
+//     title: "Redesign homepage",
+//     description: "Update the homepage with new branding and improve user experience",
+//     dueDate: "May 10",
+//     priority: "high",
+//     progress: 65,
+//     assignees: [
+//       { name: "Alex Johnson", initial: "A" },
+//       { name: "Maria Garcia", initial: "M" }
+//     ]
+//   },
+//   {
+//     id: "task-2",
+//     title: "Implement authentication",
+//     description: "Set up OAuth and email registration flows with proper security measures",
+//     dueDate: "May 15",
+//     priority: "high",
+//     progress: 30,
+//     assignees: [
+//       { name: "James Wilson", initial: "J" }
+//     ]
+//   }
+// ];
 
 export const dashboardApi = {
   // Get project statistics

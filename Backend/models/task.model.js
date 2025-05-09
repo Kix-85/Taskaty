@@ -14,6 +14,11 @@ const taskSchema = new mongoose.Schema({
         trim: true,
         maxlength: 1000
     },
+    project: {
+ 	type: mongoose.Schema.Types.ObjectId,
+	ref: 'Project',
+	required: true
+    },
     status: {
         type: String,
         required: true,
@@ -32,12 +37,12 @@ const taskSchema = new mongoose.Schema({
     },
     assignedTo: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Users',
-        required: true
+        ref: 'User',
+        required: false
     }],
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Users',
+        ref: 'User',
         required: true
     },
     tags: [{
@@ -47,7 +52,7 @@ const taskSchema = new mongoose.Schema({
     subtasks: [{
         title: {
             type: String,
-            required: true,
+            required: false,
             trim: true
         },
         completed: {
@@ -63,12 +68,12 @@ const taskSchema = new mongoose.Schema({
     comments: [{
         user: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Users',
-            required: true
+            ref: 'User',
+            required: false
         },
         content: {
             type: String,
-            required: true,
+            required: false,
             trim: true  
         },
         createdAt: {

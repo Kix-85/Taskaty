@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const verifyToken = require('../middleware/verifyToken');
+const verifyToken = require('../middlewares/verifyToken.middleware');
 const { getMyProjects, createProject, getProject, updateProject, deleteProject, searchProject} = require('../controllers/project.controller');
 
 // Ensure that only authenticated users can access them

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const verifyToken = require('../middleware/verifyToken');
+const verifyToken = require('../middlewares/verifyToken.middleware');
 const { getMyTasks, createTask, getTask, updateTask, deleteTask, createComment, deleteComment} = require('../controllers/task.controller');
 
 // Ensure that only authenticated users can access them
