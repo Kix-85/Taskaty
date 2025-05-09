@@ -1,13 +1,25 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
+import { toast } from "sonner";
+import axios, { AxiosError } from "axios";
+
+// Add type declaration for Vite env variables
+interface ImportMetaEnv {
+  VITE_API_URL: string;
+}
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Auth = () => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -37,10 +49,43 @@ const Auth = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement authentication logic
-    console.log(formData);
+    setLoading(true);
+
+    try {
+      if (!isLogin && formData.password !== formData.confirmPassword) {
+        toast.error("Passwords do not match");
+        return;
+      }
+
+      const endpoint = isLogin ? `${API_URL}/auth/login` : `${API_URL}/auth/register`;
+      const response = await axios.post(endpoint, formData, {
+        withCredentials: true
+      });
+
+      if (response.data.success) {
+        toast.success(isLogin ? "Login successful!" : "Registration successful! Please check your email for verification.");
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Something went wrong");
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSocialAuth = async (provider: 'google' | 'github') => {
+    try {
+      // Implement social auth logic here
+      toast.info(`${provider} authentication coming soon!`);
+    } catch (error) {
+      toast.error("Social authentication failed");
+    }
   };
 
   return (
@@ -128,8 +173,8 @@ const Auth = () => {
                 />
               </div>
             )}
-            <Button type="submit" className="w-full">
-              {isLogin ? "Login" : "Register"}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Loading..." : isLogin ? "Login" : "Register"}
             </Button>
           </form>
 
@@ -145,11 +190,21 @@ const Auth = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline" className="w-full">
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => handleSocialAuth('google')}
+              disabled={loading}
+            >
               <FcGoogle className="mr-2 h-4 w-4" />
               Google
             </Button>
-            <Button variant="outline" className="w-full">
+            <Button 
+              variant="outline" 
+              className="w-full"
+              onClick={() => handleSocialAuth('github')}
+              disabled={loading}
+            >
               <FaGithub className="mr-2 h-4 w-4" />
               GitHub
             </Button>
@@ -159,14 +214,14 @@ const Auth = () => {
             {isLogin ? (
               <p>
                 Don't have an account?{" "}
-                <Button variant="link" onClick={toggleAuthMode} className="p-0">
+                <Button variant="link" onClick={toggleAuthMode} className="p-0" disabled={loading}>
                   Register here
                 </Button>
               </p>
             ) : (
               <p>
                 Already have an account?{" "}
-                <Button variant="link" onClick={toggleAuthMode} className="p-0">
+                <Button variant="link" onClick={toggleAuthMode} className="p-0" disabled={loading}>
                   Login here
                 </Button>
               </p>
