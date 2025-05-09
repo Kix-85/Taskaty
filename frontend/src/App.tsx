@@ -12,21 +12,24 @@ import Messages from "./pages/messages";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/landPage";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
+  const isAuthPage = location.pathname === "/auth";
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
-      {!isLandingPage && <Sidebar />}
-      <main className={`flex-1 overflow-auto ${!isLandingPage ? "" : ""}`}>
+      {!isLandingPage && !isAuthPage && <Sidebar />}
+      <main className={`flex-1 overflow-auto ${!isLandingPage && !isAuthPage ? "" : ""}`}>
         <Toaster />
         <Sonner />
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Home />} />
           <Route path="/myTasks" element={<MyTasks />} />
           <Route path="/projects" element={<Projects />} />

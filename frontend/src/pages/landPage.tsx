@@ -29,10 +29,10 @@ const LandingPage = () => {
             </p>
             <div className="flex gap-4 justify-center">
               <Button asChild size="lg" className="text-lg px-8">
-                <Link to="/signup">Sign Up</Link>
+                <Link to="/auth">Get Started</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="text-lg px-8">
-                <Link to="/login">Log In</Link>
+                <Link to="/auth">Log In</Link>
               </Button>
             </div>
           </motion.div>
