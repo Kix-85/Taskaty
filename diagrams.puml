@@ -1,0 +1,305 @@
+@startuml System Architecture
+
+!theme plain
+skinparam componentStyle rectangle
+
+package "Frontend" {
+    [React App] as frontend
+    [Zustand Store] as store
+    [API Client] as api
+    [Socket.IO Client] as socket
+}
+
+package "Backend" {
+    [Express Server] as server
+    [Auth Controller] as auth
+    [Task Controller] as task
+    [Project Controller] as project
+    [Socket.IO Server] as socketServer
+}
+
+database "MongoDB" {
+    [User Collection] as users
+    [Task Collection] as tasks
+    [Project Collection] as projects
+}
+
+frontend --> api : HTTP Requests
+api --> server : API Calls
+server --> auth : Authentication
+server --> task : Task Management
+server --> project : Project Management
+auth --> users : CRUD
+task --> tasks : CRUD
+project --> projects : CRUD
+frontend --> socket : Real-time Updates
+socket --> socketServer : WebSocket
+socketServer --> server : Event Handling
+
+@enduml
+
+@startuml Authentication Flow
+
+!theme plain
+skinparam sequence {
+    ArrowColor #2C3E50
+    ActorBorderColor #2C3E50
+    LifeLineBorderColor #2C3E50
+    ParticipantBorderColor #2C3E50
+}
+
+actor User
+participant "Frontend" as FE
+participant "Auth Controller" as AC
+participant "Database" as DB
+
+User -> FE: Submit Login
+FE -> AC: POST /api/auth/login
+AC -> DB: Verify Credentials
+DB --> AC: User Data
+AC -> AC: Generate JWT
+AC --> FE: Set HTTP-only Cookie
+FE --> User: Redirect to Dashboard
+
+@enduml
+
+@startuml Task Management Flow
+
+!theme plain
+skinparam sequence {
+    ArrowColor #2C3E50
+    ActorBorderColor #2C3E50
+    LifeLineBorderColor #2C3E50
+    ParticipantBorderColor #2C3E50
+}
+
+actor User
+participant "Frontend" as FE
+participant "Task Controller" as TC
+participant "Database" as DB
+participant "Socket.IO" as Socket
+
+User -> FE: Create/Update Task
+FE -> TC: API Request
+TC -> DB: Save Task
+DB --> TC: Confirmation
+TC -> Socket: Emit Update
+Socket --> FE: Real-time Update
+FE --> User: UI Update
+
+@enduml
+
+@startuml Component Structure
+
+!theme plain
+skinparam componentStyle rectangle
+
+package "Frontend Components" {
+    [Auth] as auth
+    [Dashboard] as dashboard
+    [Tasks] as tasks
+    [Projects] as projects
+    [Settings] as settings
+}
+
+package "UI Components" {
+    [TaskCard] as taskCard
+    [ProjectCard] as projectCard
+    [KanbanBoard] as kanban
+    [Calendar] as calendar
+    [Navigation] as nav
+}
+
+package "State Management" {
+    [Task Store] as taskStore
+    [Project Store] as projectStore
+    [User Store] as userStore
+}
+
+dashboard --> tasks
+dashboard --> projects
+tasks --> taskCard
+tasks --> kanban
+tasks --> calendar
+projects --> projectCard
+auth --> userStore
+tasks --> taskStore
+projects --> projectStore
+
+@enduml
+
+@startuml Database Schema
+
+!theme plain
+skinparam class {
+    BackgroundColor #F5F5F5
+    ArrowColor #2C3E50
+    BorderColor #2C3E50
+}
+
+class User {
+    +String: name
+    +String: email
+    +String: password
+    +Date: birthDate
+    +Boolean: isAccountVerified
+    +Date: createdAt
+    +Date: updatedAt
+}
+
+class Task {
+    +String: title
+    +String: description
+    +String: content
+    +Date: startDate
+    +Date: dueDate
+    +Enum: priority
+    +Enum: status
+    +Number: progress
+    +User[]: assignees
+    +Project: projectId
+    +User: createdBy
+    +Comment[]: comments
+}
+
+class Project {
+    +String: name
+    +String: description
+    +String: status
+    +Date: dueDate
+    +User: leader
+    +User[]: teamMembers
+    +Task[]: tasks
+    +View[]: lastViews
+}
+
+class Comment {
+    +User: user
+    +String: text
+    +Date: createdAt
+}
+
+class View {
+    +User: user
+    +Date: date
+}
+
+User "1" -- "many" Task: creates
+User "many" -- "many" Task: assigned to
+Task "many" -- "1" Project: belongs to
+User "1" -- "many" Project: leads
+User "many" -- "many" Project: team member
+Task "1" -- "many" Comment: has
+User "1" -- "many" Comment: writes
+Project "1" -- "many" View: has
+
+@enduml
+
+@startuml API Endpoints
+
+!theme plain
+skinparam componentStyle rectangle
+
+package "Authentication" {
+    [POST /api/auth/register] as register
+    [POST /api/auth/login] as login
+    [POST /api/auth/logout] as logout
+    [POST /api/auth/reset-password] as reset
+    [GET /api/auth/verify-email] as verify
+}
+
+package "Tasks" {
+    [GET /api/task/me] as getTasks
+    [POST /api/task] as createTask
+    [PUT /api/task/:id] as updateTask
+    [DELETE /api/task/:id] as deleteTask
+}
+
+package "Projects" {
+    [GET /api/project/me] as getProjects
+    [POST /api/project] as createProject
+    [PUT /api/project/:id] as updateProject
+    [DELETE /api/project/:id] as deleteProject
+}
+
+@enduml
+
+@startuml Security Architecture
+
+!theme plain
+skinparam componentStyle rectangle
+
+package "Frontend Security" {
+    [HTTP-only Cookies] as cookies
+    [CSRF Protection] as csrf
+    [Input Validation] as input
+    [XSS Prevention] as xss
+}
+
+package "Backend Security" {
+    [Password Hashing] as hash
+    [JWT Validation] as jwt
+    [Rate Limiting] as rate
+    [CORS Configuration] as cors
+    [Input Sanitization] as sanitize
+}
+
+package "Database Security" {
+    [Data Encryption] as encrypt
+    [Access Control] as access
+    [Backup System] as backup
+}
+
+cookies --> jwt
+input --> sanitize
+hash --> encrypt
+jwt --> access
+rate --> cors
+
+@enduml
+
+@startuml Deployment Architecture
+
+!theme plain
+skinparam componentStyle rectangle
+
+cloud "CDN" {
+    [Static Assets] as cdn
+}
+
+node "Frontend Server" {
+    [React App] as frontend
+    [Nginx] as nginx
+}
+
+node "Backend Server" {
+    [Node.js] as node
+    [Express] as express
+    [Socket.IO] as socket
+}
+
+database "MongoDB Cluster" {
+    [Primary] as primary
+    [Secondary 1] as secondary1
+    [Secondary 2] as secondary2
+}
+
+cloud "Monitoring" {
+    [Logging] as logs
+    [Metrics] as metrics
+    [Alerts] as alerts
+}
+
+cdn --> nginx
+nginx --> frontend
+frontend --> express
+express --> node
+node --> socket
+express --> primary
+primary --> secondary1
+primary --> secondary2
+node --> logs
+express --> metrics
+metrics --> alerts
+
+@enduml 

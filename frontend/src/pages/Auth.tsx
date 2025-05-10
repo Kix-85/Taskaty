@@ -7,7 +7,9 @@ import { Label } from "@/components/ui/label";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import { toast } from "sonner";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
+import { useAuthStore } from "@/store/authStore";
+import api from "@/lib/api";
 
 // Add type declaration for Vite env variables
 interface ImportMetaEnv {
@@ -18,12 +20,12 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const Auth = () => {
   const navigate = useNavigate();
+  const setUser = useAuthStore((state) => state.setUser);
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    username: "",
     password: "",
     confirmPassword: "",
     birthDate: ""
@@ -34,7 +36,6 @@ const Auth = () => {
     setFormData({
       name: "",
       email: "",
-      username: "",
       password: "",
       confirmPassword: "",
       birthDate: ""
@@ -59,21 +60,32 @@ const Auth = () => {
         return;
       }
 
-      const endpoint = isLogin ? `${API_URL}/auth/login` : `${API_URL}/auth/register`;
-      const response = await axios.post(endpoint, formData, {
-        withCredentials: true
-      });
+      // Comment out actual API call
+      // const endpoint = isLogin ? '/auth/login' : '/auth/register';
+      // const response = await api.post(endpoint, {
+      //   email: formData.email,
+      //   password: formData.password,
+      //   ...(isLogin ? {} : {
+      //     name: formData.name,
+      //     birthDate: formData.birthDate
+      //   })
+      // });
 
-      if (response.data.success) {
-        toast.success(isLogin ? "Login successful!" : "Registration successful! Please check your email for verification.");
-        navigate("/dashboard");
-      }
+      // Simulate successful login/registration
+      const mockUser = {
+        id: "1",
+        name: formData.name || "Test User",
+        email: formData.email,
+        isAccountVerified: true
+      };
+
+      setUser(mockUser);
+      toast.success(isLogin ? "Login successful!" : "Registration successful!");
+      navigate("/dashboard");
+
     } catch (error) {
-      if (error instanceof AxiosError) {
-        toast.error(error.response?.data?.message || "Something went wrong");
-      } else {
-        toast.error("An unexpected error occurred");
-      }
+      console.error('Auth error:', error);
+      toast.error("An unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -115,17 +127,6 @@ const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
                   <Label htmlFor="birthDate">Birth Date</Label>
                   <Input
                     id="birthDate"
@@ -139,12 +140,12 @@ const Auth = () => {
               </>
             )}
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="username"
-                name="username"
-                type="text"
-                value={formData.username}
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
                 onChange={handleChange}
                 required
               />
