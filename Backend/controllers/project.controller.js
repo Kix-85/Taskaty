@@ -43,11 +43,13 @@ module.exports.getProject = async (req, res) => {
 
 module.exports.createProject = async (req, res) => {
     const userID = req.user.id;
+    console.log('User ID from createProject:', userID);
     const { name, logo, description, status, activity, dueDate, teamMembers } = req.body;
     try {
         const project = await Project.create({ name, logo, description, status, activity, dueDate, leader: userID, teamMembers });
         res.status(201).json(project);
     } catch (error) {
+        console.log('Error from createProject:', error.message);
         res.status(500).json({ message: error.message });
     }
 }

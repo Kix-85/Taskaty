@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 
 interface ProjectFormData {
-  title: string;
+  name: string;
   description: string;
   status: string;
   dueDate: string;
@@ -23,7 +23,7 @@ interface CreateProjectModalProps {
 
 export const CreateProjectModal = ({ isOpen, onClose }: CreateProjectModalProps) => {
   const [formData, setFormData] = useState<ProjectFormData>({
-    title: '',
+    name: '',
     description: '',
     status: 'Just Started',
     dueDate: '',
@@ -48,18 +48,19 @@ export const CreateProjectModal = ({ isOpen, onClose }: CreateProjectModalProps)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/api/projects', formData, {
+      const response = await axios.post('http://localhost:3000/api/project/me', formData, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${Cookies.get('token')}`
-        }
+        },
+        withCredentials: true
       });
       
       if (response.status === 201) {
         toast.success('Project created successfully');
         onClose();
         setFormData({
-          title: '',
+          name: '',
           description: '',
           status: 'Just Started',
           dueDate: '',
@@ -67,7 +68,7 @@ export const CreateProjectModal = ({ isOpen, onClose }: CreateProjectModalProps)
         });
       }
     } catch (error) {
-      console.error('Error creating project:', error);
+      console.error('Error creating project:', error.message);
       toast.error('Failed to create project');
     }
   };
@@ -99,14 +100,14 @@ export const CreateProjectModal = ({ isOpen, onClose }: CreateProjectModalProps)
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <Label htmlFor="title">Project Title</Label>
+                <Label htmlFor="name">Project name</Label>
                 <Input
                   type="text"
-                  name="title"
-                  id="title"
-                  value={formData.title}
+                  name="name"
+                  id="name"
+                  value={formData.name}
                   onChange={handleInputChange}
-                  placeholder="Enter project title"
+                  placeholder="Enter project name"
                   required
                 />
               </div>

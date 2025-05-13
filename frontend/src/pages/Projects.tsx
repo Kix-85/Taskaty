@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter, Grid3X3, List as ListIcon } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,93 +6,43 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { CreateProjectModal } from "@/components/CreateProjectModal";
+// import Cookies from "node_modules/@types/js-cookie";
+import Cookies from 'js-cookie';
 
 // Sample project data
-const projects = [
-  {
-    id: "p1",
-    title: "Website Redesign",
-    description: "Complete overhaul of the company website with modern UI/UX",
-    progress: 65,
-    members: [
-      { name: "Alex Johnson", initial: "A" },
-      { name: "Maria Garcia", initial: "M" },
-      { name: "David Lee", initial: "D" }
-    ],
-    status: "In Progress",
-    dueDate: "Jun 15, 2025"
-  },
-  {
-    id: "p2",
-    title: "Mobile Application",
-    description: "Develop a cross-platform mobile app for task management",
-    progress: 30,
-    members: [
-      { name: "Emily Chen", initial: "E" },
-      { name: "James Wilson", initial: "J" }
-    ],
-    status: "In Progress",
-    dueDate: "Jul 20, 2025"
-  },
-  {
-    id: "p3",
-    title: "API Integration",
-    description: "Connect our services with third-party APIs and ensure data flow",
-    progress: 80,
-    members: [
-      { name: "Sarah Brown", initial: "S" },
-      { name: "Alex Johnson", initial: "A" }
-    ],
-    status: "Almost Done",
-    dueDate: "May 30, 2025"
-  },
-  {
-    id: "p4",
-    title: "Database Migration",
-    description: "Migrate from legacy database to new cloud-based solution",
-    progress: 10,
-    members: [
-      { name: "David Lee", initial: "D" },
-      { name: "James Wilson", initial: "J" },
-      { name: "Emily Chen", initial: "E" }
-    ],
-    status: "Just Started",
-    dueDate: "Aug 5, 2025"
-  },
-  {
-    id: "p5",
-    title: "Analytics Dashboard",
-    description: "Build interactive analytics dashboard with real-time data visualization",
-    progress: 45,
-    members: [
-      { name: "Maria Garcia", initial: "M" },
-      { name: "Sarah Brown", initial: "S" }
-    ],
-    status: "In Progress",
-    dueDate: "Jul 10, 2025"
-  },
-  {
-    id: "p6",
-    title: "Security Audit",
-    description: "Complete a comprehensive security audit and implement recommendations",
-    progress: 90,
-    members: [
-      { name: "James Wilson", initial: "J" },
-      { name: "Alex Johnson", initial: "A" }
-    ],
-    status: "Almost Done",
-    dueDate: "May 22, 2025"
-  }
-];
+
 
 const Projects = () => {
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
+  const [projects, setProjects] = useState([])
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
+  // fetch data from http://localhost:3000/api/project/me
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/project/me', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Cookies.get('token')}`
+          },
+          credentials: 'include'
+        });
+        const data = await response.json();
+        setProjects(data);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+    
+    fetchProjects();
+  }, [projects]);
+
   // Filter projects based on search query
-  const filteredProjects = projects.filter(project => 
-    project.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredProjects = projects.filter(project =>
+    project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     project.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -107,7 +57,7 @@ const Projects = () => {
         return 'bg-green-500 hover:bg-green-600';
       default:
         return 'bg-gray-500 hover:bg-gray-600';
-    }
+    } 
   };
 
   return (
@@ -190,7 +140,7 @@ const Projects = () => {
                 </CardContent>
                 
                 <CardFooter className="flex justify-between">
-                  <div className="flex -space-x-2">
+                  {/* <div className="flex -space-x-2">
                     {project.members.map((member, idx) => (
                       <div 
                         key={`${project.id}-member-${idx}`}
@@ -199,7 +149,7 @@ const Projects = () => {
                         {member.initial}
                       </div>
                     ))}
-                  </div>
+                  </div> */}
                   <div className="text-sm text-muted-foreground">Due: {project.dueDate}</div>
                 </CardFooter>
               </Card>
