@@ -2,39 +2,19 @@ import axios from 'axios';
 import { create } from 'zustand';
 import { toast } from 'sonner';
 import Cookies from 'js-cookie';
-
-// Types
-export interface Task {
-  id: string;
-  title: string;
-  description: string;
-  content: string;
-  startDate: string;
-  dueDate: string;
-  priority: 'low' | 'medium' | 'high';
-  status: 'To Do' | 'In Progress' | 'Done';
-  progress: number;
-  assignees: { name: string; initial: string }[];
-  projectId?: string;
-  subscribes: number;
-}
-
-export interface TaskGroups {
-  'To Do': Task[];
-  'In Progress': Task[];
-  'Done': Task[];
-}
+import { mockTasks } from '@/lib/mockData';
+import type { Task, TaskGroups } from '@/types/task';
 
 // API Configuration
-const API_URL = '/api/task/me';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // This is important for cookies
+  withCredentials: true,
 });
 
 // Add request interceptor for auth token
@@ -51,9 +31,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized access
+      // Clear the token on unauthorized
+      Cookies.remove('token');
       toast.error('Session expired. Please login again.');
-      // You might want to redirect to login page here
+      window.location.href = '/auth';
     }
     return Promise.reject(error);
   }
@@ -68,8 +49,16 @@ interface TaskStore {
   createTask: (task: Omit<Task, 'id'>) => Promise<void>;
   updateTask: (id: string, task: Partial<Task>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
-  moveTask: (taskId: string, sourceStatus: keyof TaskGroups, destinationStatus: keyof TaskGroups, newIndex: number) => Promise<void>;
+  moveTask: (taskId: string, sourceStatus: keyof TaskGroups, destinationStatus: keyof TaskGroups, index: number) => Promise<void>;
 }
+
+const groupTasksByStatus = (tasks: Task[]): TaskGroups => {
+  return {
+    'To Do': tasks.filter(task => task.status === 'To Do'),
+    'In Progress': tasks.filter(task => task.status === 'In Progress'),
+    'Done': tasks.filter(task => task.status === 'Done')
+  };
+};
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
   tasks: {
@@ -81,28 +70,29 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   error: null,
 
   fetchTasks: async () => {
+    set({ isLoading: true, error: null });
     try {
-      set({ isLoading: true, error: null });
-      const response = await api.get(API_URL);
-      set({ tasks: response.data, isLoading: false });
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      const groupedTasks = groupTasksByStatus(mockTasks);
+      set({ tasks: groupedTasks, isLoading: false });
     } catch (error) {
       set({ error: 'Failed to fetch tasks', isLoading: false });
-      toast.error('Failed to fetch tasks');
     }
   },
 
   createTask: async (taskData) => {
     try {
       set({ isLoading: true, error: null });
-      const response = await api.post(API_URL, taskData);
+      const response = await api.post('/task', taskData);
       const newTask = response.data;
       
       set((state) => ({
         tasks: {
           ...state.tasks,
-          [newTask.status]: [...state.tasks[newTask.status], newTask]
-        },
-        isLoading: false
+          'To Do': [...state.tasks['To Do'], newTask],
+          isLoading: false
+        }
       }));
       
       toast.success('Task created successfully');
@@ -115,26 +105,22 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   updateTask: async (id, taskData) => {
     try {
       set({ isLoading: true, error: null });
-      const response = await api.put(`${API_URL}/${id}`, taskData);
+      const response = await api.put(`/task/${id}`, taskData);
       const updatedTask = response.data;
       
       set((state) => {
-        const newTasks = { ...state.tasks };
-        
-        // Remove task from old status if status changed
-        if (taskData.status && taskData.status !== updatedTask.status) {
-          Object.keys(newTasks).forEach((status) => {
-            newTasks[status as keyof TaskGroups] = newTasks[status as keyof TaskGroups].filter(
-              (task) => task.id !== id
-            );
-          });
-        }
-        
-        // Add/update task in new status
-        newTasks[updatedTask.status] = newTasks[updatedTask.status].map((task) =>
-          task.id === id ? updatedTask : task
-        );
-        
+        const newTasks = {
+          ...state.tasks,
+          'To Do': state.tasks['To Do'].map((task) =>
+            task.id === id ? updatedTask : task
+          ),
+          'In Progress': state.tasks['In Progress'].map((task) =>
+            task.id === id ? updatedTask : task
+          ),
+          'Done': state.tasks['Done'].map((task) =>
+            task.id === id ? updatedTask : task
+          )
+        };
         return { tasks: newTasks, isLoading: false };
       });
       
@@ -148,15 +134,15 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   deleteTask: async (id) => {
     try {
       set({ isLoading: true, error: null });
-      await api.delete(`${API_URL}/${id}`);
+      await api.delete(`/task/${id}`);
       
       set((state) => {
-        const newTasks = { ...state.tasks };
-        Object.keys(newTasks).forEach((status) => {
-          newTasks[status as keyof TaskGroups] = newTasks[status as keyof TaskGroups].filter(
-            (task) => task.id !== id
-          );
-        });
+        const newTasks = {
+          ...state.tasks,
+          'To Do': state.tasks['To Do'].filter((task) => task.id !== id),
+          'In Progress': state.tasks['In Progress'].filter((task) => task.id !== id),
+          'Done': state.tasks['Done'].filter((task) => task.id !== id)
+        };
         return { tasks: newTasks, isLoading: false };
       });
       
@@ -167,50 +153,32 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     }
   },
 
-  moveTask: async (taskId, sourceStatus, destinationStatus, newIndex) => {
-    try {
-      set({ isLoading: true, error: null });
+  moveTask: async (taskId: string, sourceStatus: keyof TaskGroups, destinationStatus: keyof TaskGroups, index: number) => {
+    set(state => {
+      const newTasks = { ...state.tasks };
+      const task = newTasks[sourceStatus].find(t => t.id === taskId);
       
-      // Optimistically update UI
-      set((state) => {
-        const newTasks = { ...state.tasks };
-        const task = newTasks[sourceStatus].find((t) => t.id === taskId);
-        
-        if (!task) return state;
-        
-        // Remove from source
-        newTasks[sourceStatus] = newTasks[sourceStatus].filter((t) => t.id !== taskId);
-        
-        // Add to destination
-        const updatedTask = { ...task, status: destinationStatus };
-        newTasks[destinationStatus].splice(newIndex, 0, updatedTask);
-        
-        return { tasks: newTasks };
-      });
+      if (!task) return state;
       
-      // Update backend
-      await api.put(`${API_URL}/${taskId}`, {
-        status: destinationStatus,
-        index: newIndex
-      });
+      // Remove from source
+      newTasks[sourceStatus] = newTasks[sourceStatus].filter(t => t.id !== taskId);
       
-      set({ isLoading: false });
-    } catch (error) {
-      set({ error: 'Failed to move task', isLoading: false });
-      toast.error('Failed to move task');
-      // Revert optimistic update
-      get().fetchTasks();
-    }
+      // Add to destination
+      const updatedTask = { ...task, status: destinationStatus };
+      newTasks[destinationStatus].splice(index, 0, updatedTask);
+      
+      return { tasks: newTasks };
+    });
   }
 }));
 
 // Export API functions for direct use if needed
 export const taskApi = {
-  getAll: () => api.get(API_URL),
-  getById: (id: string) => api.get(`${API_URL}/${id}`),
-  create: (task: Omit<Task, 'id'>) => api.post(API_URL, task),
-  update: (id: string, task: Partial<Task>) => api.put(`${API_URL}/${id}`, task),
-  delete: (id: string) => api.delete(`${API_URL}/${id}`),
+  getAll: () => api.get('/task/me'),
+  getById: (id: string) => api.get(`/task/${id}`),
+  create: (task: Omit<Task, 'id'>) => api.post('/task', task),
+  update: (id: string, task: Partial<Task>) => api.put(`/task/${id}`, task),
+  delete: (id: string) => api.delete(`/task/${id}`),
   move: (taskId: string, sourceStatus: keyof TaskGroups, destinationStatus: keyof TaskGroups, newIndex: number) =>
-    api.put(`${API_URL}/${taskId}/move`, { sourceStatus, destinationStatus, newIndex })
+    api.put(`/task/${taskId}/move`, { sourceStatus, destinationStatus, newIndex })
 }; 

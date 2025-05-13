@@ -2,27 +2,15 @@ import React, { useState } from "react";
 import TaskCard from "@/components/TaskCard";
 import { X, Pencil, Eye, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import type { Task, TaskGroups } from "@/types/task";
 
-type Task = {
-  id: string;
-  title: string;
-  description: string;
-  dueDate: string;
-  priority: "low" | "medium" | "high";
-  progress: number;
-  assignees: { name: string; initial: string }[];
-  status: string;
-};
-
-type TaskGroups = {
-  "To Do": Task[];
-  "In Progress": Task[];
-  "Done": Task[];
-};
-
-type ListProps = {
+interface ListProps {
   tasks: TaskGroups;
-};
+  onTaskMove?: (result: any) => void;
+}
 
 const TaskModal = ({ task, onClose }: { task: Task | null; onClose: () => void }) => {
   if (!task) return null;
@@ -71,41 +59,75 @@ const TaskModal = ({ task, onClose }: { task: Task | null; onClose: () => void }
   );
 };
 
-const List: React.FC<ListProps> = ({ tasks }) => {
+const List = ({ tasks, onTaskMove }: ListProps) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const handleTaskDoubleClick = (task: Task) => {
     setSelectedTask(task);
   };
 
+  const handleDragEnd = (result: any) => {
+    if (!result.destination || !onTaskMove) return;
+    onTaskMove(result);
+  };
+
   return (
     <>
-      <div className="p-2 space-y-4 rounded-lg border bg-card/50 backdrop-blur-sm shadow-sm h-full">
+      <DragDropContext onDragEnd={handleDragEnd}>
         {Object.entries(tasks).map(([status, statusTasks]) => (
-          <div key={status} className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 capitalize">{status}</h3>
-            <div className="space-y-4">
-              {statusTasks.map((task) => (
+          <div key={status} className="mb-8">
+            <h3 className="text-lg font-semibold mb-4 capitalize">{status}</h3>
+            <Droppable droppableId={status}>
+              {(provided) => (
                 <div
-                  key={task.id}
-                  onDoubleClick={() => handleTaskDoubleClick(task)}
-                  className="cursor-pointer"
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="space-y-4"
                 >
-                  <TaskCard
-                    title={task.title}
-                    description={task.description}
-                    dueDate={task.dueDate}
-                    priority={task.priority}
-                    progress={task.progress}
-                    assignees={task.assignees}
-                    className="transition-all duration-200 hover:shadow-md"
-                  />
+                  {statusTasks.map((task, index) => (
+                    <Draggable key={task.id} draggableId={task.id} index={index}>
+                      {(provided) => (
+                        <Card
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className="hover:shadow-md transition-shadow"
+                        >
+                          <CardContent className="p-4">
+                            <div className="flex justify-between items-start mb-2">
+                              <h3 className="font-medium">{task.title}</h3>
+                              <span className={`px-2 py-1 rounded text-white text-sm ${
+                                task.status === 'To Do' ? 'bg-gray-500' :
+                                task.status === 'In Progress' ? 'bg-blue-500' :
+                                'bg-green-500'
+                              }`}>
+                                {task.status}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-500 mb-4">{task.description}</p>
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-sm">
+                                <span>Progress</span>
+                                <span>{task.progress}%</span>
+                              </div>
+                              <Progress value={task.progress} />
+                              <div className="flex justify-between text-sm text-gray-500">
+                                <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                                <span>Priority: {task.priority}</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
                 </div>
-              ))}
-            </div>
+              )}
+            </Droppable>
           </div>
         ))}
-      </div>
+      </DragDropContext>
       {selectedTask && (
         <TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} />
       )}
