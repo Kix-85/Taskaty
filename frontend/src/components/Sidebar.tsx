@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { 
   Home, 
@@ -22,6 +22,7 @@ import {
   ChevronRight,
   ChevronLeft
 } from "lucide-react";
+import { authService } from "@/services/authService";
 
 interface SidebarProps {
   className?: string;
@@ -49,6 +50,7 @@ export function Sidebar({ className }: SidebarProps) {
   const isMobile = useIsMobile();
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const toggleSidebar = useCallback(() => {
     if (isMobile) {
@@ -71,6 +73,16 @@ export function Sidebar({ className }: SidebarProps) {
 
   // Determine if sidebar should be shown
   const showSidebar = !isMobile || (isMobile && mobileOpen);
+
+  async function handleLogout() {
+    const res = await authService.logout()
+    console.log(res.status)
+    if (res.status === 200) {
+      navigate("/");
+    } else {
+      console.error("Logout failed");
+    }
+  }
 
   return (
     <>
@@ -152,7 +164,7 @@ export function Sidebar({ className }: SidebarProps) {
           <Button variant="ghost" size="icon">
             <Flag className="w-6 h-6" />
           </Button>
-          <Button variant="ghost" size="icon">
+          <Button onClick={handleLogout} variant="ghost" size="icon">
             <LogOut className="w-6 h-6" />
           </Button>
         </div>
