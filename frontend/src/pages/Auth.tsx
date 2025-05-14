@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
+import { authService } from "@/services/authService";
+import { resolve } from "path/win32";
 
 // Add type declaration for Vite env variables
 interface ImportMetaEnv {
@@ -26,6 +28,7 @@ const Auth = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    username: "",
     password: "",
     confirmPassword: "",
     birthDate: ""
@@ -36,6 +39,7 @@ const Auth = () => {
     setFormData({
       name: "",
       email: "",
+      username: "",
       password: "",
       confirmPassword: "",
       birthDate: ""
@@ -53,39 +57,35 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    console.log('Handle submit is called');
+    console.log(isLogin);
 
     try {
-      if (!isLogin && formData.password !== formData.confirmPassword) {
-        toast.error("Passwords do not match");
-        return;
-      }
-
-      // Comment out actual API call
-      // const endpoint = isLogin ? '/auth/login' : '/auth/register';
-      // const response = await api.post(endpoint, {
-      //   email: formData.email,
-      //   password: formData.password,
-      //   ...(isLogin ? {} : {
-      //     name: formData.name,
-      //     birthDate: formData.birthDate
-      //   })
-      // });
-
-      // Simulate successful login/registration
-      const mockUser = {
-        id: "1",
-        name: formData.name || "Test User",
+      const endpoint = isLogin ? 'login' : 'register';
+      console.log('First');
+      const res = await authService.sign(endpoint, {
         email: formData.email,
-        isAccountVerified: true
-      };
-
-      setUser(mockUser);
-      toast.success(isLogin ? "Login successful!" : "Registration successful!");
-      navigate("/dashboard");
-
+        password: formData.password,
+        ...(isLogin ? {} : {
+          name: formData.name,
+          username: formData.username,
+          birthDate: formData.birthDate,
+          confirmPassword: formData.confirmPassword
+        }),
+      });
+      console.log("After the authService");
+      console.log('Response:', res);
+      // Optionally set user here if needed
+      if(res.status === 200) {
+      navigate('/dashboard');
+      } else {
+        console.log(res)
+        toast.error(res.response.data.message || "An error occurred");
+      }
     } catch (error) {
-      console.error('Auth error:', error);
-      toast.error("An unexpected error occurred");
+      const err = error as AxiosError;
+      console.log("Error here from the catch block");
+      toast.error(err?.response?.data?.message || "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -152,14 +152,14 @@ const Auth = () => {
             )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -202,8 +202,8 @@ const Auth = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full"
               onClick={() => handleSocialAuth('google')}
               disabled={loading}
@@ -211,8 +211,8 @@ const Auth = () => {
               <FcGoogle className="mr-2 h-4 w-4" />
               Google
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full"
               onClick={() => handleSocialAuth('github')}
               disabled={loading}
@@ -245,4 +245,4 @@ const Auth = () => {
   );
 };
 
-export default Auth; 
+export default Auth;

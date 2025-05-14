@@ -1,6 +1,5 @@
 export type Task = {
   comments: any;
-  comments: any;
   id: string;
   title: string;
   content: string;

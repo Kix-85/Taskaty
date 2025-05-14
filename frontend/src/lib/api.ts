@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { mockApi } from './mockApi';
 
 const API_URL = import.meta.env.VITE_API_URL;
-const USE_MOCK = true; // Toggle this to switch between mock and real API
+const USE_MOCK = false; // Toggle this to switch between mock and real API
 
 // Create axios instance with default config
 const api = axios.create({
@@ -47,9 +47,9 @@ interface ApiResponse<T = unknown> {
 // Create a wrapper that uses mock data when enabled
 const apiWrapper = {
   post: async (url: string, data: RequestData): Promise<ApiResponse> => {
-    if (USE_MOCK) {
-      return mockApi.post(url, data);
-    }
+    // if (USE_MOCK) {
+    //   return mockApi.post(url, data);
+    // }
     return api.post(url, data);
   },
   get: async (url: string): Promise<ApiResponse> => {
