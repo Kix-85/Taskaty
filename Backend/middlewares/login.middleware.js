@@ -2,6 +2,7 @@ const User = require('../models/user.model.js')
 const bcrypt = require('bcrypt');
 
 module.exports.validateLogin = async (req, res, next) => {
+    console.log('From login middleware:', req.body)
     const { email, password } = req.body;
 
     // Check for missing fields
@@ -13,16 +14,19 @@ module.exports.validateLogin = async (req, res, next) => {
         const user = await User.findOne({ email });
 
         if (!user) {
+            console.log('User not found:', user);
             return res.status(401).json({ success: false, message: 'Invalid email or password' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
+            console.log('Password does not match:', isMatch);
             return res.status(401).json({ success: false, message: 'Invalid email or password' });
         }
 
         if (!user.isAccountVerified) {
+            console.log('User is not verified:', user.isAccountVerified);
             return res.status(401).json({ success: false, message: 'Please verify your email address' });
         }
 

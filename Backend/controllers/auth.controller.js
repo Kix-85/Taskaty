@@ -7,6 +7,7 @@ const { sendEmail } = require('../utils/sendEmail.js');
 
 // register controller
 module.exports.register = async (req, res) => {
+    console.log('request from register');
     const { username, name, email, password, birthDate } = req.body;
 
     try {
@@ -30,17 +31,18 @@ module.exports.register = async (req, res) => {
         console.log(verificationEmailTemplate);
         const template = verificationEmailTemplate(`${process.env.VERIFICATIONLINK}?token=${token}`, user.name);
         await sendEmail(user.email, subject, template);
-
+        
         console.log('Verification email sent to:', user.email, ' successfully!');
         return res.status(201).json({ success: true, message: 'We have sent Email verification, please check your Email to verify your account' });
     } catch (error) {
         console.log('Error from register controller: ', error.message);
-        return res.status(500).json({ success: false, message: 'Something went wrong (register controller)' });
+        return res.status(500).json({ success: false, message: error.message });
     }
 };
 
 // login controller
 module.exports.login = async (req, res) => {
+    console.log('From login:', req.body);
     const user = req.user;
 
     try {
@@ -62,7 +64,7 @@ module.exports.login = async (req, res) => {
         });
     } catch (error) {
         console.log('Error:', error.message);
-        return res.status(500).json({ success: false, message: 'Something went wrong' });
+        return res.status(500).json({ success: false, message: 'Something went wrong' + error.message });
     }
 };
 
@@ -91,7 +93,7 @@ module.exports.resetPassword = async (req, res) => {
         return res.status(200).json({success: true, message: "check your email to reset your password"});
     } catch (error) {
         console.log('Error from resetPassword controller: ', error.message);
-        return res.status(500).json({ success: false, message: 'Something went wrong (resetPassword controller)' });
+        return res.status(500).json({ success: false, message: 'Something went wrong (resetPassword controller)'+ error.message });
     }
 }
 
@@ -106,6 +108,6 @@ module.exports.logout = async (req, res) => {
         return res.status(200).json({ success: true, message: 'User Logged out successfully' })
     } catch (error) {
         console.log("Error: ", error.message);
-        return res.status(500).json({ success: false, message: 'Something went wrong' })
+        return res.status(500).json({ success: false, message: 'Something went wrong'+ error.message})
     }
 }
