@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,18 +7,10 @@ import { Label } from "@/components/ui/label";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import { toast } from "sonner";
-import { AxiosError } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { useAuthStore } from "@/store/authStore";
-import api from "@/lib/api";
 import { authService } from "@/services/authService";
-import { resolve } from "path/win32";
 
-// Add type declaration for Vite env variables
-interface ImportMetaEnv {
-  VITE_API_URL: string;
-}
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -62,7 +54,7 @@ const Auth = () => {
 
     try {
       const endpoint = isLogin ? 'login' : 'register';
-      console.log('First');
+
       const res = await authService.sign(endpoint, {
         email: formData.email,
         password: formData.password,
@@ -73,19 +65,35 @@ const Auth = () => {
           confirmPassword: formData.confirmPassword
         }),
       });
-      console.log("After the authService");
-      console.log('Response:', res);
-      // Optionally set user here if needed
+      
       if(res.status === 200) {
-      navigate('/dashboard');
+        const user = res.data.user;
+        console.log(user);
+        setUser(user);
+        toast.success(`Welcome back, ${user.name}!`);
+        // Redirect to dashboard
+        navigate('/dashboard');
+      } else if (res.status === 201) {
+        toast.success("Registration successful!");
+        toast.info("Registration successful! Please verify your email before you can log in. Check your email inbox or spam folder.");
+        setIsLogin(true);
       } else {
-        console.log(res)
-        toast.error(res.response.data.message || "An error occurred");
+        // logic error or missing fields
+        const response: any = res as AxiosResponse;
+        console.log(res);
+        toast.error(response.response.data.message || "An error occurred");
       }
     } catch (error) {
-      const err = error as AxiosError;
+      // server error
+      const err: any = error as AxiosError;
       console.log("Error here from the catch block");
-      toast.error(err?.response?.data?.message || "An error occurred");
+      if(err.response) {
+        console.log(err.response.data);
+        toast.error(err.response.data.message || "An error occurred");
+      } else {
+        console.log(err);
+        toast.error("Something went wrong, please try again later");
+      }
     } finally {
       setLoading(false);
     }
