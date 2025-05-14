@@ -4,7 +4,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  isAccountVerified: boolean;
+  // isAccountVerified: boolean;
 }
 
 interface AuthState {
