@@ -4,11 +4,11 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { 
-  Home, 
-  CheckSquare, 
-  Folder, 
-  MessageSquare, 
+import {
+  Home,
+  CheckSquare,
+  Folder,
+  MessageSquare,
   Settings,
   Menu,
   X,
@@ -23,6 +23,7 @@ import {
   ChevronLeft
 } from "lucide-react";
 import { authService } from "@/services/authService";
+import { useAuthStore } from "@/store/authStore";
 
 interface SidebarProps {
   className?: string;
@@ -32,15 +33,15 @@ const navItems = [
   { icon: Home, label: "Dashboard", href: "/dashboard" },
   { icon: CheckSquare, label: "My Tasks", href: "/myTasks" },
   { icon: Folder, label: "Projects", href: "/projects" },
-  { 
-    icon: MessageSquare, 
-    label: "Messages", 
+  {
+    icon: MessageSquare,
+    label: "Messages",
     href: "/messages",
     badge: "6"
   },
-  { 
-    icon: Settings, 
-    label: "Settings", 
+  {
+    icon: Settings,
+    label: "Settings",
     href: "/settings"
   }
 ];
@@ -74,15 +75,20 @@ export function Sidebar({ className }: SidebarProps) {
   // Determine if sidebar should be shown
   const showSidebar = !isMobile || (isMobile && mobileOpen);
 
-  async function handleLogout() {
-    const res = await authService.logout()
-    console.log(res.status)
-    if (res.status === 200) {
-      navigate("/");
-    } else {
-      console.error("Logout failed");
+  // Example logout function (could be inside authService or component)
+  const handleLogout = async () => {
+    try {
+      const res = await authService.logout();
+      if (res.status === 200) {
+        useAuthStore.getState().setUser(null);
+        useAuthStore.getState().isAuthenticated = false;
+        window.location.href = "/auth";
+      }
+    } catch (err) {
+      console.error("Logout failed", err);
     }
-  }
+  };
+
 
   return (
     <>
