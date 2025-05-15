@@ -75,6 +75,7 @@ const Auth = () => {
         navigate('/dashboard');
       } else if (res.status === 201) {
         toast.success("Registration successful!");
+<<<<<<< HEAD
         toast.info("We have sent you email verification. Please verify your email before login.");
         setIsLogin(true);
       } else {
