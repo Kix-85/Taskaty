@@ -22,10 +22,11 @@ const AppContent = () => {
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
   const isAuthPage = location.pathname === "/auth";
+  const isVerifyPage = location.pathname === "/verify-email";
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
-      {!isLandingPage && !isAuthPage && <Sidebar />}
+      {!isLandingPage && !isAuthPage && !isVerifyPage && <Sidebar />}
       <main className={`flex-1 overflow-auto`}>
         <Toaster />
         <Sonner />
