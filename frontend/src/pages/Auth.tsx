@@ -75,7 +75,7 @@ const Auth = () => {
         navigate('/dashboard');
       } else if (res.status === 201) {
         toast.success("Registration successful!");
-        toast.info("Registration successful! Please verify your email before you can log in. Check your email inbox or spam folder.");
+        toast.info("Please verify your email before you can log in. Check your email inbox or spam folder.");
         setIsLogin(true);
       } else {
         // logic error or missing fields
