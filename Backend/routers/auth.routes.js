@@ -32,19 +32,4 @@ router.post('/reset-password', resetPassword);
 // Change Password
 router.post('/change-password', changePassword);
 
-// // Verify token endpoint
-// router.get('/verify-token', verifyToken, (req, res) => {
-//   try {
-//     res.json({
-//       authenticated: true,
-//       user: req.user
-//     });
-//   } catch (error) {
-//     res.status(401).json({
-//       authenticated: false,
-//       message: 'Invalid token'
-//     });
-//   }
-// });
-
 module.exports = router;

@@ -17,12 +17,12 @@ exports.googleCallback = async (req, res, next) => {
         passport.authenticate('google', async (err, user, info) => {
             if (err) {
                 console.error('Error during Google authentication:', err);
-                return res.redirect('http://localhost:8080/auth');
+                return res.redirect(`${process.env.FRONTEND_URL}/auth`);
             }
 
             if (!user) {
                 console.log('User not found in database');
-                return res.redirect('http://localhost:8080/auth');
+                return res.redirect(`${process.env.FRONTEND_URL}/auth`);
             }
 
             // Generate JWT after successful login
@@ -30,19 +30,19 @@ exports.googleCallback = async (req, res, next) => {
                 userId: user._id, 
                 email: user.email,
             };
-
+            console.log('User found:', user, "\nUser payload:", payload);
             // Generate JWT token and set it in the cookie
             const token = generateTokenService(payload, '1h');
             setJwtCookie(res, token);
 
-            res.redirect('http://localhost:8080/dashboard');
-            
+            res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
+
             // Redirect to dashboard after successful login
         })(req, res, next);
     } catch (error) {
         console.error('Error during Google authentication:', error);
         console.error(error);
-        res.redirect('http://localhost:8080/auth'); // On failure, redirect to auth
+        res.redirect(`${process.env.FRONTEND_URL}/auth`); // On failure, redirect to auth
     }
 };
 
@@ -58,9 +58,9 @@ module.exports.register = async (req, res) => {
         const user = await User.create({ username, name, email, password: hashedPassword, birthDate });
 
         // Generate JWT token and set it in the cookie
-        const token = generateTokenService(user._id, process.env.JWT_EXPIRES_IN);
-        setJwtCookie(res, token);
-
+        const token = generateTokenService({id: user._id}, process.env.JWT_EXPIRES_IN);
+        // setJwtCookie(res, token);
+        console.log("Token generated and set in cookie:", token);
         // Send verification email
         const subject = 'Verify your email address';
         console.log(verificationEmailTemplate);
@@ -81,7 +81,7 @@ module.exports.login = async (req, res) => {
     const user = req.user;
 
     try {
-        const token = generateTokenService(user._id, process.env.JWT_EXPIRES_IN);
+        const token = generateTokenService({id: user._id}, process.env.JWT_EXPIRES_IN);
         setJwtCookie(res, token);
 
         return res.status(200).json({
@@ -106,9 +106,7 @@ module.exports.resetPassword = async (req, res) => {
     }
 
     try {
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-            expiresIn: process.env.JWT_EXPIRES_IN
-        })
+        const token = generateTokenService({ id: user._id }, process.env.JWT_EXPIRES_IN);
 
         // send email with reset password link
         const resetPasswordLink = `${process.env.RESET_PASS_LINK}?token=${token}`;
