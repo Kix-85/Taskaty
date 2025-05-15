@@ -1,5 +1,3 @@
-import React from "react";
-import { useAuthStore } from "@/store/authStore";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,7 +14,7 @@ import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/landPage";
 import Auth from "./pages/Auth";
 import ProtectedRoute from "./components/protectRoute";
-import LoadingSpinner from "./components/loadingSpinner";
+import VerifyEmail from "./pages/verifyEmail";
 
 const queryClient = new QueryClient();
 
@@ -24,15 +22,6 @@ const AppContent = () => {
   const location = useLocation();
   const isLandingPage = location.pathname === "/";
   const isAuthPage = location.pathname === "/auth";
-
-  // Get loading state from auth store
-  const isLoading = useAuthStore((state) => state.isLoading);
-
-  // if (isLoading) {
-  //   // Show loading screen WITHOUT sidebar or routes
-  //   return <LoadingSpinner />;
-  // }
-  
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -44,6 +33,7 @@ const AppContent = () => {
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
 
           {/* Protected Routes */}
           <Route
