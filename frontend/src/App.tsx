@@ -1,3 +1,5 @@
+import React from "react";
+import { useAuthStore } from "@/store/authStore";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +15,8 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/landPage";
 import Auth from "./pages/Auth";
+import ProtectedRoute from "./components/protectRoute";
+import LoadingSpinner from "./components/loadingSpinner";
 
 const queryClient = new QueryClient();
 
@@ -21,20 +25,69 @@ const AppContent = () => {
   const isLandingPage = location.pathname === "/";
   const isAuthPage = location.pathname === "/auth";
 
+  // Get loading state from auth store
+  const isLoading = useAuthStore((state) => state.isLoading);
+
+  // if (isLoading) {
+  //   // Show loading screen WITHOUT sidebar or routes
+  //   return <LoadingSpinner />;
+  // }
+  
+
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       {!isLandingPage && !isAuthPage && <Sidebar />}
-      <main className={`flex-1 overflow-auto ${!isLandingPage && !isAuthPage ? "" : ""}`}>
+      <main className={`flex-1 overflow-auto`}>
         <Toaster />
         <Sonner />
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/dashboard" element={<Home />} />
-          <Route path="/myTasks" element={<MyTasks />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/messages" element={<Messages />} />
-          <Route path="/settings/*" element={<Settings />} />
+
+          {/* Protected Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/myTasks"
+            element={
+              <ProtectedRoute>
+                <MyTasks />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/projects"
+            element={
+              <ProtectedRoute>
+                <Projects />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/messages"
+            element={
+              <ProtectedRoute>
+                <Messages />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings/*"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Not found route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
