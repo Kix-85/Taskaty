@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
         minlength: 3,
         maxlength: 50
     },
-    bio : {
+    bio: {
         type: String,
         required: false,
         trim: true,
@@ -35,9 +35,15 @@ const userSchema = new mongoose.Schema({
         required: true,
         minlength: 6
     },
+    googleId: {
+        type: String,
+        required: false, // Not required for normal signup
+        unique: true,
+    },
+
     birthDate: {
         type: Date,
-        required: true,
+        required: false,
         // min: 6,
         // max: 100,
     },

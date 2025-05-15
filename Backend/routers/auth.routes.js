@@ -4,7 +4,7 @@ const { validateRegister } = require('../middlewares/register.middleware');
 const { validateLogin } = require('../middlewares/login.middleware');
 const { verifyEmail } = require('../controllers/verify.controller');
 const { changePassword } = require('../controllers/changePass.controller');
-// const { verifyToken } = require('../middlewares/auth.middleware');
+const { googleLogin, googleCallback } = require('../controllers/auth.controller');
 
 const router = express.Router()
 
@@ -13,6 +13,12 @@ router.post('/register', validateRegister, register);
 
 // Login
 router.post('/login', validateLogin, login);
+
+// Google OAuth login
+router.get('/google', googleLogin);
+
+// Google OAuth callback
+router.get('/google/callback', googleCallback);
 
 // Logout
 router.post('/logout', logout);

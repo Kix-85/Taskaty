@@ -4,6 +4,48 @@ const jwt = require('jsonwebtoken');
 const { verificationEmailTemplate } = require('../utils/templates/verifyEmail.template');  // Correct the import here
 const { resetPasswordTemplate } = require('../utils/templates/resetPass.template.js');
 const { sendEmail } = require('../utils/sendEmail.js');
+const passport = require('../config/passport'); 
+const { generateTokenService, setJwtCookie } = require('../services/jwtService.js');
+
+// Start Google OAuth flow
+exports.googleLogin = passport.authenticate('google', { scope: ['profile', 'email'] });
+
+// Handle Google OAuth callback
+exports.googleCallback = async (req, res, next) => {
+    try {
+        // Passport authentication callback
+        passport.authenticate('google', async (err, user, info) => {
+            if (err) {
+                console.error('Error during Google authentication:', err);
+                return res.redirect('http://localhost:8080/auth');
+            }
+
+            if (!user) {
+                console.log('User not found in database');
+                return res.redirect('http://localhost:8080/auth');
+            }
+
+            // Generate JWT after successful login
+            const payload = {
+                userId: user._id, 
+                email: user.email,
+            };
+
+            // Generate JWT token and set it in the cookie
+            const token = generateTokenService(payload, '1h');
+            setJwtCookie(res, token);
+
+            res.redirect('http://localhost:8080/dashboard');
+            
+            // Redirect to dashboard after successful login
+        })(req, res, next);
+    } catch (error) {
+        console.error('Error during Google authentication:', error);
+        console.error(error);
+        res.redirect('http://localhost:8080/auth'); // On failure, redirect to auth
+    }
+};
+
 
 // register controller
 module.exports.register = async (req, res) => {
@@ -15,23 +57,16 @@ module.exports.register = async (req, res) => {
         console.log(User);
         const user = await User.create({ username, name, email, password: hashedPassword, birthDate });
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-            expiresIn: process.env.JWT_EXPIRES_IN,
-        });
-
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        // Generate JWT token and set it in the cookie
+        const token = generateTokenService(user._id, process.env.JWT_EXPIRES_IN);
+        setJwtCookie(res, token);
 
         // Send verification email
         const subject = 'Verify your email address';
         console.log(verificationEmailTemplate);
         const template = verificationEmailTemplate(`${process.env.VERIFICATIONLINK}?token=${token}`, user.name);
         await sendEmail(user.email, subject, template);
-        
+
         console.log('Verification email sent to:', user.email, ' successfully!');
         return res.status(201).json({ success: true, message: 'We have sent Email verification, please check your Email to verify your account' });
     } catch (error) {
@@ -46,16 +81,8 @@ module.exports.login = async (req, res) => {
     const user = req.user;
 
     try {
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-            expiresIn: '7d',
-        });
-
-        res.cookie('token', token, {
-            httpOnly: process.env.NODE_ENV === 'production' ? true : false,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        const token = generateTokenService(user._id, process.env.JWT_EXPIRES_IN);
+        setJwtCookie(res, token);
 
         return res.status(200).json({
             success: true,
@@ -74,15 +101,15 @@ module.exports.resetPassword = async (req, res) => {
 
     const user = await User.findOne({ email });
 
-    if(!user) {
-        return res.status(404).json({success: false, message: "User not found"});
+    if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
     }
 
     try {
-        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
             expiresIn: process.env.JWT_EXPIRES_IN
         })
-    
+
         // send email with reset password link
         const resetPasswordLink = `${process.env.RESET_PASS_LINK}?token=${token}`;
         const template = resetPasswordTemplate(resetPasswordLink, user.name);
@@ -90,10 +117,10 @@ module.exports.resetPassword = async (req, res) => {
         await sendEmail(user.email, subject, template);
 
         console.log('Reset password email sent to:', user.email, ' successfully!');
-        return res.status(200).json({success: true, message: "check your email to reset your password"});
+        return res.status(200).json({ success: true, message: "check your email to reset your password" });
     } catch (error) {
         console.log('Error from resetPassword controller: ', error.message);
-        return res.status(500).json({ success: false, message: 'Something went wrong (resetPassword controller)'+ error.message });
+        return res.status(500).json({ success: false, message: 'Something went wrong (resetPassword controller)' + error.message });
     }
 }
 
@@ -108,6 +135,6 @@ module.exports.logout = async (req, res) => {
         return res.status(200).json({ success: true, message: 'User Logged out successfully' })
     } catch (error) {
         console.log("Error: ", error.message);
-        return res.status(500).json({ success: false, message: 'Something went wrong'+ error.message})
+        return res.status(500).json({ success: false, message: 'Something went wrong' + error.message })
     }
 }

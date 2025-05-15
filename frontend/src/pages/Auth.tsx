@@ -101,8 +101,9 @@ const Auth = () => {
 
   const handleSocialAuth = async (provider: 'google' | 'github') => {
     try {
-      // Implement social auth logic here
-      toast.info(`${provider} authentication coming soon!`);
+      console.log(`Redirecting to ${provider} authentication...`);
+      window.location.href = `${import.meta.env.VITE_API_URL}/auth/${provider}`;
+      // toast.info(`${provider} authentication coming soon!`);
     } catch (error) {
       toast.error("Social authentication failed");
     }
