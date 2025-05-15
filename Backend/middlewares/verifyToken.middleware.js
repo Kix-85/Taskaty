@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { verifyTokenService } = require('../services/jwtService');
 
 const verifyToken = (req, res, next) => {
     // Get token from cookies
@@ -10,7 +11,7 @@ const verifyToken = (req, res, next) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = verifyTokenService(token, process.env.JWT_SECRET);
         console.log(decoded)
         req.user = decoded;
         next(); 
