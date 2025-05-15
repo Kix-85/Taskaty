@@ -15,7 +15,7 @@ module.exports.validateLogin = async (req, res, next) => {
 
         if (!user) {
             console.log('User not found:', user);
-            return res.status(401).json({ success: false, message: 'Invalid email or password' });
+            return res.status(401).json({ success: false, message: 'Email does not exist. Please register first!' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);

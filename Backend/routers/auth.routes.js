@@ -2,7 +2,7 @@ const express = require('express')
 const { register, login, logout, resetPassword } = require('../controllers/auth.controller');
 const { validateRegister } = require('../middlewares/register.middleware');
 const { validateLogin } = require('../middlewares/login.middleware');
-const { verifyEmail } = require('../controllers/verify.controller');
+const { verifyEmail } = require('../controllers/verifyEmail.controller');
 const { changePassword } = require('../controllers/changePass.controller');
 const { googleLogin, googleCallback } = require('../controllers/auth.controller');
 

@@ -27,7 +27,8 @@ exports.googleCallback = async (req, res, next) => {
 
             // Generate JWT after successful login
             const payload = {
-                userId: user._id, 
+                userId: user._id,
+                name: user.name,
                 email: user.email,
             };
             console.log('User found:', user, "\nUser payload:", payload);
