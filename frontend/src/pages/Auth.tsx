@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FcGoogle } from "react-icons/fc";
-import { FaGithub } from "react-icons/fa";
 import { toast } from "sonner";
 import { AxiosError, AxiosResponse } from "axios";
 import { useAuthStore } from "@/store/authStore";
@@ -99,7 +98,7 @@ const Auth = () => {
     }
   };
 
-  const handleSocialAuth = async (provider: 'google' | 'github') => {
+  const handleSocialAuth = async (provider: 'google') => {
     try {
       console.log(`Redirecting to ${provider} authentication...`);
       window.location.href = `${import.meta.env.VITE_API_URL}/auth/${provider}`;
