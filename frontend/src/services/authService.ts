@@ -7,7 +7,7 @@ export const authService = {
             console.log('Response From Auth Service:', res.data);
             return res;
         } catch (error) {
-            throw error; // Let the caller handle the error properly
+            throw error; 
         }
     },
 
@@ -16,7 +16,7 @@ export const authService = {
             const res = await api.post('/auth/logout');
             return res;
         } catch (error) {
-            throw error; // Let the caller handle the error properly
+            throw error; 
         }
     }
 }

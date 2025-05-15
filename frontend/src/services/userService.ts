@@ -7,9 +7,9 @@ export interface User {
   email: string;
   bio?: string;
   profileImage?: string;
-  role: 'user' | 'admin';
-  status: 'active' | 'inactive' | 'suspended';
-  statistics: {
+  role?: 'user' | 'admin';
+  status?: 'active' | 'inactive' | 'suspended';
+  statistics?: {
     tasksCompleted: number;
     lastActive: string;
   };
@@ -22,6 +22,12 @@ export const userService = {
   getCurrentUser: async () => {
     const response = await api.get('/user/me');
     return response.data;
+  },
+
+  verifyToken: async () => {
+    const response = await api.get('/user/verify-token', { withCredentials: true });
+    console.log('From user service: ', response);
+    return response;
   },
 
   // Get user by ID
