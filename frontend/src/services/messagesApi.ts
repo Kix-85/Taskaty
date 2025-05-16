@@ -6,7 +6,7 @@ const API_URL = '/api/messages';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: 'https://app3000.maayn.me',
   headers: {
     'Content-Type': 'application/json',
   },

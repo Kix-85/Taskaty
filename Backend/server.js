@@ -13,7 +13,7 @@ const cors = require('cors');
 const passport = require('./config/passport');
 
 // Handle Cors and whitelist
-const whiteLists = ['http://localhost:8080', 'https://yourdomain.com'];
+const whiteLists = ['http://localhost:8080', 'https://app6000.maayn.me'];
 app.use(cors({
     origin: function (origin, callback) {
         if (whiteLists.includes(origin) || !origin) {
@@ -29,7 +29,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
         // change after production
-        origin: 'http://localhost:8080',
+        origin: 'https://app6000.maayn.me',
         methods: ['GET', 'POST'],
         credentials: true,
     },
@@ -42,8 +42,11 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 // Routes
+app.get('/', (req, res) => {
+    res.send('Welcome to the Task Management API');
+});
 app.use('/api/auth', auth);
-app.use('/api/task', task);
+app.use('/api/tasks', task);
 app.use('/api/user', user);
 app.use('/api/project', project)
 

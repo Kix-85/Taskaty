@@ -18,6 +18,7 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<string>('');
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -25,7 +26,6 @@ const Dashboard = () => {
         setIsLoading(true);
         setError(null);
 
-        // Use mock data directly
         const stats = await dashboardApi.getProjectStats();
         const today = await dashboardApi.getTodayTasks();
         const upcoming = await dashboardApi.getUpcomingTasks();
@@ -33,6 +33,12 @@ const Dashboard = () => {
         setProjectStats(stats);
         setTodayTasks(today);
         setUpcomingTasks(upcoming);
+        
+        if (stats?.projects?.length > 0) {
+          setSelectedProjectId(stats.projects[0].id);
+        } else {
+          setError('No projects found. Please create a project first.');
+        }
 
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch dashboard data';
@@ -46,31 +52,22 @@ const Dashboard = () => {
     fetchDashboardData();
   }, []);
 
+  const formatTaskForCard = (task: Task) => ({
+    title: task.name,
+    description: task.description || '',
+    dueDate: task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date',
+    priority: task.priority || 'medium',
+    progress: task.progress || 0,
+    assignees: task.assignedTo?.map(user => ({
+      name: user.name,
+      initial: user.name.charAt(0).toUpperCase()
+    })) || []
+  });
+
   if (isLoading) {
     return (
-      <div className="flex flex-col min-h-screen animate-fade-in">
-        <div className="sticky top-0 z-10 bg-background p-6 pb-4 border-b">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <Skeleton className="h-8 w-48 mb-2" />
-              <Skeleton className="h-4 w-64" />
-            </div>
-            <Skeleton className="h-10 w-32" />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-6">
-            {[...Array(5)].map((_, i) => (
-              <Card key={i}>
-                <CardHeader className="pb-2">
-                  <Skeleton className="h-4 w-24" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-8 w-16" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
     );
   }
@@ -94,6 +91,7 @@ const Dashboard = () => {
           <Button 
             className="w-full md:w-auto"
             onClick={() => setIsCreateModalOpen(true)}
+            disabled={!selectedProjectId}
           >
             <Plus size={16} className="mr-2" />
             Add New Task
@@ -161,13 +159,8 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {todayTasks.map((task) => (
                     <TaskCard
-                      key={task.id}
-                      title={task.title}
-                      description={task.description}
-                      dueDate={task.dueDate}
-                      priority={task.priority}
-                      progress={task.progress}
-                      assignees={task.assignees}
+                      key={task._id}
+                      {...formatTaskForCard(task)}
                     />
                   ))}
                 </div>
@@ -188,13 +181,8 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {upcomingTasks.map((task) => (
                     <TaskCard
-                      key={task.id}
-                      title={task.title}
-                      description={task.description}
-                      dueDate={task.dueDate}
-                      priority={task.priority}
-                      progress={task.progress}
-                      assignees={task.assignees}
+                      key={task._id}
+                      {...formatTaskForCard(task)}
                     />
                   ))}
                 </div>
@@ -203,7 +191,11 @@ const Dashboard = () => {
           </div>
         </ScrollArea>
       </div>
-      <CreateTaskModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
+      <CreateTaskModal 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setIsCreateModalOpen(false)} 
+        projectId={selectedProjectId}
+      />
     </div>
   );
 };

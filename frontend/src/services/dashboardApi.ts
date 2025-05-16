@@ -6,7 +6,7 @@ const API_URL = '/api/dashboard';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: 'https://app3000.maayn.me',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -37,13 +37,17 @@ api.interceptors.response.use(
 );
 
 export interface Task {
-  id: string;
-  title: string;
+  _id: string;
+  name: string;
   description: string;
   dueDate: string;
   priority: "low" | "medium" | "high";
   progress: number;
-  assignees: { name: string; initial: string }[];
+  assignedTo?: Array<{
+    _id: string;
+    name: string;
+    email: string;
+  }>;
 }
 
 export interface ProjectStats {
@@ -52,59 +56,64 @@ export interface ProjectStats {
   inProgressTasks: number;
   upcomingTasks: number;
   overdueTask: number;
+  projects: Array<{
+    id: string;
+    name: string;
+    description: string;
+    status: string;
+    dueDate: string;
+  }>;
 }
-
-// Mock data
-const mockProjectStats: ProjectStats = {
-  totalTasks: 24,
-  completedTasks: 12,
-  inProgressTasks: 8,
-  upcomingTasks: 4,
-  overdueTask: 2,
-};
-
-const mockTasks: Task[] = [
-  {
-    id: "task-1",
-    title: "Redesign homepage",
-    description: "Update the homepage with new branding and improve user experience",
-    dueDate: "May 10",
-    priority: "high",
-    progress: 65,
-    assignees: [
-      { name: "Alex Johnson", initial: "A" },
-      { name: "Maria Garcia", initial: "M" }
-    ]
-  },
-  {
-    id: "task-2",
-    title: "Implement authentication",
-    description: "Set up OAuth and email registration flows with proper security measures",
-    dueDate: "May 15",
-    priority: "high",
-    progress: 30,
-    assignees: [
-      { name: "James Wilson", initial: "J" }
-    ]
-  }
-];
 
 export const dashboardApi = {
   // Get project statistics
   getProjectStats: async (): Promise<ProjectStats> => {
-    // Return mock data directly
-    return mockProjectStats;
+    try {
+      const response = await api.get('/api/project/me');
+      const projects = response.data;
+      
+      // Calculate stats from real data
+      const stats: ProjectStats = {
+        totalTasks: 0,
+        completedTasks: 0,
+        inProgressTasks: 0,
+        upcomingTasks: 0,
+        overdueTask: 0,
+        projects: projects.map((project: any) => ({
+          id: project._id,
+          name: project.name,
+          description: project.description,
+          status: project.status,
+          dueDate: project.dueDate
+        }))
+      };
+
+      return stats;
+    } catch (error) {
+      console.error('Error fetching project stats:', error);
+      throw error;
+    }
   },
 
   // Get today's tasks
   getTodayTasks: async (): Promise<Task[]> => {
-    // Return mock data directly
-    return mockTasks;
+    try {
+      const response = await api.get('/api/tasks/me');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching today\'s tasks:', error);
+      throw error;
+    }
   },
 
   // Get upcoming tasks
   getUpcomingTasks: async (): Promise<Task[]> => {
-    // Return mock data directly
-    return mockTasks;
+    try {
+      const response = await api.get('/api/tasks/me');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching upcoming tasks:', error);
+      throw error;
+    }
   }
 }; 

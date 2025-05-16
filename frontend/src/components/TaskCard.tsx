@@ -8,7 +8,7 @@ interface TaskCardProps {
   dueDate: string;
   priority: "low" | "medium" | "high";
   progress: number;
-  assignees: { name: string; initial: string }[];
+  assignees?: { name: string; initial: string }[];
   className?: string;
 }
 
@@ -18,7 +18,7 @@ const TaskCard = ({
   dueDate,
   priority,
   progress,
-  assignees,
+  assignees = [],
   className,
 }: TaskCardProps) => {
   const priorityColors = {
@@ -47,7 +47,7 @@ const TaskCard = ({
         <div className="flex -space-x-2">
           {assignees.map((assignee, index) => (
             <div
-              key={index}
+              key={`${assignee.name}-${index}`}
               className="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-medium border-2 border-white"
               title={assignee.name}
             >
