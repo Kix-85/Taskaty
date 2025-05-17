@@ -5,6 +5,7 @@ import { useProjectStore } from '@/store/projectStore';
 import Kanban from '@/components/taskComponents/Kanban';
 import List from '@/components/taskComponents/List';
 import Calendar from '@/components/taskComponents/Calendar';
+import { BotChat } from '@/components/BotChat';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
@@ -89,6 +90,8 @@ const MyTasks = () => {
         {selectedView === 'List' && <List tasks={filteredTasks} onTaskMove={handleTaskMove} />}
         {selectedView === 'Calendar' && <Calendar tasks={calendarTasks} />}
       </div>
+
+      <BotChat />
     </div>
   );
 };

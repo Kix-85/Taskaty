@@ -32,7 +32,13 @@ export function Message({ message, isOwnMessage }: MessageProps) {
     const renderContent = () => {
         switch (message.messageType) {
             case 'emoji':
-                return <span className="text-2xl">{message.content}</span>;
+                return (
+                    <div className="flex flex-wrap gap-1">
+                        {message.content.split('').map((emoji, index) => (
+                            <span key={index} className="text-2xl">{emoji}</span>
+                        ))}
+                    </div>
+                );
                 
             case 'file':
                 // Extract filename from URL or use a default
@@ -80,7 +86,11 @@ export function Message({ message, isOwnMessage }: MessageProps) {
                 
             case 'text':
             default:
-                return <p className="break-words">{message.content}</p>;
+                return (
+                    <pre className="whitespace-pre-wrap break-words font-sans">
+                        {message.content}
+                    </pre>
+                );
         }
     };
 

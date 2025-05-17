@@ -1,172 +1,158 @@
-import { useState, KeyboardEvent, useEffect, useRef } from 'react';
-import { Input } from './ui/input';
-import { Button } from './ui/button';
-import { Smile, Send, Paperclip, X } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import React, { useState, useRef, KeyboardEvent, useEffect } from 'react';
+import { Send, Smile, Paperclip } from 'lucide-react';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 
 interface MessageInputProps {
-    receiverId: string;
-    onSendMessage: (content: string, type?: "text" | "emoji" | "file") => void;
+    onSendMessage: (content: string, type: 'text' | 'emoji' | 'file') => void;
+    onSendFile?: (file: File) => void;
 }
 
-export function MessageInput({ receiverId, onSendMessage }: MessageInputProps) {
+export function MessageInput({ onSendMessage, onSendFile }: MessageInputProps) {
     const [message, setMessage] = useState('');
-    const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
-    const [file, setFile] = useState<File | null>(null);
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
+    const emojiPickerRef = useRef<HTMLDivElement>(null);
 
-    // Focus input when receiver changes
+    // Close emoji picker when clicking outside
     useEffect(() => {
-        if (inputRef.current) {
-            inputRef.current.focus();
-        }
-    }, [receiverId]);
-
-    const handleSendMessage = async () => {
-        if (message.trim() || file) {
-            if (file) {
-                // If there's a file to send, handle file upload
-                try {
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    
-                    // Upload file to your server
-                    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
-                        method: 'POST',
-                        credentials: 'include',
-                        body: formData
-                    });
-                    
-                    if (response.ok) {
-                        const { fileUrl } = await response.json();
-                        
-                        // Send file message with the URL
-                        onSendMessage(fileUrl, 'file');
-                    } else {
-                        alert('Failed to upload file. Please try again.');
-                    }
-                } catch (error) {
-                    console.error('Error uploading file:', error);
-                    alert('Error uploading file. Please try again.');
-                }
-                
-                // Clear file regardless of success/failure
-                setFile(null);
+        const handleClickOutside = (event: MouseEvent) => {
+            if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
+                setShowEmojiPicker(false);
             }
-            
-            // Send text message if there's text
-            if (message.trim()) {
-                onSendMessage(message.trim());
-                setMessage('');
-            }
-        }
-    };
+        };
 
-    const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSendMessage();
         }
     };
 
-    const handleEmojiSelect = (emoji: any) => {
-        onSendMessage(emoji.native, "emoji");
-        setIsEmojiPickerOpen(false);
-        
-        // Focus back on input after emoji selection
-        if (inputRef.current) {
-            inputRef.current.focus();
+    const handleSendMessage = () => {
+        if (message.trim() || selectedFile) {
+            if (selectedFile && onSendFile) {
+                onSendFile(selectedFile);
+                setSelectedFile(null);
+            }
+            if (message.trim()) {
+                onSendMessage(message, 'text');
+                setMessage('');
+                if (textareaRef.current) {
+                    textareaRef.current.style.height = 'auto';
+                }
+            }
         }
     };
 
-    const handleFileSelect = () => {
-        if (fileInputRef.current) {
-            fileInputRef.current.click();
-        }
+    const handleEmojiSelect = (emoji: any) => {
+        setMessage(prev => prev + emoji.native);
+        // Don't close the emoji picker after selection
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const selectedFile = e.target.files?.[0];
-        if (selectedFile) {
-            setFile(selectedFile);
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedFile(file);
+            if (onSendFile) {
+                onSendFile(file);
+            }
         }
-    };
-
-    const clearFile = () => {
-        setFile(null);
+        // Reset file input
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
     };
 
+    const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setMessage(e.target.value);
+        // Auto-resize textarea
+        e.target.style.height = 'auto';
+        e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`;
+    };
+
     return (
-        <div className="p-4 border-t bg-card">
-            {file && (
-                <div className="mb-2 p-2 bg-muted rounded flex items-center justify-between">
-                    <span className="text-sm truncate max-w-[200px]">{file.name}</span>
-                    <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={clearFile} 
-                        className="h-6 w-6 p-0"
+        <div className="relative p-4 border-t dark:border-gray-700">
+            {selectedFile && (
+                <div className="mb-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-between">
+                    <span className="text-sm text-gray-600 dark:text-gray-300 truncate max-w-[200px]">
+                        {selectedFile.name}
+                    </span>
+                    <button
+                        onClick={() => setSelectedFile(null)}
+                        className="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                     >
-                        <X className="h-4 w-4" />
-                    </Button>
+                        ×
+                    </button>
                 </div>
             )}
-            
-            <div className="flex gap-2">
-                <Popover open={isEmojiPickerOpen} onOpenChange={setIsEmojiPickerOpen}>
-                    <PopoverTrigger asChild>
-                        <Button variant="outline" size="icon" className="text-muted-foreground hover:text-foreground">
-                            <Smile className="h-4 w-4" />
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-full p-0" align="start">
-                        <Picker
-                            data={data}
-                            onEmojiSelect={handleEmojiSelect}
-                            theme="light"
-                            set="native"
-                        />
-                    </PopoverContent>
-                </Popover>
-                
-                <Button 
-                    variant="outline" 
-                    size="icon"
-                    onClick={handleFileSelect}
-                    className="text-muted-foreground hover:text-foreground"
-                >
-                    <Paperclip className="h-4 w-4" />
-                    <input
-                        type="file"
-                        className="hidden"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
+            <div className="flex items-end gap-2">
+                <div className="flex-1 relative">
+                    <textarea
+                        ref={textareaRef}
+                        value={message}
+                        onChange={handleTextareaChange}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Type a message..."
+                        className="w-full p-3 pr-24 rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white resize-none min-h-[44px] max-h-[200px] focus:outline-none focus:ring-2 focus:ring-blue-500 overflow-hidden"
+                        rows={1}
                     />
-                </Button>
+                    <div className="absolute right-2 bottom-2 flex items-center gap-1">
+                        <button
+                            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                            className="p-1.5 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            type="button"
+                        >
+                            <Smile className="w-5 h-5" />
+                        </button>
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="p-1.5 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            type="button"
+                        >
+                            <Paperclip className="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
                 
-                <Input
-                    ref={inputRef}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Type a message..."
-                    className="flex-1"
-                />
-                
-                <Button 
-                    onClick={handleSendMessage} 
-                    disabled={!message.trim() && !file}
-                    size="icon"
+                <button
+                    onClick={handleSendMessage}
+                    disabled={!message.trim() && !selectedFile}
+                    className="p-2 rounded-lg bg-blue-500 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
-                    <Send className="h-4 w-4" />
-                </Button>
+                    <Send className="w-5 h-5" />
+                </button>
+
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                />
             </div>
+
+            {showEmojiPicker && (
+                <div 
+                    ref={emojiPickerRef}
+                    className="absolute bottom-full right-0 mb-2 z-50"
+                >
+                    <Picker
+                        data={data}
+                        onEmojiSelect={handleEmojiSelect}
+                        theme="light"
+                        set="native"
+                        previewPosition="none"
+                        skinTonePosition="none"
+                        autoFocus
+                    />
+                </div>
+            )}
         </div>
     );
 }
