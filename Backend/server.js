@@ -37,7 +37,6 @@ app.use(cors({
     credentials: true,
 }));
 
-// Server
 const server = http.createServer(app);
 // Setup Socket.IO with CORS configuration
 const io = new Server(server, {
