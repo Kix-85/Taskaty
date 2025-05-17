@@ -25,6 +25,7 @@ app.use(cors({
     credentials: true,
 }));
 
+// create server
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
