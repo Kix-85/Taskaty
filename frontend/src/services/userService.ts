@@ -35,7 +35,9 @@ export const userService = {
   getUserById: async (id: string) => {
     const response = await api.get(`/user/${id}`);
     return response.data;
-  },  // Update user profile
+  },
+
+  // Update user profile
   updateUserProfile: async (formData: FormData) => {
     try {
       console.log("Uploading profile data...");
@@ -77,9 +79,31 @@ export const userService = {
     return response.data;
   },
 
+  // resetUserPassword: async (email: string, currentPassword: string, newPassword: string, confirmPassword: string) => {
+  //   const response = await api.put('/user/reset-pass', { email, currentPassword, newPassword, confirmPassword });
+  //   console.log('From reset password: ', response)
+  //   return response.data;
+  // },
   // Update user status
   updateStatus: async (userId: string, status: User['status']) => {
     const response = await api.put(`/user/${userId}/status`, { status });
     return response.data;
+  },
+
+  // Reset user password
+  resetUserPassword: async (data: {
+    email: string;
+    newPassword: string;
+    confirmPassword: string;
+  }) => {
+    try {
+      const response = await api.post('/auth/reset-pass', data);
+      return response.data;
+    } catch (error: any) {
+      if (error.response) {
+        throw new Error(error.response.data.message || 'Failed to reset password');
+      }
+      throw error;
+    }
   }
 }; 

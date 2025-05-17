@@ -1,5 +1,5 @@
 const express = require('express')
-const { register, login, logout, resetPassword } = require('../controllers/auth.controller');
+const { register, login, logout, resetPassword, resetPass } = require('../controllers/auth.controller');
 const { validateRegister } = require('../middlewares/register.middleware');
 const { validateLogin } = require('../middlewares/login.middleware');
 const { verifyEmail } = require('../controllers/verifyEmail.controller');
@@ -26,10 +26,13 @@ router.post('/logout', logout);
 // verify email account
 router.get('/verify-email', verifyEmail);
 
-// Reset Password
-router.post('/reset-password', resetPassword);
+// // Reset Password
+// router.post('/reset-password', resetPassword);
 
-// Change Password
-router.post('/change-password', changePassword);
+// // Change Password
+// router.post('/change-password', changePassword);
+
+// resetPass another logic
+router.post('/reset-pass', resetPass)
 
 module.exports = router;

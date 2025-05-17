@@ -61,7 +61,47 @@ export default function AccountSetting() {
       email: "",
       bio: ""
     }
-  }); const onSubmit = async (data: FormData) => {
+  });
+  interface PasswordFormData {
+    currentPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }
+
+  const passwordForm = useForm<PasswordFormData>({
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: ""
+    }
+  });
+
+  const onReset = async (data: PasswordFormData) => {
+    try {
+      if (!user?.email) {
+        toast.error('User email not found');
+        return;
+      }
+
+      const response = await userService.resetUserPassword({
+        email: user.email,
+        newPassword: data.newPassword,
+        confirmPassword: data.confirmPassword
+      });
+
+      if (response.success) {
+        toast.success('Password updated successfully');
+        passwordForm.reset(); // Clear the form
+      } else {
+        toast.error(response.message || 'Failed to update password');
+      }
+    } catch (error: any) {
+      console.error('Error resetting password:', error);
+      toast.error(error.message || 'An error occurred while updating password');
+    }
+  }
+
+  const onSubmit = async (data: FormData) => {
     try {
       const formData = new FormData();
       // Add all form fields
@@ -211,26 +251,68 @@ export default function AccountSetting() {
             </div>
           </form>
         </Form>
-      </SettingsPanel>
-
-      <SettingsPanel
+      </SettingsPanel>      <SettingsPanel
         title="Password"
         description="Update your password to keep your account secure."
+        onSave={() => passwordForm.handleSubmit(onReset)()}
       >
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="current-password">Current Password</Label>
-            <Input id="current-password" type="password" placeholder="Enter current password" />
-          </div>
-          <div>
-            <Label htmlFor="new-password">New Password</Label>
-            <Input id="new-password" type="password" placeholder="Enter new password" />
-          </div>
-          <div>
-            <Label htmlFor="confirm-password">Confirm New Password</Label>
-            <Input id="confirm-password" type="password" placeholder="Confirm new password" />
-          </div>
-        </div>
+        <Form {...passwordForm}>
+          <form className="space-y-4" onSubmit={passwordForm.handleSubmit(onReset)}>
+            <FormField
+              control={passwordForm.control}
+              name="currentPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Current Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Enter current password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={passwordForm.control}
+              name="newPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>New Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Enter new password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={passwordForm.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm New Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Confirm new password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
       </SettingsPanel>
     </div>
   );
