@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Check, Star, Users, MessageSquare } from "lucide-react";
+import { ArrowRight, Check, Star, Users, MessageSquare, User } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent } from "@/components/ui/card";
 
 const LandingPage = () => {
   return (
@@ -87,6 +89,56 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Team Section */}
+      <section className="py-24 bg-background">
+        <div className="container px-6 mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Meet Our Team</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              The talented individuals behind Taskaty
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-5xl mx-auto">
+            <TeamMember 
+              name="Kareem" 
+              role="Team Lead"
+              delay={0}
+              initials="KE"
+            />
+            <TeamMember 
+              name="Ayman" 
+              role="backend Developer"
+              delay={0.1}
+              initials="A"
+            />
+            <TeamMember 
+              name="Yousef" 
+              role="frontend Developer"
+              delay={0.2}
+              initials="Y"
+            />
+            <TeamMember 
+              name="Shahd" 
+              role="UI/UX Designer"
+              delay={0.3}
+              initials="S"
+            />
+            <TeamMember 
+              name="Malak" 
+              role="QA Engineer"
+              delay={0.4}
+              initials="M"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-background border-t py-12">
         <div className="container px-6 mx-auto">
@@ -150,37 +202,72 @@ const FeatureCard = ({
 }) => {
   return (
     <motion.div
-  initial={{ opacity: 0, y: 40, scale: 0.95 }}
-  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-  whileHover={{ scale: 1.1 }}
-  transition={{ duration: 0.5, ease: "easeOut", delay }}
-  viewport={{ once: true, amount: 0.3 }}
-  className="p-8 rounded-xl bg-background border shadow-sm 
-             hover:bg-blue-100 dark:hover:bg-blue-900 
-             transition-colors duration-300 
-             flex flex-col items-center text-center"
->
-  {icon}
-  <h3 className="text-xl font-semibold mb-3">{title}</h3>
-  <p className="text-muted-foreground">{description}</p>
-  <div className="mt-6">
-    <ul className="space-y-2">
-      <li className="flex items-center gap-2">
-        <Check className="h-4 w-4 text-primary" />
-        <span className="text-sm">Easy to use</span>
-      </li>
-      <li className="flex items-center gap-2">
-        <Check className="h-4 w-4 text-primary" />
-        <span className="text-sm">Fast and reliable</span>
-      </li>
-    </ul>
-  </div>
-</motion.div>
-
+      initial={{ opacity: 0, y: 40, scale: 0.95 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      whileHover={{ scale: 1.1 }}
+      transition={{ duration: 0.5, ease: "easeOut", delay }}
+      viewport={{ once: true, amount: 0.3 }}
+      className="p-8 rounded-xl bg-background border shadow-sm 
+                 hover:bg-blue-100 dark:hover:bg-blue-900 
+                 transition-colors duration-300 
+                 flex flex-col items-center text-center"
+    >
+      {icon}
+      <h3 className="text-xl font-semibold mb-3">{title}</h3>
+      <p className="text-muted-foreground">{description}</p>
+      <div className="mt-6">
+        <ul className="space-y-2">
+          <li className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-primary" />
+            <span className="text-sm">Easy to use</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-primary" />
+            <span className="text-sm">Fast and reliable</span>
+          </li>
+        </ul>
+      </div>
+    </motion.div>
   );
 };
 
-
-
+// Team Member Component
+const TeamMember = ({ 
+  name, 
+  role, 
+  initials,
+  delay = 0 
+}: { 
+  name: string; 
+  role: string;
+  initials: string;
+  delay?: number;
+}) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay }}
+      viewport={{ once: true, margin: "-100px" }}
+      className="flex flex-col items-center text-center"
+    >
+      <Card className="w-full overflow-hidden">
+        <CardContent className="p-6">
+          <div className="flex flex-col items-center gap-3">
+            <Avatar className="h-20 w-20 border-2 border-primary mb-2">
+              <AvatarFallback className="bg-primary/10 text-primary text-xl font-semibold">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h3 className="font-semibold text-lg">{name}</h3>
+              <p className="text-sm text-muted-foreground">{role}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+};
 
 export default LandingPage;
