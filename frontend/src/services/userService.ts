@@ -19,7 +19,7 @@ export interface User {
 
 export const userService = {
   // Get current user profile
-  getCurrentUser: async () => {
+  getUserProfile: async () => {
     const response = await api.get('/user/me');
     return response.data;
   },
@@ -35,12 +35,28 @@ export const userService = {
   getUserById: async (id: string) => {
     const response = await api.get(`/user/${id}`);
     return response.data;
-  },
-
-  // Update user profile
-  updateProfile: async (userData: Partial<User>) => {
-    const response = await api.put('/user/profile', userData);
-    return response.data;
+  },  // Update user profile
+  updateUserProfile: async (formData: FormData) => {
+    try {
+      console.log("Uploading profile data...");
+      const response = await api.put('/user/me', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        timeout: 30000, // Increase timeout for file uploads
+      });
+      console.log("Response from updateUserProfile: ", response);
+      return response.data;
+    } catch (error: any) {
+      console.error('Profile update error:', error);
+      if (error.response) {
+        throw new Error(error.response.data.message || 'Error updating profile');
+      } else if (error.request) {
+        throw new Error('No response from server. Please try again.');
+      } else {
+        throw new Error('Error updating profile: ' + error.message);
+      }
+    }
   },
 
   // Update user settings

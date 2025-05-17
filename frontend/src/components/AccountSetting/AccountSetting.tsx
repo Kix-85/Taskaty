@@ -82,6 +82,7 @@ export default function AccountSetting() {
       }
 
       const response = await userService.updateUserProfile(formData);
+      console.log('From Response: ', response)
       if (response.success) {
         // Update the user state with new data
         setUser(response.data);
@@ -164,21 +165,22 @@ export default function AccountSetting() {
                 </div>
               </div>
 
-              <div className="space-y-4 flex-1">                <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter your full name" />
-                    </FormControl>
-                    <FormDescription>
-                      This is your public display name.
-                    </FormDescription>
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-4 flex-1">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Enter your full name" />
+                      </FormControl>
+                      <FormDescription>
+                        This is your public display name.
+                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
 
                 <FormField
                   control={form.control}
