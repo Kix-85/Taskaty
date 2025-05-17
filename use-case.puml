@@ -1,0 +1,91 @@
+@startuml Taskaty System
+
+' Actors
+actor "User" as user
+actor "Admin" as admin
+actor "Guest" as guest
+
+' System boundary
+rectangle "Taskaty Task Management System" {
+    ' Authentication & User Management
+    usecase "Register" as register
+    usecase "Login" as login
+    usecase "Login with Google" as googleLogin
+    usecase "Verify Email" as verifyEmail
+    usecase "Reset Password" as resetPass
+    usecase "Change Password" as changePass
+    usecase "Manage Profile" as manageProfile
+    usecase "Update Settings" as updateSettings
+
+    ' Task Management
+    usecase "Create Task" as createTask
+    usecase "View Tasks" as viewTasks
+    usecase "Update Task" as updateTask
+    usecase "Delete Task" as deleteTask
+    usecase "Mark Task Complete" as completeTask
+    usecase "Set Task Priority" as setPriority
+    usecase "Add Task Comments" as addComments
+
+    ' Project Management
+    usecase "Create Project" as createProject
+    usecase "View Projects" as viewProjects
+    usecase "Update Project" as updateProject
+    usecase "Delete Project" as deleteProject
+    usecase "Assign Members" as assignMembers
+
+    ' Messaging & Communication
+    usecase "Send Messages" as sendMessage
+    usecase "View Messages" as viewMessages
+    usecase "View Chat History" as viewChat
+    usecase "Mark Messages Read" as markRead
+
+    ' Dashboard & Reports
+    usecase "View Dashboard" as viewDashboard
+    usecase "View Statistics" as viewStats
+    usecase "Get Notifications" as getNotifications
+}
+
+' Relationships
+
+' Guest relationships
+guest --> register
+guest --> login
+guest --> googleLogin
+
+' User relationships
+user --> createTask
+user --> viewTasks
+user --> updateTask
+user --> deleteTask
+user --> completeTask
+user --> setPriority
+user --> addComments
+user --> createProject
+user --> viewProjects
+user --> updateProject
+user --> deleteProject
+user --> assignMembers
+user --> sendMessage
+user --> viewMessages
+user --> viewChat
+user --> markRead
+user --> viewDashboard
+user --> viewStats
+user --> getNotifications
+user --> manageProfile
+user --> updateSettings
+user --> changePass
+user --> verifyEmail
+user --> resetPass
+
+' Admin relationships
+admin --|> user
+admin --> "Manage Users"
+
+' Dependencies and includes
+register ..> verifyEmail : <<include>>
+login ..> viewDashboard : <<include>>
+createProject ..> assignMembers : <<include>>
+viewMessages ..> markRead : <<extends>>
+
+@enduml

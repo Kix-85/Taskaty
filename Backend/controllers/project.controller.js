@@ -1,7 +1,9 @@
 const Project = require('../models/project.model');
 
 module.exports.getMyProjects = async (req, res) => {
+    console.log('req.user: ', req.user);
     const userID = req.user.id;
+    console.log('userID: ', userID);
     try {
         const projects = await Project.find({ 
             $or: [
@@ -43,10 +45,11 @@ module.exports.getProject = async (req, res) => {
 
 module.exports.createProject = async (req, res) => {
     const userID = req.user.id;
-    console.log('User ID from createProject:', userID);
+    console.log('req.body: ', req.body);
     const { name, logo, description, status, activity, dueDate, teamMembers } = req.body;
     try {
-        const project = await Project.create({ name, logo, description, status, activity, dueDate, leader: userID, teamMembers });
+        const project = await Project.create({leader: userID, name, logo, description, status, activity, dueDate, teamMembers });
+        console.log('Project is created: ', project)
         res.status(201).json(project);
     } catch (error) {
         console.log('Error from createProject:', error.message);

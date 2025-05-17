@@ -1,12 +1,13 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'sonner';
+import { API_CONFIG } from '../config/api';
 
 const API_URL = '/api/messages';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: 'https://app3000.maayn.me',
+  baseURL: API_CONFIG.baseURL,
   headers: {
     'Content-Type': 'application/json',
   },

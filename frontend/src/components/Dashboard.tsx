@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import TaskCard from "@/components/TaskCard";
@@ -10,6 +8,7 @@ import { dashboardApi, Task, ProjectStats } from "@/services/dashboardApi";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CreateTaskModal } from "@/components/CreateTaskModal";
+import TaskEditModal from "@/components/taskComponents/TaskEditModal";
 
 const Dashboard = () => {
   const [projectStats, setProjectStats] = useState<ProjectStats | null>(null);
@@ -18,56 +17,70 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedProjectId, setSelectedProjectId] = useState<string>('');
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const fetchDashboardData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const stats = await dashboardApi.getProjectStats();
+      const today = await dashboardApi.getTodayTasks();
+      const upcoming = await dashboardApi.getUpcomingTasks();
+
+      setProjectStats(stats);
+      setTodayTasks(today);
+      setUpcomingTasks(upcoming);
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch dashboard data';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        const stats = await dashboardApi.getProjectStats();
-        const today = await dashboardApi.getTodayTasks();
-        const upcoming = await dashboardApi.getUpcomingTasks();
-
-        setProjectStats(stats);
-        setTodayTasks(today);
-        setUpcomingTasks(upcoming);
-        
-        if (stats?.projects?.length > 0) {
-          setSelectedProjectId(stats.projects[0].id);
-        } else {
-          setError('No projects found. Please create a project first.');
-        }
-
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch dashboard data';
-        setError(errorMessage);
-        toast.error(errorMessage);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchDashboardData();
   }, []);
 
-  const formatTaskForCard = (task: Task) => ({
-    title: task.name,
-    description: task.description || '',
-    dueDate: task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date',
-    priority: task.priority || 'medium',
-    progress: task.progress || 0,
-    assignees: task.assignedTo?.map(user => ({
-      name: user.name,
-      initial: user.name.charAt(0).toUpperCase()
-    })) || []
-  });
+  const handleTaskCreated = () => {
+    fetchDashboardData();
+    setIsCreateModalOpen(false);
+  };
+
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setIsEditModalOpen(true);
+  };
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      <div className="flex flex-col min-h-screen animate-fade-in">
+        <div className="sticky top-0 z-10 bg-background p-6 pb-4 border-b">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <Skeleton className="h-8 w-48 mb-2" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+            <Skeleton className="h-10 w-32" />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-6">
+            {[...Array(5)].map((_, i) => (
+              <Card key={i}>
+                <CardHeader className="pb-2">
+                  <Skeleton className="h-4 w-24" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-8 w-16" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -91,7 +104,6 @@ const Dashboard = () => {
           <Button 
             className="w-full md:w-auto"
             onClick={() => setIsCreateModalOpen(true)}
-            disabled={!selectedProjectId}
           >
             <Plus size={16} className="mr-2" />
             Add New Task
@@ -136,7 +148,7 @@ const Dashboard = () => {
               <CardTitle className="text-sm font-medium">Overdue</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-500">{projectStats?.overdueTask}</div>
+              <div className="text-2xl font-bold text-red-500">{projectStats?.overdueTasks}</div>
             </CardContent>
           </Card>
         </div>
@@ -158,10 +170,20 @@ const Dashboard = () => {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {todayTasks.map((task) => (
-                    <TaskCard
-                      key={task._id}
-                      {...formatTaskForCard(task)}
-                    />
+                    <div 
+                      key={task.id} 
+                      onClick={() => handleTaskClick(task)}
+                      className="cursor-pointer hover:opacity-80 transition-opacity"
+                    >
+                      <TaskCard
+                        title={task.name}
+                        description={task.description}
+                        dueDate={task.dueDate}
+                        status={task.status}
+                        progress={task.progress}
+                        assignedTo={task.assignedTo}
+                      />
+                    </div>
                   ))}
                 </div>
               </CardContent>
@@ -180,10 +202,20 @@ const Dashboard = () => {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {upcomingTasks.map((task) => (
-                    <TaskCard
-                      key={task._id}
-                      {...formatTaskForCard(task)}
-                    />
+                    <div 
+                      key={task.id} 
+                      onClick={() => handleTaskClick(task)}
+                      className="cursor-pointer hover:opacity-80 transition-opacity"
+                    >
+                      <TaskCard
+                        title={task.name}
+                        description={task.description}
+                        dueDate={task.dueDate}
+                        status={task.status}
+                        progress={task.progress}
+                        assignedTo={task.assignedTo}
+                      />
+                    </div>
                   ))}
                 </div>
               </CardContent>
@@ -191,11 +223,23 @@ const Dashboard = () => {
           </div>
         </ScrollArea>
       </div>
+
       <CreateTaskModal 
         isOpen={isCreateModalOpen} 
         onClose={() => setIsCreateModalOpen(false)} 
-        projectId={selectedProjectId}
+        onTaskCreated={handleTaskCreated}
       />
+
+      {selectedTask && (
+        <TaskEditModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedTask(null);
+          }}
+          task={selectedTask}
+        />
+      )}
     </div>
   );
 };

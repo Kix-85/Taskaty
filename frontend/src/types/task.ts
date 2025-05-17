@@ -1,16 +1,19 @@
 export type Task = {
-  comments: any;
-  id: string;
-  title: string;
-  content: string;
+  _id: string;
+  name: string;
   description: string;
-  startDate: string;
-  dueDate: string;
-  priority: "low" | "medium" | "high";
-  progress: number;
-  assignees: { name: string; initial: string }[];
   status: string;
-  subscribes: number;
+  priority: "low" | "medium" | "high";
+  progress?: number;
+  dueDate?: string;
+  project?: {
+    _id: string;
+    name: string;
+  };
+  assignees?: { name: string; initial: string }[];
+  comments?: any[];
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type TaskGroups = {

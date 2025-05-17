@@ -1,20 +1,23 @@
 import api from '@/lib/axios';
 
 export interface Project {
-  id: string;
+  _id: string;
   name: string;
   description: string;
-  status: 'active' | 'archived' | 'completed';
+  status: string;
+  progress?: number;
+  dueDate?: string;
   members: string[];
   createdAt: string;
-  updatedAt: string;
+  updatedAt: string;  
 }
 
 export const projectService = {
   // Get all projects
   getAllProjects: async () => {
-    const response = await api.get('/project');
-    return response.data;
+    const response = await api.get('/project/me');
+    console.log('Response from getAllProjects: ', response);
+    return response;
   },
 
   // Get project by ID
@@ -24,9 +27,9 @@ export const projectService = {
   },
 
   // Create new project
-  createProject: async (projectData: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const response = await api.post('/project', projectData);
-    return response.data;
+  createProject: async (projectData: Omit<Project, '_id' | 'createdAt' | 'updatedAt'>) => {
+    const response = await api.post('/project/me', projectData);
+    return response;
   },
 
   // Update project
