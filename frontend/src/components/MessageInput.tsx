@@ -1,99 +1,172 @@
-
-import { useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Smile, Paperclip, Send } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import Picker from '@emoji-mart/react';
+import { useState, KeyboardEvent, useEffect, useRef } from 'react';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
+import { Smile, Send, Paperclip, X } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
 
 interface MessageInputProps {
-  onSendMessage: (message: string) => void;
+    receiverId: string;
+    onSendMessage: (content: string, type?: "text" | "emoji" | "file") => void;
 }
 
-export function MessageInput({ onSendMessage }: MessageInputProps) {
-  const [message, setMessage] = useState("");
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      onSendMessage(message);
-      setMessage("");
-    }
-  };
+export function MessageInput({ receiverId, onSendMessage }: MessageInputProps) {
+    const [message, setMessage] = useState('');
+    const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
+    const [file, setFile] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+    // Focus input when receiver changes
+    useEffect(() => {
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [receiverId]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleEmojiSelect = (emoji: any) => {
-    setMessage(prev => prev + emoji.native);
-  };
-  
-  const handleAttachmentClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  return (
-    <div className="p-2 border-t border-border">
-      <div className="flex items-end gap-2">
-        <div className="flex-1 relative">
-          <Textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
-            className="min-h-[60px] resize-none pr-20"
-          />
-          
-          <div className="absolute bottom-2 right-2 flex items-center space-x-1">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <Smile size={20} />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="end">
-                <Picker 
-                  data={data}
-                  onEmojiSelect={handleEmojiSelect}
-                  theme="light"
-                  previewPosition="none"
-                  set="native"
-                />
-              </PopoverContent>
-            </Popover>
+    const handleSendMessage = async () => {
+        if (message.trim() || file) {
+            if (file) {
+                // If there's a file to send, handle file upload
+                try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    
+                    // Upload file to your server
+                    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/upload`, {
+                        method: 'POST',
+                        credentials: 'include',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        const { fileUrl } = await response.json();
+                        
+                        // Send file message with the URL
+                        onSendMessage(fileUrl, 'file');
+                    } else {
+                        alert('Failed to upload file. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error uploading file:', error);
+                    alert('Error uploading file. Please try again.');
+                }
+                
+                // Clear file regardless of success/failure
+                setFile(null);
+            }
             
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-8 w-8" 
-              onClick={handleAttachmentClick}
-            >
-              <Paperclip size={20} />
-              <input 
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                onChange={(e) => console.log("File selected:", e.target.files)}
-              />
-            </Button>
-          </div>
-        </div>
+            // Send text message if there's text
+            if (message.trim()) {
+                onSendMessage(message.trim());
+                setMessage('');
+            }
+        }
+    };
+
+    const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage();
+        }
+    };
+
+    const handleEmojiSelect = (emoji: any) => {
+        onSendMessage(emoji.native, "emoji");
+        setIsEmojiPickerOpen(false);
         
-        <Button 
-          type="submit" 
-          size="icon" 
-          className="h-10 w-10"
-          onClick={handleSendMessage}
-        >
-          <Send size={20} />
-        </Button>
-      </div>
-    </div>
-  );
+        // Focus back on input after emoji selection
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    };
+
+    const handleFileSelect = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = e.target.files?.[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+        }
+    };
+
+    const clearFile = () => {
+        setFile(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+    return (
+        <div className="p-4 border-t bg-card">
+            {file && (
+                <div className="mb-2 p-2 bg-muted rounded flex items-center justify-between">
+                    <span className="text-sm truncate max-w-[200px]">{file.name}</span>
+                    <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={clearFile} 
+                        className="h-6 w-6 p-0"
+                    >
+                        <X className="h-4 w-4" />
+                    </Button>
+                </div>
+            )}
+            
+            <div className="flex gap-2">
+                <Popover open={isEmojiPickerOpen} onOpenChange={setIsEmojiPickerOpen}>
+                    <PopoverTrigger asChild>
+                        <Button variant="outline" size="icon" className="text-muted-foreground hover:text-foreground">
+                            <Smile className="h-4 w-4" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0" align="start">
+                        <Picker
+                            data={data}
+                            onEmojiSelect={handleEmojiSelect}
+                            theme="light"
+                            set="native"
+                        />
+                    </PopoverContent>
+                </Popover>
+                
+                <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={handleFileSelect}
+                    className="text-muted-foreground hover:text-foreground"
+                >
+                    <Paperclip className="h-4 w-4" />
+                    <input
+                        type="file"
+                        className="hidden"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                    />
+                </Button>
+                
+                <Input
+                    ref={inputRef}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Type a message..."
+                    className="flex-1"
+                />
+                
+                <Button 
+                    onClick={handleSendMessage} 
+                    disabled={!message.trim() && !file}
+                    size="icon"
+                >
+                    <Send className="h-4 w-4" />
+                </Button>
+            </div>
+        </div>
+    );
 }

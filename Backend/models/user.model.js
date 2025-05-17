@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema({
     googleId: {
         type: String,
         required: false, // Not required for normal signup
-        unique: true,
+        sparse: true,
     },
 
     birthDate: {
@@ -123,8 +123,6 @@ const userSchema = new mongoose.Schema({
 });
 
 // Indexes for better query performance
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
 userSchema.index({ status: 1 });
 userSchema.index({ 'statistics.lastActive': -1 });
 
