@@ -12,11 +12,11 @@ const app = express();
 const cors = require('cors');
 const passport = require('./config/passport');
 
-// Handle Cors and whitelist
-const whiteLists = ['http://localhost:8080', 'https://yourdomain.com'];
+const allowedOrigins = ['http://localhost:8080', 'https://app8080.maayn.me', 'http://192.168.1.6:8080'];
+
 app.use(cors({
     origin: function (origin, callback) {
-        if (whiteLists.includes(origin) || !origin) {
+        if (allowedOrigins.includes(origin) || !origin) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
@@ -29,7 +29,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
         // change after production
-        origin: 'http://localhost:8080',
+        origin: ['http://localhost:8080', 'http://192.168.1.6:8080'],
         methods: ['GET', 'POST'],
         credentials: true,
     },
@@ -42,6 +42,9 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 // Routes
+app.get('/api', (req, res, next) => {
+    return res.send("<h1 style='text-align: center; color: red; position: relative; top: 50%'> Welcome to the Ayman's API </h1>");
+});
 app.use('/api/auth', auth);
 app.use('/api/task', task);
 app.use('/api/user', user);

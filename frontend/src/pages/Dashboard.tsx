@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import api from "@/lib/api";
+import api from "@/lib/axios";
 import { mockTasks, mockProjects } from "@/lib/mockData";
 
 interface ApiResponse {
@@ -130,4 +130,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

@@ -7,10 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { projectService } from '@/services/projectService';
 
 interface ProjectFormData {
   name: string;
   description: string;
+  // will modify the status to only accept specific valuues
   status: string;
   dueDate: string;
   members: string[];
@@ -19,9 +21,10 @@ interface ProjectFormData {
 interface CreateProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onProjectCreated: () => void;
 }
 
-export const CreateProjectModal = ({ isOpen, onClose }: CreateProjectModalProps) => {
+export const CreateProjectModal = ({ isOpen, onClose, onProjectCreated }: CreateProjectModalProps) => {
   const [formData, setFormData] = useState<ProjectFormData>({
     name: '',
     description: '',
@@ -48,17 +51,14 @@ export const CreateProjectModal = ({ isOpen, onClose }: CreateProjectModalProps)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/api/project/me', formData, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Cookies.get('token')}`
-        },
-        withCredentials: true
-      });
-      
+      const response = await projectService.createProject(formData);
+      console.log('Project created from handle submit:', response.data);
+
       if (response.status === 201) {
+        console.log("Oh yeah")
         toast.success('Project created successfully');
         onClose();
+        onProjectCreated();
         setFormData({
           name: '',
           description: '',
@@ -133,8 +133,8 @@ export const CreateProjectModal = ({ isOpen, onClose }: CreateProjectModalProps)
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Just Started">Just Started</SelectItem>
-                    <SelectItem value="In Progress">In Progress</SelectItem>
-                    <SelectItem value="Almost Done">Almost Done</SelectItem>
+                    <SelectItem value="in progress">In Progress</SelectItem>
+                    <SelectItem value="done">Done</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

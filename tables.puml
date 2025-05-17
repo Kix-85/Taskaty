@@ -1,0 +1,103 @@
+@startuml Database Schema
+
+' Styling
+skinparam linetype ortho
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+' Entities
+entity "User" as user {
+    * id: ObjectId
+    --
+    * username: String
+    * name: String
+    * email: String
+    * password: String
+    birthDate: Date
+    bio: String
+    profileImage: String
+    * role: enum
+    * status: enum
+    googleId: String
+    statistics.tasksCompleted: Number
+    statistics.lastActive: Date
+}
+
+entity "Task" as task {
+    * id: ObjectId
+    --
+    * name: String
+    description: String
+    * status: enum
+    * priority: enum
+    dueDate: Date
+    * createdBy: ObjectId
+    estimatedTime: Number
+    actualTime: Number
+    progress: Number
+    isRecurring: Boolean
+}
+
+entity "Project" as project {
+    * id: ObjectId
+    --
+    * name: String
+    logo: String
+    description: String
+    * status: enum
+    dueDate: Date
+    * leader: ObjectId
+    activity: Array
+    lastViews: Array
+}
+
+entity "Message" as message {
+    * id: ObjectId
+    --
+    * sender: ObjectId
+    * receiver: ObjectId
+    * content: String
+    * read: Boolean
+    * createdAt: Date
+}
+
+entity "Comment" as comment {
+    * id: ObjectId
+    --
+    * user: ObjectId
+    * content: String
+    * createdAt: Date
+}
+
+entity "Subtask" as subtask {
+    * id: ObjectId
+    --
+    title: String
+    completed: Boolean
+}
+
+entity "Attachment" as attachment {
+    name: String
+    url: String
+    type: String
+}
+
+' Relationships
+user "1" -- "N" task : creates >
+user "1" -- "N" project : leads >
+user "N" -- "N" project : member of >
+user "1" -- "N" message : sends >
+user "1" -- "N" message : receives >
+user "1" -- "N" comment : writes >
+
+project "1" -- "N" task : contains >
+
+task "1" -- "N" subtask : has >
+task "1" -- "N" attachment : has >
+task "1" -- "N" comment : has >
+task "N" -- "N" user : assigned to >
+
+@enduml

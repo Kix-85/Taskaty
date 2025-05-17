@@ -15,14 +15,14 @@ const taskSchema = new mongoose.Schema({
         maxlength: 1000
     },
     project: {
- 	type: mongoose.Schema.Types.ObjectId,
-	ref: 'Project',
-	required: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project',
+        required: false
     },
     status: {
         type: String,
         required: true,
-        enum: ['todo', 'in_progress', 'done', 'review'],
+        enum: ['todo', 'in progress', 'done'],
         default: 'todo'
     },
     priority: {
@@ -74,7 +74,7 @@ const taskSchema = new mongoose.Schema({
         content: {
             type: String,
             required: false,
-            trim: true  
+            trim: true
         },
         createdAt: {
             type: Date,
