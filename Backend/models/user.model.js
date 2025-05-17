@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
         unique: true,
         trim: true,
         lowercase: true,
-        match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
+        match: [/^\w+([.-]?\w+)@\w+([.-]?\w+)(\.\w{2,3})+$/, 'Please enter a valid email']
     },
     password: {
         type: String,
@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema({
     googleId: {
         type: String,
         required: false, // Not required for normal signup
-        unique: true,
+        sparse: true,
     },
 
     birthDate: {
@@ -123,10 +123,8 @@ const userSchema = new mongoose.Schema({
 });
 
 // Indexes for better query performance
-userSchema.index({ email: 1 });
-userSchema.index({ username: 1 });
 userSchema.index({ status: 1 });
 userSchema.index({ 'statistics.lastActive': -1 });
 
 const User = mongoose.model("User", userSchema);
-module.exports = User;
+module.exports = User;
