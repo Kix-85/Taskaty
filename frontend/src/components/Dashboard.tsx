@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import TaskCard from "@/components/TaskCard";
@@ -10,6 +8,7 @@ import { dashboardApi, Task, ProjectStats } from "@/services/dashboardApi";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CreateTaskModal } from "@/components/CreateTaskModal";
+import TaskEditModal from "@/components/taskComponents/TaskEditModal";
 
 const Dashboard = () => {
   const [projectStats, setProjectStats] = useState<ProjectStats | null>(null);
@@ -18,33 +17,44 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const fetchDashboardData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const stats = await dashboardApi.getProjectStats();
+      const today = await dashboardApi.getTodayTasks();
+      const upcoming = await dashboardApi.getUpcomingTasks();
+
+      setProjectStats(stats);
+      setTodayTasks(today);
+      setUpcomingTasks(upcoming);
+
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch dashboard data';
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        // Use mock data directly
-        const stats = await dashboardApi.getProjectStats();
-        const today = await dashboardApi.getTodayTasks();
-        const upcoming = await dashboardApi.getUpcomingTasks();
-
-        setProjectStats(stats);
-        setTodayTasks(today);
-        setUpcomingTasks(upcoming);
-
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch dashboard data';
-        setError(errorMessage);
-        toast.error(errorMessage);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchDashboardData();
   }, []);
+
+  const handleTaskCreated = () => {
+    fetchDashboardData();
+    setIsCreateModalOpen(false);
+  };
+
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setIsEditModalOpen(true);
+  };
 
   if (isLoading) {
     return (
@@ -138,7 +148,7 @@ const Dashboard = () => {
               <CardTitle className="text-sm font-medium">Overdue</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-500">{projectStats?.overdueTask}</div>
+              <div className="text-2xl font-bold text-red-500">{projectStats?.overdueTasks}</div>
             </CardContent>
           </Card>
         </div>
@@ -160,15 +170,20 @@ const Dashboard = () => {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {todayTasks.map((task) => (
-                    <TaskCard
-                      key={task.id}
-                      title={task.title}
-                      description={task.description}
-                      dueDate={task.dueDate}
-                      priority={task.priority}
-                      progress={task.progress}
-                      assignees={task.assignees}
-                    />
+                    <div 
+                      key={task.id} 
+                      onClick={() => handleTaskClick(task)}
+                      className="cursor-pointer hover:opacity-80 transition-opacity"
+                    >
+                      <TaskCard
+                        title={task.name}
+                        description={task.description}
+                        dueDate={task.dueDate}
+                        status={task.status}
+                        progress={task.progress}
+                        assignedTo={task.assignedTo}
+                      />
+                    </div>
                   ))}
                 </div>
               </CardContent>
@@ -187,15 +202,20 @@ const Dashboard = () => {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {upcomingTasks.map((task) => (
-                    <TaskCard
-                      key={task.id}
-                      title={task.title}
-                      description={task.description}
-                      dueDate={task.dueDate}
-                      priority={task.priority}
-                      progress={task.progress}
-                      assignees={task.assignees}
-                    />
+                    <div 
+                      key={task.id} 
+                      onClick={() => handleTaskClick(task)}
+                      className="cursor-pointer hover:opacity-80 transition-opacity"
+                    >
+                      <TaskCard
+                        title={task.name}
+                        description={task.description}
+                        dueDate={task.dueDate}
+                        status={task.status}
+                        progress={task.progress}
+                        assignedTo={task.assignedTo}
+                      />
+                    </div>
                   ))}
                 </div>
               </CardContent>
@@ -203,7 +223,23 @@ const Dashboard = () => {
           </div>
         </ScrollArea>
       </div>
-      <CreateTaskModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
+
+      <CreateTaskModal 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setIsCreateModalOpen(false)} 
+        onTaskCreated={handleTaskCreated}
+      />
+
+      {selectedTask && (
+        <TaskEditModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedTask(null);
+          }}
+          task={selectedTask}
+        />
+      )}
     </div>
   );
 };

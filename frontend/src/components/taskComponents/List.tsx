@@ -6,6 +6,9 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { Task, TaskGroups } from "@/types/task";
+import { useTaskStore } from '@/store/taskStore';
+import { toast } from 'sonner';
+import TaskEditModal from './TaskEditModal';
 
 interface ListProps {
   tasks: TaskGroups;
@@ -60,15 +63,50 @@ const TaskModal = ({ task, onClose }: { task: Task | null; onClose: () => void }
 };
 
 const List = ({ tasks, onTaskMove }: ListProps) => {
+  const { updateTask } = useTaskStore();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const handleTaskDoubleClick = (task: Task) => {
-    setSelectedTask(task);
+  const handleDragEnd = async (result: any) => {
+    if (!result.destination || !onTaskMove) return;
+
+    const { source, destination, draggableId } = result;
+    const task = tasks[source.droppableId].find(t => t._id === draggableId);
+
+    if (!task) return;
+
+    // Map the display status to the backend status
+    const statusMap: { [key: string]: string } = {
+      'To Do': 'todo',
+      'In Progress': 'in progress',
+      'Done': 'done'
+    };
+
+    // Get the backend status value
+    const backendStatus = statusMap[destination.droppableId];
+
+    // Update local state immediately for instant feedback
+    onTaskMove(result);
+
+    try {
+      // Update task status in the backend
+      await updateTask(task._id, { status: backendStatus });
+      toast.success('Task status updated successfully');
+    } catch (error) {
+      // If backend update fails, revert the local state
+      onTaskMove({
+        ...result,
+        source: result.destination,
+        destination: result.source
+      });
+      toast.error('Failed to update task status');
+      console.error('Error updating task status:', error);
+    }
   };
 
-  const handleDragEnd = (result: any) => {
-    if (!result.destination || !onTaskMove) return;
-    onTaskMove(result);
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task);
+    setIsEditModalOpen(true);
   };
 
   return (
@@ -76,51 +114,75 @@ const List = ({ tasks, onTaskMove }: ListProps) => {
       <DragDropContext onDragEnd={handleDragEnd}>
         {Object.entries(tasks).map(([status, statusTasks]) => (
           <div key={status} className="mb-8">
-            <h3 className="text-lg font-semibold mb-4 capitalize">{status}</h3>
+            <h3 className="text-lg font-semibold mb-4 capitalize text-foreground">{status}</h3>
             <Droppable droppableId={status}>
-              {(provided) => (
+              {(provided, snapshot) => (
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  className="space-y-4"
+                  className={`space-y-4 min-h-[200px] p-4 rounded-lg transition-colors duration-200 ${
+                    snapshot.isDraggingOver 
+                      ? 'bg-primary/10 border-2 border-dashed border-primary' 
+                      : 'bg-card/50 border border-border'
+                  }`}
                 >
-                  {statusTasks.map((task, index) => (
-                    <Draggable key={task.id} draggableId={task.id} index={index}>
-                      {(provided) => (
-                        <Card
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className="hover:shadow-md transition-shadow"
+                  {statusTasks.length === 0 ? (
+                    <div className="h-[200px] flex items-center justify-center text-muted-foreground">
+                      Drop tasks here
+                    </div>
+                  ) : (
+                    statusTasks.map((task, index) => {
+                      if (!task || !task._id) {
+                        console.warn('Skipping task with no _id:', task);
+                        return null;
+                      }
+
+                      return (
+                        <Draggable 
+                          key={task._id} 
+                          draggableId={String(task._id)} 
+                          index={index}
                         >
-                          <CardContent className="p-4">
-                            <div className="flex justify-between items-start mb-2">
-                              <h3 className="font-medium">{task.title}</h3>
-                              <span className={`px-2 py-1 rounded text-white text-sm ${
-                                task.status === 'To Do' ? 'bg-gray-500' :
-                                task.status === 'In Progress' ? 'bg-blue-500' :
-                                'bg-green-500'
-                              }`}>
-                                {task.status}
-                              </span>
-                            </div>
-                            <p className="text-sm text-gray-500 mb-4">{task.description}</p>
-                            <div className="space-y-2">
-                              <div className="flex justify-between text-sm">
-                                <span>Progress</span>
-                                <span>{task.progress}%</span>
-                              </div>
-                              <Progress value={task.progress} />
-                              <div className="flex justify-between text-sm text-gray-500">
-                                <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
-                                <span>Priority: {task.priority}</span>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      )}
-                    </Draggable>
-                  ))}
+                          {(provided, snapshot) => (
+                            <Card
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className={`hover:shadow-md transition-all duration-200 bg-card cursor-pointer ${
+                                snapshot.isDragging ? 'shadow-lg scale-[1.02]' : ''
+                              }`}
+                              onClick={() => handleTaskClick(task)}
+                            >
+                              <CardContent className="p-4">
+                                <div className="flex justify-between items-start mb-2">
+                                  <h3 className="font-medium text-foreground">{task.name}</h3>
+                                  <span className={`px-2 py-1 rounded text-white text-sm ${
+                                    status === 'To Do' ? 'bg-gray-500' :
+                                    status === 'In Progress' ? 'bg-blue-500' :
+                                    'bg-green-500'
+                                  }`}>
+                                    {status}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-muted-foreground mb-4">{task.description}</p>
+                                <div className="space-y-2">
+                                  <div className="flex justify-between text-sm text-foreground">
+                                    <span>Progress</span>
+                                    <span>{task.progress || 0}%</span>
+                                  </div>
+                                  <Progress value={task.progress || 0} />
+                                  <div className="flex justify-between text-sm text-muted-foreground">
+                                    <span>Due: {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}</span>
+                                    <span>Priority: {task.priority}</span>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          )}
+                        </Draggable>
+                      );
+                    })
+                  )}
                   {provided.placeholder}
                 </div>
               )}
@@ -128,8 +190,16 @@ const List = ({ tasks, onTaskMove }: ListProps) => {
           </div>
         ))}
       </DragDropContext>
+
       {selectedTask && (
-        <TaskModal task={selectedTask} onClose={() => setSelectedTask(null)} />
+        <TaskEditModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedTask(null);
+          }}
+          task={selectedTask}
+        />
       )}
     </>
   );

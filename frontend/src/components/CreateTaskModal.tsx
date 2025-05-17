@@ -1,27 +1,32 @@
-import { useState } from 'react';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-
-interface TaskFormData {
-  title: string;
-  description: string;
-  priority: string;
-  dueDate: string;
-  status: string;
-}
+import { useState, useEffect } from 'react';
+import { useTaskStore } from '@/store/taskStore';
+import { useProjectStore } from '@/store/projectStore';
+import type { Task } from '@/types/task';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 interface CreateTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onTaskCreated?: () => void;
 }
 
-export const CreateTaskModal = ({ isOpen, onClose }: CreateTaskModalProps) => {
-  const [formData, setFormData] = useState<TaskFormData>({
-    title: '',
+export const CreateTaskModal = ({ isOpen, onClose, onTaskCreated }: CreateTaskModalProps) => {
+  const { createTask } = useTaskStore();
+  const { projects, fetchProjects } = useProjectStore();
+  
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  const [formData, setFormData] = useState({
+    name: '',
     description: '',
-    priority: 'medium',
+    priority: 'medium' as Task['priority'],
     dueDate: '',
-    status: 'pending'
+    status: 'todo',
+    progress: 0,
+    project: undefined as { _id: string; name: string } | undefined,
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -35,28 +40,34 @@ export const CreateTaskModal = ({ isOpen, onClose }: CreateTaskModalProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3000/api/tasks', formData, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Cookies.get('token')}`
-        }
+      await createTask({
+        name: formData.name,
+        description: formData.description,
+        priority: formData.priority,
+        dueDate: formData.dueDate,
+        status: formData.status,
+        progress: formData.progress,
+        project: formData.project,
       });
       
-      if (response.status === 201) {
-        onClose();
-        setFormData({
-          title: '',
-          description: '',
-          priority: 'medium',
-          dueDate: '',
-          status: 'pending'
-        });
-        // You might want to add a success notification here
-      }
+      resetForm();
+      onClose();
+      onTaskCreated?.();
     } catch (error) {
       console.error('Error creating task:', error);
-      // You might want to add an error notification here
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      description: '',
+      priority: 'medium',
+      dueDate: '',
+      status: 'todo',
+      progress: 0,
+      project: undefined,
+    });
   };
 
   if (!isOpen) return null;
@@ -64,9 +75,7 @@ export const CreateTaskModal = ({ isOpen, onClose }: CreateTaskModalProps) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="relative p-4 w-full max-w-2xl">
-        {/* Modal content */}
         <div className="relative p-4 bg-white rounded-lg shadow dark:bg-gray-800 sm:p-5">
-          {/* Modal header */}
           <div className="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
               Create New Task
@@ -82,24 +91,50 @@ export const CreateTaskModal = ({ isOpen, onClose }: CreateTaskModalProps) => {
               <span className="sr-only">Close modal</span>
             </button>
           </div>
-          {/* Modal body */}
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 mb-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
+                <Label htmlFor="name">Task Name</Label>
                 <input
                   type="text"
-                  name="title"
-                  id="title"
-                  value={formData.title}
+                  name="name"
+                  id="name"
+                  value={formData.name}
                   onChange={handleInputChange}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  placeholder="Enter task title"
+                  placeholder="Enter task name"
                   required
                 />
               </div>
+
+              <div className="sm:col-span-2">
+                <Label htmlFor="project">Project</Label>
+                <Select
+                  value={formData.project?._id || 'none'}
+                  onValueChange={(value) => {
+                    const selectedProject = projects.find(p => p._id === value);
+                    setFormData(prev => ({
+                      ...prev,
+                      project: selectedProject ? { _id: selectedProject._id, name: selectedProject.name } : undefined
+                    }));
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select project" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No Project</SelectItem>
+                    {projects.map((project) => (
+                      <SelectItem key={project._id} value={project._id}>
+                        {project.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div>
-                <label htmlFor="priority" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Priority</label>
+                <Label htmlFor="priority">Priority</Label>
                 <select
                   id="priority"
                   name="priority"
@@ -112,8 +147,9 @@ export const CreateTaskModal = ({ isOpen, onClose }: CreateTaskModalProps) => {
                   <option value="high">High</option>
                 </select>
               </div>
+
               <div>
-                <label htmlFor="dueDate" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Due Date</label>
+                <Label htmlFor="dueDate">Due Date</Label>
                 <input
                   type="date"
                   name="dueDate"
@@ -124,8 +160,9 @@ export const CreateTaskModal = ({ isOpen, onClose }: CreateTaskModalProps) => {
                   required
                 />
               </div>
+
               <div>
-                <label htmlFor="status" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
+                <Label htmlFor="status">Status</Label>
                 <select
                   id="status"
                   name="status"
@@ -133,13 +170,28 @@ export const CreateTaskModal = ({ isOpen, onClose }: CreateTaskModalProps) => {
                   onChange={handleInputChange}
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                 >
-                  <option value="pending">Pending</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="completed">Completed</option>
+                  <option value="todo">To Do</option>
+                  <option value="in progress">In Progress</option>
+                  <option value="done">Done</option>
                 </select>
               </div>
+
+              <div>
+                <Label htmlFor="progress">Progress (%)</Label>
+                <input
+                  type="number"
+                  name="progress"
+                  id="progress"
+                  min="0"
+                  max="100"
+                  value={formData.progress}
+                  onChange={handleInputChange}
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                />
+              </div>
+
               <div className="sm:col-span-2">
-                <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                <Label htmlFor="description">Description</Label>
                 <textarea
                   id="description"
                   name="description"
@@ -165,4 +217,4 @@ export const CreateTaskModal = ({ isOpen, onClose }: CreateTaskModalProps) => {
       </div>
     </div>
   );
-}; 
+};

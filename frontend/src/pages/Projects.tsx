@@ -6,39 +6,37 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { CreateProjectModal } from "@/components/CreateProjectModal";
+import { ProjectEditModal } from "@/components/ProjectEditModal";
+import { projectService, Project } from "@/services/projectService";
+import { toast } from "sonner";
 // import Cookies from "node_modules/@types/js-cookie";
 import Cookies from 'js-cookie';
+import api from "@/lib/axios";
 
 // Sample project data
 
 
 const Projects = () => {
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
-  const [projects, setProjects] = useState([])
+  const [projects, setProjects] = useState<Project[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  
-  // fetch data from http://localhost:3000/api/project/me
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await projectService.getAllProjects();
+      setProjects(response.data);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+      toast.error('Failed to fetch projects');
+    }
+  };
+
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/api/project/me', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Cookies.get('token')}`
-          },
-          credentials: 'include'
-        });
-        const data = await response.json();
-        setProjects(data);
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      }
-    };
-    
     fetchProjects();
-  }, [projects]);
+  }, []);
 
   // Filter projects based on search query
   const filteredProjects = projects.filter(project =>
@@ -48,7 +46,7 @@ const Projects = () => {
 
   // Status badge color mapping
   const getStatusColor = (status: string) => {
-    switch(status) {
+    switch (status) {
       case 'Just Started':
         return 'bg-blue-500 hover:bg-blue-600';
       case 'In Progress':
@@ -57,7 +55,16 @@ const Projects = () => {
         return 'bg-green-500 hover:bg-green-600';
       default:
         return 'bg-gray-500 hover:bg-gray-600';
-    } 
+    }
+  };
+
+  const handleProjectClick = (project: Project) => {
+    if (!project._id) {
+      toast.error('Invalid project ID');
+      return;
+    }
+    setSelectedProject(project);
+    setIsEditModalOpen(true);
   };
 
   return (
@@ -68,8 +75,8 @@ const Projects = () => {
             <h1 className="text-2xl font-bold">Projects</h1>
             <p className="text-muted-foreground">Manage your projects and team collaboration</p>
           </div>
-          
-          <Button 
+
+          <Button
             className="w-full md:w-auto"
             onClick={() => setIsCreateModalOpen(true)}
           >
@@ -77,7 +84,7 @@ const Projects = () => {
             New Project
           </Button>
         </div>
-        
+
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -88,24 +95,24 @@ const Projects = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          
+
           <div className="flex gap-2">
             <Button variant="outline" size="icon">
               <Filter size={16} />
             </Button>
-            
+
             <div className="flex rounded-md border">
-              <Button 
-                variant={viewType === 'grid' ? 'default' : 'ghost'} 
-                size="icon" 
+              <Button
+                variant={viewType === 'grid' ? 'default' : 'ghost'}
+                size="icon"
                 onClick={() => setViewType('grid')}
                 className="rounded-l-md rounded-r-none"
               >
                 <Grid3X3 size={16} />
               </Button>
-              <Button 
-                variant={viewType === 'list' ? 'default' : 'ghost'} 
-                size="icon" 
+              <Button
+                variant={viewType === 'list' ? 'default' : 'ghost'}
+                size="icon"
                 onClick={() => setViewType('list')}
                 className="rounded-l-none rounded-r-md"
               >
@@ -115,42 +122,38 @@ const Projects = () => {
           </div>
         </div>
       </header>
-      
+
       <main className="content-area">
         {viewType === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProjects.map((project) => (
-              <Card key={project.id} className="transition-all duration-200 hover:shadow-md">
+              <Card 
+                key={project._id} 
+                className="transition-all duration-200 hover:shadow-md cursor-pointer"
+                onClick={() => handleProjectClick(project)}
+              >
                 <CardHeader className="pb-2">
-                  <CardTitle>{project.title}</CardTitle>
+                  <CardTitle>{project.name}</CardTitle>
                   <div className="flex items-center justify-between">
                     <CardDescription className="line-clamp-2">{project.description}</CardDescription>
                     <Badge className={getStatusColor(project.status)}>{project.status}</Badge>
                   </div>
                 </CardHeader>
-                
+
                 <CardContent className="pb-2">
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between text-sm">
                       <span>Progress</span>
-                      <span>{project.progress}%</span>
+                      <span>{project.progress || 0}%</span>
                     </div>
-                    <Progress value={project.progress} className="h-2" />
+                    <Progress value={project.progress || 0} className="h-2" />
                   </div>
                 </CardContent>
-                
+
                 <CardFooter className="flex justify-between">
-                  {/* <div className="flex -space-x-2">
-                    {project.members.map((member, idx) => (
-                      <div 
-                        key={`${project.id}-member-${idx}`}
-                        className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-medium border-2 border-background"
-                      >
-                        {member.initial}
-                      </div>
-                    ))}
-                  </div> */}
-                  <div className="text-sm text-muted-foreground">Due: {project.dueDate}</div>
+                  <div className="text-sm text-muted-foreground">
+                    Due: {project.dueDate ? new Date(project.dueDate).toLocaleDateString() : 'No due date'}
+                  </div>
                 </CardFooter>
               </Card>
             ))}
@@ -158,39 +161,30 @@ const Projects = () => {
         ) : (
           <div className="flex flex-col gap-3">
             {filteredProjects.map((project) => (
-              <Card key={project.id} className="transition-all duration-200 hover:shadow-md">
+              <Card 
+                key={project._id} 
+                className="transition-all duration-200 hover:shadow-md cursor-pointer"
+                onClick={() => handleProjectClick(project)}
+              >
                 <div className="flex flex-col sm:flex-row p-4 gap-4">
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-1">
-                      <h3 className="text-lg font-semibold">{project.title}</h3>
+                      <h3 className="text-lg font-semibold">{project.name}</h3>
                       <Badge className={getStatusColor(project.status)}>{project.status}</Badge>
                     </div>
                     <p className="text-muted-foreground text-sm">{project.description}</p>
                   </div>
-                  
+
                   <div className="sm:w-60 flex flex-col gap-2">
                     <div className="flex items-center justify-between text-sm">
                       <span>Progress</span>
-                      <span>{project.progress}%</span>
+                      <span>{project.progress || 0}%</span>
                     </div>
-                    <Progress value={project.progress} className="h-2" />
+                    <Progress value={project.progress || 0} className="h-2" />
                     <div className="flex justify-between items-center mt-2">
-                      <div className="flex -space-x-2">
-                        {project.members.slice(0, 3).map((member, idx) => (
-                          <div 
-                            key={`${project.id}-member-${idx}`}
-                            className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-medium border-2 border-background"
-                          >
-                            {member.initial}
-                          </div>
-                        ))}
-                        {project.members.length > 3 && (
-                          <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-muted-foreground text-xs font-medium border-2 border-background">
-                            +{project.members.length - 3}
-                          </div>
-                        )}
+                      <div className="text-sm text-muted-foreground">
+                        Due: {project.dueDate ? new Date(project.dueDate).toLocaleDateString() : 'No due date'}
                       </div>
-                      <div className="text-sm text-muted-foreground">Due: {project.dueDate}</div>
                     </div>
                   </div>
                 </div>
@@ -198,7 +192,7 @@ const Projects = () => {
             ))}
           </div>
         )}
-        
+
         {filteredProjects.length === 0 && (
           <div className="flex flex-col items-center justify-center h-60 text-center">
             <div className="text-3xl mb-2">🔍</div>
@@ -208,10 +202,23 @@ const Projects = () => {
         )}
       </main>
 
-      <CreateProjectModal 
-        isOpen={isCreateModalOpen} 
-        onClose={() => setIsCreateModalOpen(false)} 
+      <CreateProjectModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onProjectCreated={fetchProjects}
       />
+
+      {selectedProject && (
+        <ProjectEditModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedProject(null);
+          }}
+          project={selectedProject}
+          onProjectUpdated={fetchProjects}
+        />
+      )}
     </div>
   );
 };

@@ -22,7 +22,7 @@ const projectSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
-        enum: ['not_started', 'in_progress', 'done', 'Just Started'],
+        enum: ['not_started', 'in progress', 'done', 'Just Started'],
         default: 'not_started'
     },
     activity: [{

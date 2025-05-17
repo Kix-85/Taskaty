@@ -24,6 +24,7 @@ export const userService = {
     return response.data;
   },
 
+  // verify token
   verifyToken: async () => {
     const response = await api.get('/user/verify-token', { withCredentials: true });
     console.log('From user service: ', response);

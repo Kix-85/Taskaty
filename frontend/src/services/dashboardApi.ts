@@ -1,12 +1,13 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'sonner';
+import { API_CONFIG } from '../config/api';
 
-const API_URL = '/api/dashboard';
+const API_URL = '/api/task';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: API_CONFIG.baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -19,7 +20,6 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  console.log('Making API request to:', config.url);
   return config;
 });
 
@@ -38,12 +38,20 @@ api.interceptors.response.use(
 
 export interface Task {
   id: string;
-  title: string;
+  name: string;
   description: string;
   dueDate: string;
-  priority: "low" | "medium" | "high";
+  status: string;
   progress: number;
-  assignees: { name: string; initial: string }[];
+  assignedTo: { name: string; email: string }[];
+  project: {
+    name: string;
+    logo: string;
+    description: string;
+    status: string;
+    activity: string;
+    dueDate: string;
+  };
 }
 
 export interface ProjectStats {
@@ -51,60 +59,86 @@ export interface ProjectStats {
   completedTasks: number;
   inProgressTasks: number;
   upcomingTasks: number;
-  overdueTask: number;
+  overdueTasks: number;
 }
-
-// Mock data
-const mockProjectStats: ProjectStats = {
-  totalTasks: 24,
-  completedTasks: 12,
-  inProgressTasks: 8,
-  upcomingTasks: 4,
-  overdueTask: 2,
-};
-
-const mockTasks: Task[] = [
-  {
-    id: "task-1",
-    title: "Redesign homepage",
-    description: "Update the homepage with new branding and improve user experience",
-    dueDate: "May 10",
-    priority: "high",
-    progress: 65,
-    assignees: [
-      { name: "Alex Johnson", initial: "A" },
-      { name: "Maria Garcia", initial: "M" }
-    ]
-  },
-  {
-    id: "task-2",
-    title: "Implement authentication",
-    description: "Set up OAuth and email registration flows with proper security measures",
-    dueDate: "May 15",
-    priority: "high",
-    progress: 30,
-    assignees: [
-      { name: "James Wilson", initial: "J" }
-    ]
-  }
-];
 
 export const dashboardApi = {
   // Get project statistics
   getProjectStats: async (): Promise<ProjectStats> => {
-    // Return mock data directly
-    return mockProjectStats;
+    try {
+      const response = await api.get(`${API_URL}/me`);
+      const tasks = response.data;
+      
+      const stats: ProjectStats = {
+        totalTasks: tasks.length,
+        completedTasks: tasks.filter((task: Task) => task.status === 'completed').length,
+        inProgressTasks: tasks.filter((task: Task) => task.status === 'in-progress').length,
+        upcomingTasks: tasks.filter((task: Task) => {
+          const dueDate = new Date(task.dueDate);
+          const today = new Date();
+          return dueDate > today && task.status !== 'completed';
+        }).length,
+        overdueTasks: tasks.filter((task: Task) => {
+          const dueDate = new Date(task.dueDate);
+          const today = new Date();
+          return dueDate < today && task.status !== 'completed';
+        }).length,
+      };
+      
+      return stats;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.response?.data?.message || 'Failed to fetch project stats');
+      }
+      throw error;
+    }
   },
 
   // Get today's tasks
   getTodayTasks: async (): Promise<Task[]> => {
-    // Return mock data directly
-    return mockTasks;
+    try {
+      const response = await api.get(`${API_URL}/me`);
+      const tasks = response.data;
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      
+      return tasks.filter((task: Task) => {
+        const taskDate = new Date(task.dueDate);
+        return taskDate >= today && taskDate < tomorrow;
+      });
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.response?.data?.message || 'Failed to fetch today\'s tasks');
+      }
+      throw error;
+    }
   },
 
   // Get upcoming tasks
   getUpcomingTasks: async (): Promise<Task[]> => {
-    // Return mock data directly
-    return mockTasks;
+    try {
+      const response = await api.get(`${API_URL}/me`);
+      const tasks = response.data;
+      
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      return tasks
+        .filter((task: Task) => {
+          const taskDate = new Date(task.dueDate);
+          return taskDate > today && task.status !== 'completed';
+        })
+        .sort((a: Task, b: Task) => {
+          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+        });
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.response?.data?.message || 'Failed to fetch upcoming tasks');
+      }
+      throw error;
+    }
   }
 }; 
