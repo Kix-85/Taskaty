@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { UserRound, ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { BotChat } from '@/components/BotChat';
 
 // Mock user data for testing
 const mockCurrentUser = {
@@ -31,7 +32,7 @@ export default function Chat() {
   const showChatArea = !isMobile || selectedUserId;
 
   return (
-    <div className="flex flex-col h-screen bg-background">
+    <div className="h-screen flex flex-col">
       {/* Header */}
       <header className="h-16 border-b flex items-center justify-between px-4 bg-card">
         <div className="flex items-center gap-2">
@@ -59,7 +60,7 @@ export default function Chat() {
       </header>
       
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex-1 flex overflow-hidden">
         {/* User List - Hidden on mobile when chat is open */}
         <div className={cn(
           "transition-[width] duration-300 ease-in-out",
@@ -76,14 +77,19 @@ export default function Chat() {
         
         {/* Chat Area - Full width on mobile when open */}
         <div className={cn(
-          "transition-[width] duration-300 ease-in-out",
+          "transition-[width] duration-300 ease-in-out flex-1 relative",
           showChatArea ? "w-full" : "w-0"
         )}>
           {showChatArea && (
-            <ChatArea 
-              selectedUserId={selectedUserId}
-              currentUser={mockCurrentUser}
-            />
+            <>
+              <ChatArea 
+                selectedUserId={selectedUserId}
+                currentUser={mockCurrentUser}
+              />
+              <div className="absolute bottom-0 right-0">
+                <BotChat />
+              </div>
+            </>
           )}
         </div>
       </div>
