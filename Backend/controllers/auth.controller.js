@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const { verificationEmailTemplate } = require('../utils/templates/verifyEmail.template');  // Correct the import here
 const { resetPasswordTemplate } = require('../utils/templates/resetPass.template.js');
 const { sendEmail } = require('../utils/sendEmail.js');
-const passport = require('../config/passport'); 
+const passport = require('../config/passport');
 const { generateTokenService, setJwtCookie } = require('../services/jwtService.js');
 
 // Start Google OAuth flow
@@ -59,7 +59,7 @@ module.exports.register = async (req, res) => {
         const user = await User.create({ username, name, email, password: hashedPassword, birthDate });
 
         // Generate JWT token and set it in the cookie
-        const token = generateTokenService({id: user._id}, process.env.JWT_EXPIRES_IN);
+        const token = generateTokenService({ id: user._id }, process.env.JWT_EXPIRES_IN);
         // setJwtCookie(res, token);
         console.log("Token generated and set in cookie:", token);
         // Send verification email
@@ -82,7 +82,7 @@ module.exports.login = async (req, res) => {
     const user = req.user;
 
     try {
-        const token = generateTokenService({id: user._id}, process.env.JWT_EXPIRES_IN);
+        const token = generateTokenService({ id: user._id }, process.env.JWT_EXPIRES_IN);
         setJwtCookie(res, token);
 
         return res.status(200).json({
@@ -137,3 +137,72 @@ module.exports.logout = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Something went wrong' + error.message })
     }
 }
+
+// Reset password with current password
+module.exports.resetPass = async (req, res) => {
+    try {
+        const { email, newPassword, confirmPassword } = req.body;
+
+        // Validate inputs
+        if (!email || !newPassword || !confirmPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'All fields are required'
+            });
+        }
+
+        // Check if passwords match
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'New password and confirm password do not match'
+            });
+        }
+
+        // Find user by email
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        // // Verify current password
+        // const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+        // if (!isPasswordValid) {
+        //     return res.status(401).json({
+        //         success: false,
+        //         message: 'Current password is incorrect'
+        //     });
+        // }
+
+        // Hash new password
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update password
+        user.password = hashedNewPassword;
+        await user.save();
+
+        // Send email notification
+        const subject = 'Password Changed Successfully';
+        const template = `
+            <h1>Password Changed</h1>
+            <p>Dear ${user.name},</p>
+            <p>Your password has been changed successfully.</p>
+            <p>If you did not make this change, please contact support immediately.</p>
+        `;
+        await sendEmail(user.email, subject, template);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Password changed successfully'
+        });
+    } catch (error) {
+        console.error('Error in resetPass:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error changing password: ' + error.message
+        });
+    }
+};
