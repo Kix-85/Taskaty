@@ -15,6 +15,7 @@ import LandingPage from "./pages/landPage";
 import Auth from "./pages/Auth";
 import ProtectedRoute from "./components/protectRoute";
 import VerifyEmail from "./pages/verifyEmail";
+import { ChatBotProvider } from '@/providers/ChatBotProvider';
 
 const queryClient = new QueryClient();
 
@@ -89,11 +90,13 @@ const AppContent = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
-      <TooltipProvider>
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </TooltipProvider>
+      <ChatBotProvider>
+        <TooltipProvider>
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </TooltipProvider>
+      </ChatBotProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );

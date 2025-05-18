@@ -50,7 +50,17 @@ const taskSchema = new mongoose.Schema({
         trim: true
     }],
     subtasks: [{
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            default: () => new mongoose.Types.ObjectId(),
+            required: true
+        },
         title: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        description: {
             type: String,
             required: false,
             trim: true

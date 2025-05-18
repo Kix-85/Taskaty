@@ -1,6 +1,7 @@
 const Task = require("../models/task.model");
 const Project = require("../models/project.model");
 const { createComment, deleteComment } = require("./comment.controller");
+const mongoose = require("mongoose");
 
 module.exports.getMyTasks = async (req, res) => {
     const userID = req.user.id;
@@ -46,31 +47,44 @@ module.exports.getTask = async (req, res) => {
 
 module.exports.createTask = async (req, res) => {
     const userID = req.user.id;
-    const { title, description, status, dueDate, project, assignedTo, progress, isRecurring, recurrencePattern } = req.body;
-    const name = title;
+    const { title, name, description, status, priority, dueDate, project, assignedTo, progress, isRecurring, recurrencePattern } = req.body;
+    
+    // Use title if provided, otherwise use name
+    const taskName = title || name;
+    
+    if (!taskName) {
+        return res.status(400).json({ message: 'Task title/name is required' });
+    }
+
     try {
-        const existingTask = await Task.findOne({ name, project });
+        const existingTask = await Task.findOne({ name: taskName, project });
         if (existingTask) {
             return res.status(400).json({ message: 'Task with the same title already exists in this project' });
         }
 
-        // 1. Check if project exists
-        // const targetProject = await Project.findById(project);
-        // if (!targetProject) {
-        //     return res.status(404).json({ message: 'Project not found' });
-        // }
+        const taskData = {
+            name: taskName,
+            description,
+            status: status || 'todo',
+            priority: priority || 'medium',
+            dueDate,
+            project,
+            assignedTo,
+            createdBy: userID,
+            progress: progress || 0,
+            isRecurring,
+            recurrencePattern
+        };
 
-        // // 2. Check if the user is the leader of the project
-        // if (targetProject.leader.toString() !== userID) {
-        //     return res.status(403).json({ message: 'Only the project leader can create tasks.' });
-        // }
+        const task = await Task.create(taskData);
 
-        const task = await Task.create({ name, description, status, dueDate, project, assignedTo, createdBy: userID, progress, isRecurring, recurrencePattern });
-
-        await Project.findByIdAndUpdate(project, { $push: { tasks: task._id } });
+        if (project) {
+            await Project.findByIdAndUpdate(project, { $push: { tasks: task._id } });
+        }
 
         res.status(201).json(task);
     } catch (error) {
+        console.error('Error creating task:', error);
         res.status(500).json({ message: error.message });
     }
 };
@@ -147,3 +161,75 @@ module.exports.deleteTask = async (req, res) => {
 
 module.exports.createComment = createComment;
 module.exports.deleteComment = deleteComment;
+
+// Subtask operations
+module.exports.createSubtask = async (req, res) => {
+    const taskId = req.params.taskID;
+    const { title, description } = req.body;
+
+    try {
+        const task = await Task.findById(taskId);
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        const newSubtask = {
+            _id: new mongoose.Types.ObjectId(),
+            title,
+            description,
+            completed: false
+        };
+
+        task.subtasks.push(newSubtask);
+        await task.save();
+
+        res.status(201).json(task);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports.updateSubtask = async (req, res) => {
+    const { taskID, subtaskID } = req.params;
+    const updates = req.body;
+
+    try {
+        const task = await Task.findById(taskID);
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        const subtaskIndex = task.subtasks.findIndex(st => st._id.toString() === subtaskID);
+        if (subtaskIndex === -1) {
+            return res.status(404).json({ message: 'Subtask not found' });
+        }
+
+        task.subtasks[subtaskIndex] = {
+            ...task.subtasks[subtaskIndex],
+            ...updates
+        };
+
+        await task.save();
+        res.status(200).json(task);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports.deleteSubtask = async (req, res) => {
+    const { taskID, subtaskID } = req.params;
+
+    try {
+        const task = await Task.findById(taskID);
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        task.subtasks = task.subtasks.filter(st => st._id.toString() !== subtaskID);
+        await task.save();
+
+        res.status(200).json(task);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

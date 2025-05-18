@@ -1,7 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const verifyToken = require('../middlewares/verifyToken.middleware');
-const { getMyTasks, createTask, getTask, updateTask, deleteTask, createComment, deleteComment, getTasksByProject, getTasksByUser} = require('../controllers/task.controller');
+const { 
+  getMyTasks, 
+  createTask, 
+  getTask, 
+  updateTask, 
+  deleteTask, 
+  createComment, 
+  deleteComment, 
+  getTasksByProject, 
+  getTasksByUser,
+  createSubtask,
+  updateSubtask,
+  deleteSubtask
+} = require('../controllers/task.controller');
 
 // Ensure that only authenticated users can access them
 router.use(verifyToken);
@@ -26,6 +39,11 @@ router.get('/project/:projectID', getTasksByProject);
 
 // get tasks by user
 router.get('/user/:userID', getTasksByUser);
+
+// Subtask routes
+router.post('/:taskID/subtask', createSubtask);
+router.put('/:taskID/subtask/:subtaskID', updateSubtask);
+router.delete('/:taskID/subtask/:subtaskID', deleteSubtask);
 
 // Comment routes
 

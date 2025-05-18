@@ -6,7 +6,7 @@ interface ProjectStore {
   loading: boolean;
   error: string | null;
   fetchProjects: () => Promise<void>;
-  createProject: (projectData: Omit<Project, '_id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  createProject: (projectData: Omit<Project, '_id' | 'createdAt' | 'updatedAt' | 'tasks' | 'progress'>) => Promise<void>;
   updateProject: (id: string, projectData: Partial<Project>) => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
 }
@@ -19,10 +19,10 @@ export const useProjectStore = create<ProjectStore>((set) => ({
   fetchProjects: async () => {
     set({ loading: true, error: null });
     try {
-      const response = await projectService.getAllProjects();
-      set({ projects: response.data, loading: false });
+      const projects = await projectService.getAllProjects();
+      set({ projects, loading: false });
     } catch (error) {
-      set({ error: 'Failed to fetch projects', loading: false });
+      set({ error: 'Failed to fetch projects', loading: false, projects: [] });
     }
   },
 
@@ -30,8 +30,8 @@ export const useProjectStore = create<ProjectStore>((set) => ({
     set({ loading: true, error: null });
     try {
       await projectService.createProject(projectData);
-      const response = await projectService.getAllProjects();
-      set({ projects: response.data, loading: false });
+      const projects = await projectService.getAllProjects();
+      set({ projects, loading: false });
     } catch (error) {
       set({ error: 'Failed to create project', loading: false });
     }
@@ -41,8 +41,8 @@ export const useProjectStore = create<ProjectStore>((set) => ({
     set({ loading: true, error: null });
     try {
       await projectService.updateProject(id, projectData);
-      const response = await projectService.getAllProjects();
-      set({ projects: response.data, loading: false });
+      const projects = await projectService.getAllProjects();
+      set({ projects, loading: false });
     } catch (error) {
       set({ error: 'Failed to update project', loading: false });
     }
@@ -52,8 +52,8 @@ export const useProjectStore = create<ProjectStore>((set) => ({
     set({ loading: true, error: null });
     try {
       await projectService.deleteProject(id);
-      const response = await projectService.getAllProjects();
-      set({ projects: response.data, loading: false });
+      const projects = await projectService.getAllProjects();
+      set({ projects, loading: false });
     } catch (error) {
       set({ error: 'Failed to delete project', loading: false });
     }

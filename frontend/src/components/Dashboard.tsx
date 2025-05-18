@@ -30,8 +30,8 @@ const Dashboard = () => {
       const upcoming = await dashboardApi.getUpcomingTasks();
 
       setProjectStats(stats);
-      setTodayTasks(today);
-      setUpcomingTasks(upcoming);
+      setTodayTasks(today || []);
+      setUpcomingTasks(upcoming || []);
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch dashboard data';
@@ -70,7 +70,7 @@ const Dashboard = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-6">
             {[...Array(5)].map((_, i) => (
-              <Card key={i}>
+              <Card key={`skeleton-${i}`}>
                 <CardHeader className="pb-2">
                   <Skeleton className="h-4 w-24" />
                 </CardHeader>
@@ -116,7 +116,7 @@ const Dashboard = () => {
               <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{projectStats?.totalTasks}</div>
+              <div className="text-2xl font-bold">{projectStats?.totalTasks || 0}</div>
             </CardContent>
           </Card>
           <Card>
@@ -124,7 +124,7 @@ const Dashboard = () => {
               <CardTitle className="text-sm font-medium">Completed</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-500">{projectStats?.completedTasks}</div>
+              <div className="text-2xl font-bold text-green-500">{projectStats?.completedTasks || 0}</div>
             </CardContent>
           </Card>
           <Card>
@@ -132,7 +132,7 @@ const Dashboard = () => {
               <CardTitle className="text-sm font-medium">In Progress</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-500">{projectStats?.inProgressTasks}</div>
+              <div className="text-2xl font-bold text-blue-500">{projectStats?.inProgressTasks || 0}</div>
             </CardContent>
           </Card>
           <Card>
@@ -140,7 +140,7 @@ const Dashboard = () => {
               <CardTitle className="text-sm font-medium">Upcoming</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-500">{projectStats?.upcomingTasks}</div>
+              <div className="text-2xl font-bold text-yellow-500">{projectStats?.upcomingTasks || 0}</div>
             </CardContent>
           </Card>
           <Card>
@@ -148,7 +148,7 @@ const Dashboard = () => {
               <CardTitle className="text-sm font-medium">Overdue</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-500">{projectStats?.overdueTasks}</div>
+              <div className="text-2xl font-bold text-red-500">{projectStats?.overdueTasks || 0}</div>
             </CardContent>
           </Card>
         </div>
@@ -171,7 +171,7 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {todayTasks.map((task) => (
                     <div 
-                      key={task.id} 
+                      key={task._id} 
                       onClick={() => handleTaskClick(task)}
                       className="cursor-pointer hover:opacity-80 transition-opacity"
                     >
@@ -203,7 +203,7 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {upcomingTasks.map((task) => (
                     <div 
-                      key={task.id} 
+                      key={task._id} 
                       onClick={() => handleTaskClick(task)}
                       className="cursor-pointer hover:opacity-80 transition-opacity"
                     >
@@ -224,9 +224,9 @@ const Dashboard = () => {
         </ScrollArea>
       </div>
 
-      <CreateTaskModal 
-        isOpen={isCreateModalOpen} 
-        onClose={() => setIsCreateModalOpen(false)} 
+      <CreateTaskModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
         onTaskCreated={handleTaskCreated}
       />
 
@@ -238,6 +238,7 @@ const Dashboard = () => {
             setSelectedTask(null);
           }}
           task={selectedTask}
+          onTaskUpdated={fetchDashboardData}
         />
       )}
     </div>

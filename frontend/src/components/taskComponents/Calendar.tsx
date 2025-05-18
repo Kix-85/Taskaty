@@ -1,99 +1,207 @@
-import { useState } from 'react';
-import type { TaskGroups } from '@/types/task';
+import { useState, useMemo } from 'react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import type { Task, TaskGroups } from '@/types/task';
+import TaskCard from './TaskCard';
+import { format, isSameDay, isToday } from 'date-fns';
 
-interface CalendarProps {
+interface CalendarViewProps {
   tasks: TaskGroups;
+  onTaskEdit: (task: Task) => void;
 }
 
-const Calendar = ({ tasks }: CalendarProps) => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+const Calendar = ({ tasks, onTaskEdit }: CalendarViewProps) => {
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [view, setView] = useState<'month' | 'day'>('month');
 
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const firstDayOfMonth = new Date(year, month, 1).getDay();
-    return { daysInMonth, firstDayOfMonth };
+  const allTasks = Object.values(tasks).flat();
+
+  const getTasksForDate = (date: Date) => {
+    return allTasks.filter(task => {
+      if (!task.dueDate) return false;
+      const taskDate = new Date(task.dueDate);
+      return isSameDay(taskDate, date);
+    });
   };
 
-  const { daysInMonth, firstDayOfMonth } = getDaysInMonth(currentDate);
-
-  const renderCalendarDays = () => {
-    const days = [];
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                       'July', 'August', 'September', 'October', 'November', 'December'];
-
-    // Add month header
-    days.push(
-      <div key="month-header" className="col-span-7 text-center py-2 font-semibold text-lg text-gray-900 dark:text-white">
-        {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-      </div>
-    );
-
-    // Add day names header
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    dayNames.forEach(day => {
-      days.push(
-        <div key={day} className="text-center py-2 font-medium text-sm text-gray-600 dark:text-gray-400">
-          {day}
-        </div>
-      );
+  const tasksByDate = useMemo(() => {
+    const map = new Map<string, Task[]>();
+    allTasks.forEach(task => {
+      if (!task.dueDate) return;
+      const dateStr = format(new Date(task.dueDate), 'yyyy-MM-dd');
+      const existing = map.get(dateStr) || [];
+      map.set(dateStr, [...existing, task]);
     });
+    return map;
+  }, [allTasks]);
 
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      days.push(<div key={`empty-${i}`} className="aspect-square"></div>);
+  const selectedDateTasks = date ? getTasksForDate(date) : [];
+
+  const modifiers = useMemo(() => {
+    const today = new Date();
+    return {
+      taskDay: (day: Date) => {
+        const dateStr = format(day, 'yyyy-MM-dd');
+        return tasksByDate.has(dateStr);
+      },
+      today: (day: Date) => isToday(day)
+    };
+  }, [tasksByDate]);
+
+  const modifiersStyles = {
+    taskDay: {
+      backgroundColor: 'var(--primary-50)',
+      borderRadius: '50%'
+    },
+    today: {
+      backgroundColor: 'var(--primary-100)',
+      borderRadius: '50%',
+      fontWeight: 'bold'
     }
-
-    // Add days of the month
-    for (let day = 1; day <= daysInMonth; day++) {
-      const isToday = new Date().toDateString() === new Date(currentDate.getFullYear(), currentDate.getMonth(), day).toDateString();
-      
-      days.push(
-        <div
-          key={day}
-          className={`aspect-square p-2 border border-gray-200 dark:border-gray-700 rounded-lg 
-            ${isToday ? 'bg-primary-100 dark:bg-primary-900' : 'bg-white dark:bg-gray-800'}
-            hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200`}
-        >
-          <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-            {day}
-          </div>
-          <div className="space-y-1">
-            {Object.entries(tasks).map(([status, taskList]) => {
-              const dayTasks = taskList.filter(task => {
-                const taskDate = new Date(task.dueDate);
-                return taskDate.getDate() === day && 
-                       taskDate.getMonth() === currentDate.getMonth() && 
-                       taskDate.getFullYear() === currentDate.getFullYear();
-              });
-
-              if (dayTasks.length === 0) return null;
-
-              return (
-                <div key={status} className="text-xs truncate">
-                  <span className={`inline-block w-2 h-2 rounded-full mr-1 ${
-                    status === 'To Do' ? 'bg-yellow-500' :
-                    status === 'In Progress' ? 'bg-blue-500' :
-                    'bg-green-500'
-                  }`}></span>
-                  {dayTasks.length} {status}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      );
-    }
-
-    return days;
   };
 
   return (
-    <div className="w-full">
-      <div className="grid grid-cols-7 gap-2 sm:gap-4">
-        {renderCalendarDays()}
+    <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-4">
+      <div className="space-y-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="flex items-center gap-2">
+              <CalendarIcon className="h-5 w-5" />
+              Calendar
+            </CardTitle>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setView(view === 'month' ? 'day' : 'month')}
+              >
+                {view === 'month' ? 'Day View' : 'Month View'}
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <CalendarComponent
+              mode="single"
+              selected={date}
+              onSelect={setDate}
+              className="rounded-md border"
+              modifiers={modifiers}
+              modifiersStyles={modifiersStyles}
+              components={{
+                DayContent: ({ date }) => {
+                  const dateStr = format(date, 'yyyy-MM-dd');
+                  const tasksForDay = tasksByDate.get(dateStr) || [];
+                  return (
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <span>{format(date, 'd')}</span>
+                      {tasksForDay.length > 0 && (
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 flex gap-0.5">
+                          {tasksForDay.slice(0, 3).map((_, i) => (
+                            <div
+                              key={i}
+                              className="w-1 h-1 rounded-full bg-primary"
+                            />
+                          ))}
+                          {tasksForDay.length > 3 && (
+                            <div className="w-1 h-1 rounded-full bg-primary opacity-50" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+              }}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Task Summary</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <span>Total Tasks</span>
+                <Badge variant="outline">{allTasks.length}</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Due Today</span>
+                <Badge variant="outline">
+                  {getTasksForDate(new Date()).length}
+                </Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Selected Date</span>
+                <Badge variant="outline">
+                  {date ? selectedDateTasks.length : 0}
+                </Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle>
+            {date ? (
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    const newDate = new Date(date);
+                    newDate.setDate(newDate.getDate() - 1);
+                    setDate(newDate);
+                  }}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span>
+                  {format(date, 'EEEE, MMMM d, yyyy')}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    const newDate = new Date(date);
+                    newDate.setDate(newDate.getDate() + 1);
+                    setDate(newDate);
+                  }}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              'Select a date'
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[calc(100vh-300px)]">
+            <div className="space-y-4">
+              {selectedDateTasks.length === 0 ? (
+                <div className="text-center text-muted-foreground py-8">
+                  No tasks due on this date
+                </div>
+              ) : (
+                selectedDateTasks.map(task => (
+                  <TaskCard
+                    key={task._id}
+                    task={task}
+                    onEdit={onTaskEdit}
+                  />
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
     </div>
   );
 };

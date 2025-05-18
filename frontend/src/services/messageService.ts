@@ -1,48 +1,69 @@
 import api from '@/lib/axios';
 
-export interface Message {
-  id: string;
-  content: string;
-  sender: string;
-  receiver: string;
-  read: boolean;
-  createdAt: string;
+export interface User {
+  _id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  status?: 'online' | 'offline';
 }
 
-export const messageService = {
-  // Get all messages
-  getAllMessages: async () => {
-    const response = await api.get('/message');
-    return response.data;
-  },
+export interface Message {
+  _id: string;
+  sender: User;
+  receiver: User;
+  content: string;
+  messageType: 'text' | 'file' | 'image';
+  createdAt: string;
+  read: boolean;
+}
 
-  // Get messages between two users
-  getMessagesBetweenUsers: async (userId1: string, userId2: string) => {
-    const response = await api.get(`/message/between/${userId1}/${userId2}`);
-    return response.data;
-  },
+export interface Conversation {
+  _id: string;
+  participants: User[];
+  lastMessage: Message;
+  unreadCount: number;
+}
 
-  // Send new message
-  sendMessage: async (messageData: Omit<Message, 'id' | 'createdAt' | 'read'>) => {
-    const response = await api.post('/message', messageData);
-    return response.data;
-  },
-
-  // Mark message as read
-  markAsRead: async (messageId: string) => {
-    const response = await api.put(`/message/${messageId}/read`);
-    return response.data;
-  },
-
-  // Delete message
-  deleteMessage: async (messageId: string) => {
-    const response = await api.delete(`/message/${messageId}`);
-    return response.data;
-  },
-
-  // Get unread message count
-  getUnreadCount: async () => {
-    const response = await api.get('/message/unread/count');
+class MessageService {
+  async searchUsers(query: string): Promise<User[]> {
+    const response = await api.get(`/user/search?q=${query}`);
     return response.data;
   }
-}; 
+
+  async getConversations(): Promise<Conversation[]> {
+    const response = await api.get('/messages/history');
+    return response.data;
+  }
+
+  async getConversation(userId: string): Promise<Message[]> {
+    const response = await api.get(`/messages/${userId}`);
+    return response.data;
+  }
+
+  async markAsRead(senderId: string): Promise<void> {
+    await api.post(`/messages/read/${senderId}`);
+  }
+
+  async initiateCall(userId: string, type: 'video' | 'voice'): Promise<{ roomId: string }> {
+    const response = await api.post(`/messages/call/initiate`, {
+      userId,
+      type
+    });
+    return response.data;
+  }
+
+  async acceptCall(callId: string): Promise<void> {
+    await api.post(`/messages/call/accept/${callId}`);
+  }
+
+  async rejectCall(callId: string): Promise<void> {
+    await api.post(`/messages/call/reject/${callId}`);
+  }
+
+  async endCall(callId: string): Promise<void> {
+    await api.post(`/messages/call/end/${callId}`);
+  }
+}
+
+export const messageService = new MessageService(); 

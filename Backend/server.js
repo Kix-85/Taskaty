@@ -5,6 +5,7 @@ const { Server } = require('socket.io');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const passport = require('./config/passport');
+const mongoose = require('mongoose');
 
 // Import services
 const ChatService = require('./services/chat.service');
@@ -19,13 +20,14 @@ const connectDB = require('./config/db');
 
 // Create Express app and HTTP server
 const app = express();
+const server = http.createServer(app);
 
 // Configure allowed origins
 const allowedOrigins = process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(',')
-    : ['http://localhost:8080', 'http://localhost:5173', 'https://app8080.maayn.me'];
+    : ['http://localhost:8080', 'http://localhost:5173', 'http://192.168.1.6:8080'];
 
-// Configure CORS
+// Configure CORS for Express
 app.use(cors({
     origin: function (origin, callback) {
         if (allowedOrigins.includes(origin) || !origin) {
@@ -37,14 +39,16 @@ app.use(cors({
     credentials: true,
 }));
 
-const server = http.createServer(app);
-// Setup Socket.IO with CORS configuration
+// Configure Socket.IO with CORS
 const io = new Server(server, {
     cors: {
         origin: allowedOrigins,
-        methods: ['GET', 'POST'],
-        credentials: true,
+        methods: ["GET", "POST"],
+        credentials: true
     },
+    path: '/socket.io',
+    transports: ['websocket', 'polling'],
+    pingTimeout: 60000,
 });
 
 // Server level middlewares
@@ -81,7 +85,7 @@ const connectedUsers = new Map();
 
 // Socket.IO event handlers
 io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
+    console.log('A user connected:', socket.id);
 
     // Authenticate user on connection
     socket.on('authenticate', async (userId) => {
@@ -234,16 +238,76 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Handle joining a room
+    socket.on('join-room', ({ roomId, userId }) => {
+        if (roomId && userId) {
+            socket.join(roomId);
+            socket.to(roomId).emit('user-connected', userId);
+            console.log(`User ${userId} joined room ${roomId}`);
+        }
+    });
+
+    // Handle leaving a room
+    socket.on('leave-room', ({ roomId }) => {
+        if (roomId) {
+            socket.leave(roomId);
+            console.log(`User left room ${roomId}`);
+        }
+    });
+
+    // Handle chat messages
+    socket.on('send-message', async (data) => {
+        try {
+            const { content, roomId, receiverId } = data;
+            
+            if (!content) {
+                throw new Error('Message content is required');
+            }
+
+            // Save message to database
+            const message = await ChatService.saveMessage({
+                sender: socket.userId,
+                receiver: receiverId,
+                content,
+                roomId
+            });
+
+            if (roomId) {
+                // Broadcast to room
+                socket.to(roomId).emit('receive-message', message);
+            } else if (receiverId) {
+                // Send to specific user
+                const receiverSocket = connectedUsers.get(receiverId);
+                if (receiverSocket) {
+                    io.to(receiverSocket).emit('receive-message', message);
+                }
+            }
+
+            // Send confirmation to sender
+            socket.emit('message-sent', message);
+        } catch (error) {
+            console.error('Error handling message:', error);
+            socket.emit('error', { message: error.message });
+        }
+    });
+
+    // Handle video call signaling
+    socket.on('video-call-signal', ({ signal, roomId, callerId }) => {
+        socket.to(roomId).emit('receive-call-signal', { signal, callerId });
+    });
+
+    // Handle voice call signaling
+    socket.on('voice-call-signal', ({ signal, roomId, callerId }) => {
+        socket.to(roomId).emit('receive-voice-signal', { signal, callerId });
+    });
+
     // Handle disconnection
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
-
+        
         if (socket.userId) {
-            // Remove from connected users
             connectedUsers.delete(socket.userId);
-
-            // Notify other users
-            socket.broadcast.emit('user-offline', socket.userId);
+            io.emit('user-offline', socket.userId);
         }
     });
 });
@@ -258,6 +322,7 @@ app.use('/api/auth', auth);
 app.use('/api/task', task);
 app.use('/api/user', user);
 app.use('/api/project', project);
+app.use('/api/chat', require('./routers/chat.routes'));
 
 // Chat-specific routes
 app.get('/api/messages/history', passport.authenticate('jwt', { session: false }), async (req, res) => {

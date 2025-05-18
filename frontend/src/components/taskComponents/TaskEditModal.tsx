@@ -79,6 +79,9 @@ const TaskEditModal = ({ isOpen, onClose, task }: TaskEditModalProps) => {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Edit Task</DialogTitle>
+            <DialogDescription>
+              Make changes to your task here. Click save when you're done.
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">

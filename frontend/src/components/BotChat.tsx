@@ -2,6 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Message } from './Message';
 import { MessageInput } from './MessageInput';
 import { Bot, X, Minimize2, Maximize2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Send } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface BotMessage {
     _id: string;
@@ -31,117 +36,110 @@ const INITIAL_MESSAGE: BotMessage = {
     isRead: true
 };
 
-export function BotChat() {
-    const [isOpen, setIsOpen] = useState(false);
-    const [isMinimized, setIsMinimized] = useState(false);
-    const [messages, setMessages] = useState<BotMessage[]>([INITIAL_MESSAGE]);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
+interface BotChatProps {
+  onClose: () => void;
+  className?: string;
+}
 
-    useEffect(() => {
-        if (isOpen) {
-            scrollToBottom();
-        }
-    }, [messages, isOpen]);
+export function BotChat({ onClose, className }: BotChatProps) {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-    const handleSendMessage = async (content: string, type: 'text' | 'emoji' | 'file') => {
-        // Add user message
-        const userMessage: BotMessage = {
-            _id: `user-${Date.now()}`,
-            sender: {
-                _id: 'user-1',
-                name: 'You'
-            },
-            content,
-            messageType: type,
-            timestamp: new Date().toISOString(),
-            isRead: true
-        };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
 
-        setMessages(prev => [...prev, userMessage]);
+    const userMessage = { role: 'user', content: input.trim() } as Message;
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
 
-        // Simulate bot response (you can replace this with actual bot logic)
-        setTimeout(() => {
-            const botResponse: BotMessage = {
-                _id: `bot-${Date.now()}`,
-                sender: BOT_INFO,
-                content: "I'm here to help you manage your tasks effectively. What would you like to know about Taskaty?",
-                messageType: 'text',
-                timestamp: new Date().toISOString(),
-                isRead: true
-            };
-            setMessages(prev => [...prev, botResponse]);
-        }, 1000);
-    };
+    try {
+      // Simulate AI response - replace with actual API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const aiMessage = { role: 'assistant', content: 'This is a sample response.' } as Message;
+      setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    return (
-        <>
-            {/* Bot Button */}
-            <button
-                onClick={() => setIsOpen(true)}
-                className={`absolute bottom-[100px] right-[10px] sm:right-[20px] md:right-[30px] p-2 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-200 z-50 ${
-                    isOpen ? 'hidden' : 'flex items-center justify-center'
-                }`}
+  return (
+    <div className={cn(
+      "fixed bottom-4 right-4 w-full max-w-[90vw] md:max-w-[400px] bg-background rounded-lg shadow-lg border flex flex-col",
+      "h-[80vh] md:h-[600px] z-50",
+      className
+    )}>
+      <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center gap-2">
+          <Bot className="h-5 w-5" />
+          <h2 className="font-semibold">AI Assistant</h2>
+        </div>
+        <Button variant="ghost" size="icon" onClick={onClose}>
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <ScrollArea className="flex-1 p-4">
+        <div className="space-y-4">
+          {messages.map((message, i) => (
+            <div
+              key={i}
+              className={cn(
+                "flex w-full",
+                message.role === 'user' ? 'justify-end' : 'justify-start'
+              )}
             >
-                <Bot className="w-5 h-5" />
-            </button>
-
-            {/* Chat Window */}
-            {isOpen && (
-                <div className={`absolute bottom-[60px] right-[10px] w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl transition-all duration-200 z-50 ${
-                    isMinimized ? 'h-16' : 'h-[400px]'
-                }`}>
-                    {/* Header */}
-                    <div className="flex items-center justify-between p-3 border-b dark:border-gray-700 bg-white dark:bg-gray-800 rounded-t-lg">
-                        <div className="flex items-center gap-2">
-                            <div className="bg-blue-100 dark:bg-blue-900 p-1.5 rounded-full">
-                                <Bot className="w-4 h-4 text-blue-500" />
-                            </div>
-                            <span className="font-medium text-sm text-gray-900 dark:text-white">Taskaty Assistant</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <button
-                                onClick={() => setIsMinimized(!isMinimized)}
-                                className="p-1 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                            >
-                                {isMinimized ? <Maximize2 className="w-3.5 h-3.5" /> : <Minimize2 className="w-3.5 h-3.5" />}
-                            </button>
-                            <button
-                                onClick={() => setIsOpen(false)}
-                                className="p-1 rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                            >
-                                <X className="w-3.5 h-3.5" />
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Messages */}
-                    {!isMinimized && (
-                        <>
-                            <div className="h-[calc(400px-7rem)] overflow-y-auto p-3 space-y-3 bg-gray-50 dark:bg-gray-900">
-                                {messages.map((message) => (
-                                    <Message
-                                        key={message._id}
-                                        message={message}
-                                        isOwnMessage={message.sender._id === 'user-1'}
-                                    />
-                                ))}
-                                <div ref={messagesEndRef} />
-                            </div>
-
-                            {/* Input */}
-                            <div className="border-t dark:border-gray-700 bg-white dark:bg-gray-800 rounded-b-lg">
-                                <MessageInput
-                                    onSendMessage={handleSendMessage}
-                                />
-                            </div>
-                        </>
-                    )}
+              <div
+                className={cn(
+                  "max-w-[80%] rounded-lg px-4 py-2",
+                  message.role === 'user'
+                    ? 'bg-primary text-primary-foreground ml-4'
+                    : 'bg-muted mr-4'
+                )}
+              >
+                <p className="text-sm whitespace-pre-wrap break-words">
+                  {message.content}
+                </p>
+              </div>
+            </div>
+          ))}
+          {isLoading && (
+            <div className="flex justify-start">
+              <div className="bg-muted rounded-lg px-4 py-2 mr-4">
+                <div className="flex gap-1">
+                  <span className="animate-bounce">●</span>
+                  <span className="animate-bounce delay-100">●</span>
+                  <span className="animate-bounce delay-200">●</span>
                 </div>
-            )}
-        </>
-    );
+              </div>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+
+      <form onSubmit={handleSubmit} className="p-4 border-t">
+        <div className="flex gap-2">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Type your message..."
+            className="flex-1"
+            disabled={isLoading}
+          />
+          <Button type="submit" size="icon" disabled={isLoading}>
+            <Send className="h-4 w-4" />
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
 } 

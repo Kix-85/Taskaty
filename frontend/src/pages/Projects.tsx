@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Search, Filter, Grid3X3, List as ListIcon } from "lucide-react";
+import { Plus, Search, Filter, Grid3X3, List as ListIcon, Edit, Bot } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -9,28 +9,35 @@ import { CreateProjectModal } from "@/components/CreateProjectModal";
 import { ProjectEditModal } from "@/components/ProjectEditModal";
 import { projectService, Project } from "@/services/projectService";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { useTaskStore } from "@/store/taskStore";
 // import Cookies from "node_modules/@types/js-cookie";
 import Cookies from 'js-cookie';
 import api from "@/lib/axios";
+import { useChatBot } from '@/providers/ChatBotProvider';
 
 // Sample project data
 
 
 const Projects = () => {
+  const navigate = useNavigate();
+  const { filterByProject } = useTaskStore();
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
   const [projects, setProjects] = useState<Project[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { setShowChat, setContext } = useChatBot();
 
   const fetchProjects = async () => {
     try {
       const response = await projectService.getAllProjects();
-      setProjects(response.data);
+      setProjects(response || []); // Ensure we always set an array
     } catch (error) {
       console.error("Error fetching projects:", error);
       toast.error('Failed to fetch projects');
+      setProjects([]); // Set empty array on error
     }
   };
 
@@ -39,10 +46,10 @@ const Projects = () => {
   }, []);
 
   // Filter projects based on search query
-  const filteredProjects = projects.filter(project =>
+  const filteredProjects = projects?.filter(project =>
     project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     project.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ) || [];
 
   // Status badge color mapping
   const getStatusColor = (status: string) => {
@@ -58,13 +65,24 @@ const Projects = () => {
     }
   };
 
-  const handleProjectClick = (project: Project) => {
+  const handleProjectClick = async (project: Project) => {
     if (!project._id) {
       toast.error('Invalid project ID');
       return;
     }
+    await filterByProject(project._id);
+    navigate(`/myTasks?projectId=${project._id}`);
+  };
+
+  const handleEditClick = (e: React.MouseEvent, project: Project) => {
+    e.stopPropagation(); // Prevent triggering the card click
     setSelectedProject(project);
     setIsEditModalOpen(true);
+  };
+
+  const handleAskAI = () => {
+    setContext('project management and task organization');
+    setShowChat(true);
   };
 
   return (
@@ -76,13 +94,22 @@ const Projects = () => {
             <p className="text-muted-foreground">Manage your projects and team collaboration</p>
           </div>
 
-          <Button
-            className="w-full md:w-auto"
-            onClick={() => setIsCreateModalOpen(true)}
-          >
-            <Plus size={16} className="mr-2" />
-            New Project
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handleAskAI}
+            >
+              <Bot className="mr-2 h-4 w-4" />
+              Ask AI Assistant
+            </Button>
+            <Button
+              className="w-full md:w-auto"
+              onClick={() => setIsCreateModalOpen(true)}
+            >
+              <Plus size={16} className="mr-2" />
+              New Project
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
@@ -133,7 +160,17 @@ const Projects = () => {
                 onClick={() => handleProjectClick(project)}
               >
                 <CardHeader className="pb-2">
-                  <CardTitle>{project.name}</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>{project.name}</CardTitle>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => handleEditClick(e, project)}
+                      className="h-8 w-8"
+                    >
+                      <Edit size={16} />
+                    </Button>
+                  </div>
                   <div className="flex items-center justify-between">
                     <CardDescription className="line-clamp-2">{project.description}</CardDescription>
                     <Badge className={getStatusColor(project.status)}>{project.status}</Badge>
@@ -170,7 +207,17 @@ const Projects = () => {
                   <div className="flex-1">
                     <div className="flex items-start justify-between mb-1">
                       <h3 className="text-lg font-semibold">{project.name}</h3>
-                      <Badge className={getStatusColor(project.status)}>{project.status}</Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge className={getStatusColor(project.status)}>{project.status}</Badge>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => handleEditClick(e, project)}
+                          className="h-8 w-8"
+                        >
+                          <Edit size={16} />
+                        </Button>
+                      </div>
                     </div>
                     <p className="text-muted-foreground text-sm">{project.description}</p>
                   </div>
