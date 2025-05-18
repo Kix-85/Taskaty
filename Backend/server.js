@@ -15,6 +15,7 @@ const auth = require('./routers/auth.routes');
 const task = require('./routers/task.routes');
 const user = require('./routers/user.routes');
 const project = require('./routers/project.routes');
+const chat = require('./routes/chat.routes');
 const connectDB = require('./config/db');
 
 // Create Express app and HTTP server
@@ -234,6 +235,7 @@ app.use('/api/auth', auth);
 app.use('/api/task', task);
 app.use('/api/user', user);
 app.use('/api/project', project);
+app.use('/api/chat', chat);
 
 // Chat-specific routes
 app.get('/api/messages/history', passport.authenticate('jwt', { session: false }), async (req, res) => {
@@ -278,9 +280,28 @@ app.get('/api/messages/:userId', passport.authenticate('jwt', { session: false }
 // Start the server
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, async () => {
-  console.log(`Server running on port ${PORT}`);
-  await connectDB();
-  console.log('Connected to database');
+    try {
+        console.log(`Server running on port ${PORT}`);
+        await connectDB();
+        console.log('Connected to database');
+        console.log('Environment variables loaded:', {
+            hasGeminiKey: process.env.GEMINI_API_KEY,
+            allowedOrigins: process.env.ALLOWED_ORIGINS,
+            nodeEnv: process.env.NODE_ENV
+        });
+    } catch (error) {
+        console.error('Server startup error:', error);
+        process.exit(1);
+    }
+});
+
+// Error handling for uncaught exceptions
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+});
+
+process.on('unhandledRejection', (error) => {
+    console.error('Unhandled Rejection:', error);
 });
 
 // Export app for testing

@@ -158,10 +158,10 @@ export function Sidebar({ className }: SidebarProps) {
         </div>
 
         <div className={cn(
-          "hidden absolute bottom-0 left-0 justify-center p-4 w-full lg:flex bg-white dark:bg-gray-800 z-20 border-r border-gray-200 dark:border-gray-700",
+          "absolute bottom-0 left-0 justify-center p-4 w-full lg:flex bg-white dark:bg-gray-800 z-20 border-r border-gray-200 dark:border-gray-700",
           collapsed ? "flex-col space-y-4" : "space-x-4"
         )}>
-          <Button variant="ghost" size="icon">
+          {/* <Button variant="ghost" size="icon">
             <Sliders className="w-6 h-6" />
           </Button>
           <Button variant="ghost" size="icon">
@@ -169,9 +169,10 @@ export function Sidebar({ className }: SidebarProps) {
           </Button>
           <Button variant="ghost" size="icon">
             <Flag className="w-6 h-6" />
-          </Button>
-          <Button onClick={handleLogout} variant="ghost" size="icon">
-            <LogOut className="w-6 h-6" />
+          </Button> */}
+          <Button onClick={handleLogout} variant="ghost" className="bg-[#3c83f6] dark:bg-[#f8fafc] dark:text-[#020617] dark:hover:bg-[#a9c2ea] text-[#fff] hover:bg-[#a9c2ea] w-full rounded-lg" size="icon">
+            {/* <LogOut className="w-6 h-6" /> */}
+            Log Out
           </Button>
         </div>
       </aside>
