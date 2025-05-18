@@ -21,19 +21,47 @@ interface BotMessage {
     isRead: boolean;
 }
 
+interface BotChatProps {
+    bottom?: number;
+    right?: number;
+    context?: 'dashboard' | 'tasks' | 'settings' | 'messages';
+}
+
 const BOT_INFO = {
     _id: 'bot-1',
     name: 'Taskaty Bot',
-    avatar: '/bot-avatar.png' // You can add a bot avatar image
+    avatar: '/bot-avatar.png'
 };
 
-const INITIAL_MESSAGE: BotMessage = {
-    _id: 'welcome-1',
-    sender: BOT_INFO,
-    content: "👋 Hi! I'm your Taskaty assistant. I can help you with:\n\n• Creating and managing tasks\n• Setting up projects\n• Understanding task priorities\n• Tracking progress\n• And much more!\n\nHow can I help you today?",
-    messageType: 'text',
-    timestamp: new Date().toISOString(),
-    isRead: true
+// Function to generate AI response using backend API
+const generateAIResponse = async (message: string, context: string, conversationHistory: BotMessage[]): Promise<string> => {
+    try {
+        console.log('Sending request to backend:', {
+            message,
+            context,
+            historyLength: conversationHistory.length
+        });
+
+        const response = await api.post('/chat/message', {
+            message,
+            context,
+            history: conversationHistory
+        });
+
+        console.log('Received response from backend:', response.data);
+        
+        if (!response.data || !response.data.response) {
+            throw new Error('Invalid response format from backend');
+        }
+
+        return response.data.response;
+    } catch (error: any) {
+        console.error('Error getting AI response:', error);
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw new Error('Failed to get response from AI service');
+    }
 };
 
 interface Message {

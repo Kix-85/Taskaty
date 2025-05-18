@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import api from "@/lib/axios";
 import { mockTasks, mockProjects } from "@/lib/mockData";
+import type { Task } from "@/types/task";
 
 interface ApiResponse {
   tasks: any[];
@@ -97,12 +98,12 @@ const Dashboard = () => {
           <CardContent>
             <div className="space-y-4">
               {mockTasks.slice(0, 5).map((task) => (
-                <div key={task.id} className="flex items-center justify-between p-2 border rounded">
+                <div key={task._id} className="flex items-center justify-between p-2 border rounded">
                   <div>
-                    <p className="font-medium">{task.title}</p>
+                    <p className="font-medium">{task.name}</p>
                     <p className="text-sm text-gray-500">{task.status}</p>
                   </div>
-                  <Progress value={task.progress} className="w-24" />
+                  <Progress value={task.progress || 0} className="w-24" />
                 </div>
               ))}
             </div>
