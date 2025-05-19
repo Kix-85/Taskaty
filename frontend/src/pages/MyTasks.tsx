@@ -20,11 +20,12 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import type { Task, TaskGroups } from '@/types/task';
 import TaskEditModal from '@/components/taskComponents/TaskEditModal';
-import CreateTaskModal from '@/components/taskComponents/CreateTaskModal';
+import {CreateTaskModal} from '../components/CreateTaskModal';
 import { useLocation } from 'react-router-dom';
 import { useChatBot } from '@/providers/ChatBotProvider';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from 'sonner';
+import Cookies from 'js-cookie';
 
 const MyTasks = () => {
   const location = useLocation();
@@ -63,8 +64,27 @@ const MyTasks = () => {
   }, [tasks]);
 
   useEffect(() => {
-    // Check if there's a project ID in the URL search params
+    // Check for auth_success and token in URL
     const searchParams = new URLSearchParams(location.search);
+    const authSuccess = searchParams.get('auth_success');
+    const token = searchParams.get('token');
+    
+    if (authSuccess && token) {
+      // Store token in cookie
+      Cookies.set('token', token, { 
+        expires: 1, // 1 day
+        secure: true,
+        sameSite: 'strict'
+      });
+      
+      // Clean up URL
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.delete('auth_success');
+      newUrl.searchParams.delete('token');
+      window.history.replaceState({}, '', newUrl.toString());
+    }
+
+    // Check if there's a project ID in the URL search params
     const projectId = searchParams.get('projectId');
     
     if (projectId) {
@@ -95,11 +115,11 @@ const MyTasks = () => {
 
     try {
       await moveTask(
-        draggableId,
+      draggableId,
         sourceStatus as keyof TaskGroups,
         destinationStatus as keyof TaskGroups,
-        destination.index
-      );
+      destination.index
+    );
       toast.success('Task moved successfully');
     } catch (error) {
       toast.error('Failed to move task');
@@ -240,12 +260,6 @@ const MyTasks = () => {
     urgent: Object.values(tasks).flat().filter(task => task.priority === 'urgent').length
   };
 
-  const transformedTasks: TaskGroups = {
-    'To Do': calendarTasks.filter(task => task.status === 'todo'),
-    'In Progress': calendarTasks.filter(task => task.status === 'in progress'),
-    'Done': calendarTasks.filter(task => task.status === 'done')
-  };
-
   return (
     <div className="container mx-auto p-4 space-y-6">
       <div className="flex flex-col gap-4">
@@ -253,17 +267,17 @@ const MyTasks = () => {
           <div className="flex flex-col gap-2 md:flex-row md:items-center">
             <Select value={currentProjectId || 'all'} onValueChange={handleProjectChange}>
               <SelectTrigger className="w-full md:w-[200px]">
-                <SelectValue placeholder="All Projects" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Projects</SelectItem>
+              <SelectValue placeholder="All Projects" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Projects</SelectItem>
                 {projects.map(project => (
-                  <SelectItem key={project._id} value={project._id}>
-                    {project.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                <SelectItem key={project._id} value={project._id}>
+                  {project.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
@@ -509,7 +523,7 @@ const MyTasks = () => {
         )}
         {selectedView === 'Calendar' && (
           <Calendar
-            tasks={transformedTasks}
+            tasks={Object.values(filteredAndSearchedTasks).flat()}
             onTaskEdit={handleTaskEdit}
           />
         )}
@@ -523,6 +537,7 @@ const MyTasks = () => {
             setSelectedTask(null);
           }}
           task={selectedTask}
+          onTaskUpdated={fetchTasks}
         />
       )}
 

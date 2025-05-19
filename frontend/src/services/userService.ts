@@ -1,4 +1,5 @@
 import api from '@/lib/axios';
+import { useAuthStore } from '@/store/authStore';
 
 export interface User {
   id: string;
@@ -20,74 +21,96 @@ export interface User {
 export const userService = {
   // Get current user profile
   getUserProfile: async () => {
-    const response = await api.get('/user/me');
-    return response.data;
+    try {
+      const response = await api.get('/user/me');
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        useAuthStore.getState().clearUser();
+      }
+      throw new Error(error.response?.data?.message || 'Failed to fetch user profile');
+    }
   },
 
   // verify token
   verifyToken: async () => {
-    const response = await api.get('/user/verify-token', { withCredentials: true });
-    console.log('From user service: ', response);
-    return response;
+    try {
+      const response = await api.get('/user/verify-token');
+      return response;
+    } catch (error: any) {
+      if (error.response?.status === 401) {
+        useAuthStore.getState().clearUser();
+      }
+      throw error;
+    }
   },
 
   // Get user by ID
   getUserById: async (id: string) => {
-    const response = await api.get(`/user/${id}`);
-    return response.data;
+    try {
+      const response = await api.get(`/user/${id}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch user');
+    }
   },
 
   // Update user profile
   updateUserProfile: async (formData: FormData) => {
     try {
-      console.log("Uploading profile data...");
       const response = await api.put('/user/me', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
         timeout: 30000, // Increase timeout for file uploads
       });
-      console.log("Response from updateUserProfile: ", response);
       return response.data;
     } catch (error: any) {
-      console.error('Profile update error:', error);
-      if (error.response) {
-        throw new Error(error.response.data.message || 'Error updating profile');
-      } else if (error.request) {
-        throw new Error('No response from server. Please try again.');
-      } else {
-        throw new Error('Error updating profile: ' + error.message);
+      if (error.response?.status === 401) {
+        useAuthStore.getState().clearUser();
       }
+      throw new Error(error.response?.data?.message || 'Error updating profile');
     }
   },
 
   // Update user settings
   updateSettings: async (settings: Record<string, any>) => {
-    const response = await api.put('/user/settings', settings);
-    return response.data;
+    try {
+      const response = await api.put('/user/settings', settings);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to update settings');
+    }
   },
 
   // Search users
   searchUsers: async (query: string) => {
-    const response = await api.get(`/user/search?q=${query}`);
-    return response.data;
+    try {
+      const response = await api.get(`/user/search?q=${query}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to search users');
+    }
   },
 
   // Get user statistics
   getUserStatistics: async (userId: string) => {
-    const response = await api.get(`/user/${userId}/statistics`);
-    return response.data;
+    try {
+      const response = await api.get(`/user/${userId}/statistics`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch statistics');
+    }
   },
 
-  // resetUserPassword: async (email: string, currentPassword: string, newPassword: string, confirmPassword: string) => {
-  //   const response = await api.put('/user/reset-pass', { email, currentPassword, newPassword, confirmPassword });
-  //   console.log('From reset password: ', response)
-  //   return response.data;
-  // },
   // Update user status
   updateStatus: async (userId: string, status: User['status']) => {
-    const response = await api.put(`/user/${userId}/status`, { status });
-    return response.data;
+    try {
+      const response = await api.put(`/user/${userId}/status`, { status });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to update status');
+    }
   },
 
   // Reset user password
@@ -100,10 +123,7 @@ export const userService = {
       const response = await api.post('/auth/reset-pass', data);
       return response.data;
     } catch (error: any) {
-      if (error.response) {
-        throw new Error(error.response.data.message || 'Failed to reset password');
-      }
-      throw error;
+      throw new Error(error.response?.data?.message || 'Failed to reset password');
     }
   }
 }; 

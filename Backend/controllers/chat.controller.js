@@ -68,132 +68,92 @@ const generateResponse = async (req, res) => {
 
 const getConversations = async (req, res) => {
   try {
-    const conversations = await Conversation.find({
-      participants: req.user._id
-    })
-    .populate('participants', 'name email')
-    .populate({
-      path: 'messages',
-      options: { sort: { createdAt: -1 }, limit: 1 }
-    })
-    .sort({ lastActivity: -1 });
+    const userId = req.user._id;
+
+    const conversations = await Conversation.aggregate([
+      {
+        $match: {
+          participants: userId
+        }
+      },
+      {
+        $lookup: {
+          from: 'messages',
+          let: { conversationId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ['$conversationId', '$$conversationId'] }
+              }
+            },
+            {
+              $sort: { createdAt: -1 }
+            },
+            {
+              $limit: 1
+            }
+          ],
+          as: 'lastMessage'
+        }
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'participants',
+          foreignField: '_id',
+          as: 'participants'
+        }
+      },
+      {
+        $addFields: {
+          lastMessage: { $arrayElemAt: ['$lastMessage', 0] },
+          unreadCount: {
+            $size: {
+              $filter: {
+                input: '$messages',
+                as: 'message',
+                cond: {
+                  $and: [
+                    { $eq: ['$$message.receiver', userId] },
+                    { $eq: ['$$message.read', false] }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    ]);
 
     res.json(conversations);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching conversations', error: error.message });
+    console.error('Error getting conversations:', error);
+    res.status(500).json({ error: 'Failed to get conversations' });
   }
 };
 
 const getConversation = async (req, res) => {
   try {
+    const { userId } = req.params;
+    const currentUserId = req.user._id;
+
     const conversation = await Conversation.findOne({
-      _id: req.params.id,
-      participants: req.user._id
-    }).populate('participants', 'name email');
-
-    if (!conversation) {
-      return res.status(404).json({ message: 'Conversation not found' });
-    }
-
-    res.json(conversation);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching conversation', error: error.message });
-  }
-};
-
-const createConversation = async (req, res) => {
-  try {
-    const { participantIds, initialMessage } = req.body;
-    
-    // Ensure current user is included in participants
-    const allParticipants = [...new Set([...participantIds, req.user._id])];
-
-    const conversation = await Conversation.create({
-      participants: allParticipants
+      participants: { $all: [currentUserId, userId] }
     });
 
-    if (initialMessage) {
-      const message = await Message.create({
-        conversationId: conversation._id,
-        sender: req.user._id,
-        receiver: participantIds[0], // Assuming 1-1 chat for now
-        content: initialMessage,
-        messageType: 'text'
-      });
-
-      conversation.messages.push(message._id);
-      conversation.lastActivity = new Date();
-      await conversation.save();
+    if (!conversation) {
+      return res.json([]);
     }
 
-    res.status(201).json(conversation);
-  } catch (error) {
-    res.status(500).json({ message: 'Error creating conversation', error: error.message });
-  }
-};
-
-const getMessages = async (req, res) => {
-  try {
-    const { conversationId } = req.params;
-    const { page = 1, limit = 50 } = req.query;
-
-    const messages = await Message.find({
-      conversationId
-    })
-    .sort({ createdAt: -1 })
-    .skip((page - 1) * limit)
-    .limit(parseInt(limit))
-    .populate('sender', 'name email');
+    const messages = await Message.find({ conversationId: conversation._id })
+      .sort({ createdAt: 1 })
+      .populate('sender', 'name email avatar')
+      .populate('receiver', 'name email avatar');
 
     res.json(messages);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching messages', error: error.message });
-  }
-};
-
-const sendMessage = async (req, res) => {
-  try {
-    const { conversationId, content, receiverId, messageType = 'text' } = req.body;
-
-    const message = await Message.create({
-      conversationId,
-      sender: req.user._id,
-      receiver: receiverId,
-      content,
-      messageType
-    });
-
-    // Update conversation's last activity
-    await Conversation.findByIdAndUpdate(conversationId, {
-      $push: { messages: message._id },
-      lastActivity: new Date()
-    });
-
-    await message.populate('sender', 'name email');
-    res.status(201).json(message);
-  } catch (error) {
-    res.status(500).json({ message: 'Error sending message', error: error.message });
-  }
-};
-
-const markMessageAsRead = async (req, res) => {
-  try {
-    const message = await Message.findOneAndUpdate(
-      {
-        _id: req.params.id,
-        receiver: req.user._id
-      },
-      { read: true },
-      { new: true }
-    );
-
-    if (!message) {
-      return res.status(404).json({ message: 'Message not found' });
-    }
-
-    res.json(message);
-  } catch (error) {
-    res.status(500).json({ message: 'Error marking message as read', error: error.message });
+    console.error('Error getting conversation:', error);
+    res.status(500).json({ error: 'Failed to get conversation' });
   }
 };
 
@@ -274,10 +234,6 @@ module.exports = {
   generateResponse,
   getConversations,
   getConversation,
-  createConversation,
-  getMessages,
-  sendMessage,
-  markMessageAsRead,
   markAsRead,
   initiateCall,
   acceptCall,

@@ -5,12 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import type { Task, TaskGroups } from '@/types/task';
+import type { Task } from '@/types/task';
 import TaskCard from './TaskCard';
 import { format, isSameDay, isToday } from 'date-fns';
 
 interface CalendarViewProps {
-  tasks: TaskGroups;
+  tasks: Task[];
   onTaskEdit: (task: Task) => void;
 }
 
@@ -18,10 +18,8 @@ const Calendar = ({ tasks, onTaskEdit }: CalendarViewProps) => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [view, setView] = useState<'month' | 'day'>('month');
 
-  const allTasks = Object.values(tasks).flat();
-
   const getTasksForDate = (date: Date) => {
-    return allTasks.filter(task => {
+    return tasks.filter(task => {
       if (!task.dueDate) return false;
       const taskDate = new Date(task.dueDate);
       return isSameDay(taskDate, date);
@@ -30,14 +28,14 @@ const Calendar = ({ tasks, onTaskEdit }: CalendarViewProps) => {
 
   const tasksByDate = useMemo(() => {
     const map = new Map<string, Task[]>();
-    allTasks.forEach(task => {
+    tasks.forEach(task => {
       if (!task.dueDate) return;
       const dateStr = format(new Date(task.dueDate), 'yyyy-MM-dd');
       const existing = map.get(dateStr) || [];
       map.set(dateStr, [...existing, task]);
     });
     return map;
-  }, [allTasks]);
+  }, [tasks]);
 
   const selectedDateTasks = date ? getTasksForDate(date) : [];
 
@@ -127,7 +125,7 @@ const Calendar = ({ tasks, onTaskEdit }: CalendarViewProps) => {
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <span>Total Tasks</span>
-                <Badge variant="outline">{allTasks.length}</Badge>
+                <Badge variant="outline">{tasks.length}</Badge>
               </div>
               <div className="flex justify-between items-center">
                 <span>Due Today</span>

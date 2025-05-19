@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,10 +9,11 @@ import { toast } from "sonner";
 import { AxiosError, AxiosResponse } from "axios";
 import { useAuthStore } from "@/store/authStore";
 import { authService } from "@/services/authService";
-
+import Cookies from "js-cookie";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const setUser = useAuthStore((state) => state.setUser);
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -24,6 +25,55 @@ const Auth = () => {
     confirmPassword: "",
     birthDate: ""
   });
+
+  // Get the redirect path from location state
+  const from = location.state?.from?.pathname || '/dashboard';
+
+  // Handle Google OAuth callback
+  useEffect(() => {
+    const handleGoogleCallback = async () => {
+      const params = new URLSearchParams(location.search);
+      const token = params.get('token');
+      const error = params.get('error');
+
+      if (error) {
+        toast.error('Google authentication failed');
+        return;
+      }
+
+      if (token) {
+        try {
+          // Verify the token with the backend
+          const response = await authService.verifyToken(token);
+          if (response.data.user) {
+            // Store token in cookie
+            Cookies.set('token', response.data.token, {
+              expires: 1,
+              secure: true,
+              sameSite: 'strict'
+            });
+            
+            // Update user state
+            setUser(response.data.user);
+            toast.success('Successfully logged in with Google!');
+            
+            // Clear URL parameters
+            window.history.replaceState({}, document.title, '/auth');
+            
+            // Navigate to the intended destination or dashboard
+            navigate(from);
+          }
+        } catch (error) {
+          console.error('Error verifying Google token:', error);
+          toast.error('Failed to complete Google authentication');
+          // Clear URL parameters on error
+          window.history.replaceState({}, document.title, '/auth');
+        }
+      }
+    };
+
+    handleGoogleCallback();
+  }, [location.search, navigate, setUser, from]);
 
   const toggleAuthMode = () => {
     setIsLogin(!isLogin);
@@ -48,8 +98,6 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    console.log('Handle submit is called');
-    console.log(isLogin);
 
     try {
       const endpoint = isLogin ? 'login' : 'register';
@@ -67,30 +115,23 @@ const Auth = () => {
       
       if(res.status === 200) {
         const user = res.data.user;
-        console.log(user);
         setUser(user);
         toast.success(`Welcome back, ${user.name}!`);
-        // Redirect to dashboard
-        navigate('/dashboard');
+        // Redirect to the intended destination or dashboard
+        navigate(from);
       } else if (res.status === 201) {
         toast.success("Registration successful!");
         toast.info("We have sent you email verification. Please verify your email before login.");
         setIsLogin(true);
       } else {
-        // logic error or missing fields
         const response: any = res as AxiosResponse;
-        console.log(res);
         toast.error(response.response.data.message || "An error occurred");
       }
     } catch (error) {
-      // server error
       const err: any = error as AxiosError;
-      console.log("Error here from the catch block");
       if(err.response) {
-        console.log(err.response.data);
         toast.error(err.response.data.message || "An error occurred");
       } else {
-        console.log(err);
         toast.error("Something went wrong, please try again later");
       }
     } finally {

@@ -179,18 +179,18 @@ export function ChatArea({ selectedUserId, currentUser }: ChatAreaProps) {
         </div>
       </div>
 
-      <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4">
+    <ScrollArea className="flex-1 p-4">
+      <div className="space-y-4">
           {filteredMessages.map((message) => (
-            <Message
+          <Message
               key={message._id}
-              message={message}
+            message={message}
               isOwnMessage={message.sender._id === currentUser._id}
-            />
-          ))}
+          />
+        ))}
           <div ref={messagesEndRef} />
-        </div>
-      </ScrollArea>
+      </div>
+    </ScrollArea>
 
       <MessageInput receiverId={selectedUserId} onSendMessage={handleSendMessage} />
 

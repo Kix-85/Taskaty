@@ -16,15 +16,16 @@ interface TaskEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   task: Task;
+  onTaskUpdated: () => Promise<void>;
 }
 
-const TaskEditModal = ({ isOpen, onClose, task }: TaskEditModalProps) => {
+const TaskEditModal = ({ isOpen, onClose, task, onTaskUpdated }: TaskEditModalProps) => {
   const { updateTask, deleteTask, fetchTasks } = useTaskStore();
   const { projects } = useProjectStore();
   const [formData, setFormData] = useState<Partial<Task>>({
     name: '',
     description: '',
-    status: '',
+    status: 'todo',
     priority: 'medium',
     progress: 0,
     dueDate: '',
@@ -53,6 +54,7 @@ const TaskEditModal = ({ isOpen, onClose, task }: TaskEditModalProps) => {
       await fetchTasks();
       toast.success('Task updated successfully');
       onClose();
+      await onTaskUpdated();
     } catch (error) {
       toast.error('Failed to update task');
     }
@@ -64,6 +66,7 @@ const TaskEditModal = ({ isOpen, onClose, task }: TaskEditModalProps) => {
       await fetchTasks();
       toast.success('Task deleted successfully');
       onClose();
+      await onTaskUpdated();
     } catch (error) {
       toast.error('Failed to delete task');
     }

@@ -43,7 +43,7 @@ export const projectService = {
   // Create new project
   createProject: async (projectData: Omit<Project, '_id' | 'createdAt' | 'updatedAt' | 'tasks' | 'progress'>) => {
     try {
-      const response = await api.post('/project', projectData);
+      const response = await api.post('/project/me', projectData);
       toast.success('Project created successfully');
       return response.data;
     } catch (error: any) {

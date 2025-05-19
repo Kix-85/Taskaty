@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { toast } from 'sonner';
+import Cookies from 'js-cookie';
 
 // Get the base URL from environment variables
 const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -9,17 +10,25 @@ const api = axios.create({
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
+    'X-XSRF-TOKEN': Cookies.get('XSRF-TOKEN'), // Add CSRF token if available
   },
 });
 
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Get token from localStorage
-    const token = localStorage.getItem('token');
+    // Get token from secure cookie
+    const token = Cookies.get('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Update CSRF token on each request
+    const csrfToken = Cookies.get('XSRF-TOKEN');
+    if (csrfToken) {
+      config.headers['X-XSRF-TOKEN'] = csrfToken;
+    }
+    
     return config;
   },
   (error) => {
@@ -43,7 +52,7 @@ api.interceptors.response.use(
       switch (status) {
         case 401:
           // Handle unauthorized access
-          localStorage.removeItem('token');
+          Cookies.remove('token');
           window.location.href = '/auth';
           toast.error('Session expired. Please login again.');
           break;

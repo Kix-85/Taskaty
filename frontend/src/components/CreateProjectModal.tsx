@@ -52,21 +52,18 @@ export const CreateProjectModal = ({ isOpen, onClose, onProjectCreated }: Create
     e.preventDefault();
     try {
       const response = await projectService.createProject(formData);
-      console.log('Project created from handle submit:', response.data);
+      console.log('Project created from handle submit:', response);
 
-      if (response.status === 201) {
-        console.log("Oh yeah")
-        toast.success('Project created successfully');
-        onClose();
-        onProjectCreated();
-        setFormData({
-          name: '',
-          description: '',
-          status: 'Just Started',
-          dueDate: '',
-          members: []
-        });
-      }
+      toast.success('Project created successfully');
+      onClose();
+      onProjectCreated();
+      setFormData({
+        name: '',
+        description: '',
+        status: 'Just Started',
+        dueDate: '',
+        members: []
+      });
     } catch (error) {
       console.error('Error creating project:', error.message);
       toast.error('Failed to create project');

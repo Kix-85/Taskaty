@@ -1,39 +1,49 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { Toaster } from 'sonner';
+import { useAuthStore } from '@/store/authStore';
+import { authService } from '@/services/authService';
+import Auth from '@/pages/Auth';
+import Home from '@/pages/Home';
+import Dashboard from '@/pages/Dashboard';
+import MyTasks from '@/pages/MyTasks';
+import Projects from '@/pages/Projects';
+import Messages from '@/pages/messages';
+import Settings from '@/pages/Settings';
+import NotFound from '@/pages/NotFound';
+import { Sidebar } from '@/components/Sidebar';
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { Sidebar } from "@/components/Sidebar";
-import Home from "./pages/Home";
-import MyTasks from "./pages/MyTasks";
-import Projects from "./pages/Projects";
-import Messages from "./pages/messages";
-import Settings from "./pages/Settings";
-import NotFound from "./pages/NotFound";
-import LandingPage from "./pages/landPage";
-import Auth from "./pages/Auth";
-import ProtectedRoute from "./components/protectRoute";
 import VerifyEmail from "./pages/verifyEmail";
 import { ChatBotProvider } from '@/providers/ChatBotProvider';
+import ProtectedRoute from '@/components/protectRoute';
 
 const queryClient = new QueryClient();
 
-const AppContent = () => {
+function AppContent() {
   const location = useLocation();
-  const isLandingPage = location.pathname === "/";
+  const setUser = useAuthStore((state) => state.setUser);
   const isAuthPage = location.pathname === "/auth";
   const isVerifyPage = location.pathname === "/verify-email";
 
+  useEffect(() => {
+    const initializeAuth = async () => {
+      const user = await authService.initializeAuth();
+      if (user) {
+        setUser(user);
+      }
+    };
+
+    initializeAuth();
+  }, [setUser]);
+
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
-      {!isLandingPage && !isAuthPage && !isVerifyPage && <Sidebar />}
-      <main className={`flex-1 overflow-auto`}>
-        <Toaster />
-        <Sonner />
+    <div className="flex h-screen">
+      {!isAuthPage && !isVerifyPage && <Sidebar />}
+      <main className="flex-1 overflow-y-auto">
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<LandingPage />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
 
@@ -42,7 +52,7 @@ const AppContent = () => {
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <Home />
+                <Dashboard />
               </ProtectedRoute>
             }
           />
@@ -79,26 +89,30 @@ const AppContent = () => {
             }
           />
 
-          {/* Not found route */}
+          {/* Default Routes */}
+          <Route path="/" element={<Home />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
     </div>
   );
-};
+}
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <ChatBotProvider>
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
         <TooltipProvider>
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
+          <ChatBotProvider>
+            <BrowserRouter>
+              <Toaster position="top-right" />
+              <AppContent />
+            </BrowserRouter>
+          </ChatBotProvider>
         </TooltipProvider>
-      </ChatBotProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;

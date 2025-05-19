@@ -30,54 +30,6 @@ class ChatService {
         }
     }
 
-    async getUserConversations(userId) {
-        try {
-            // Get all messages where user is either sender or receiver
-            const messages = await Message.find({
-                $or: [
-                    { sender: userId },
-                    { receiver: userId }
-                ]
-            })
-            .sort({ timestamp: -1 })
-            .populate('sender', 'name avatar status')
-            .populate('receiver', 'name avatar status');
-
-            // Group messages by conversation
-            const conversationsMap = new Map();
-
-            messages.forEach(message => {
-                const otherUser = message.sender._id.toString() === userId 
-                    ? message.receiver 
-                    : message.sender;
-                const conversationId = otherUser._id.toString();
-
-                if (!conversationsMap.has(conversationId)) {
-                    conversationsMap.set(conversationId, {
-                        _id: conversationId,
-                        participants: [otherUser],
-                        lastMessage: message,
-                        unreadCount: message.receiver._id.toString() === userId && !message.isRead ? 1 : 0
-                    });
-                } else {
-                    const conversation = conversationsMap.get(conversationId);
-                    if (message.receiver._id.toString() === userId && !message.isRead) {
-                        conversation.unreadCount++;
-                    }
-                }
-            });
-
-            // Convert map to array and sort by last message timestamp
-            const conversations = Array.from(conversationsMap.values())
-                .sort((a, b) => b.lastMessage.timestamp - a.lastMessage.timestamp);
-
-            return conversations;
-        } catch (error) {
-            console.error('Error getting user conversations:', error);
-            throw new Error('Error fetching user conversations: ' + error.message);
-        }
-    }
-
     async markAsRead(senderId, receiverId) {
         try {
             await Message.updateMany(

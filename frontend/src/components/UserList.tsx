@@ -73,7 +73,7 @@ export function UserList({
           />
         </div>
       </div>
-
+      
       <ScrollArea className="h-[calc(100%-5rem)]">
         <div className="p-4 space-y-2">
           {filteredUsers.length === 0 ? (
@@ -85,19 +85,19 @@ export function UserList({
               <button
                 key={user._id}
                 onClick={() => onSelectUser(user._id)}
-                className={`
+            className={`
                   w-full flex items-center gap-3 p-3 rounded-lg transition-colors
                   ${selectedUserId === user._id 
                     ? 'bg-primary/10 text-primary'
                     : 'hover:bg-muted'
                   }
-                `}
+            `}
               >
-                <Avatar>
+              <Avatar>
                   <AvatarImage src={user.avatar} />
                   <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-                </Avatar>
-                
+              </Avatar>
+              
                 <div className="flex-1 text-left min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-medium truncate">{user.name}</span>
@@ -105,16 +105,16 @@ export function UserList({
                       <Badge variant="secondary" className="text-xs bg-green-500 text-white hover:bg-green-600 shrink-0">
                         Online
                       </Badge>
-                    )}
-                  </div>
+              )}
+            </div>
                   <p className="text-sm text-muted-foreground truncate">
                     {user.email}
                   </p>
-                </div>
+              </div>
               </button>
             ))
-          )}
-        </div>
+                )}
+              </div>
       </ScrollArea>
     </div>
   );

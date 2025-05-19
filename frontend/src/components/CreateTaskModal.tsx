@@ -47,7 +47,7 @@ export const CreateTaskModal = ({ isOpen, onClose, onTaskCreated }: CreateTaskMo
         description: formData.description,
         priority: formData.priority,
         dueDate: formData.dueDate,
-        status: formData.status,
+        status: formData.status, 
         progress: formData.progress,
         project: formData.project?._id,
       });
@@ -78,7 +78,7 @@ export const CreateTaskModal = ({ isOpen, onClose, onTaskCreated }: CreateTaskMo
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
       <div className="relative w-full max-w-2xl h-fit">
         <div className="relative p-3 pt-0 sm:p-4 bg-white rounded-lg shadow dark:bg-gray-800 max-h-[90vh] overflow-y-auto">
-          <div className="flex justify-between items-center pb-3 sm:pb-4 mb-3 sm:mb-4 rounded-t border-b dark:border-gray-600 sm:relative pt-1 sticky top-0 bg-white">
+          <div className="flex justify-between items-center pb-3 sm:pb-4 mb-3 sm:mb-4 rounded-t border-b dark:border-gray-600 sm:relative pt-1 sticky top-0 bg-transparent">
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
               Create New Task
             </h3>
