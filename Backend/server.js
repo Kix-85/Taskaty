@@ -25,7 +25,7 @@ const server = http.createServer(app);
 // Configure allowed origins
 const allowedOrigins = process.env.ALLOWED_ORIGINS
     ? process.env.ALLOWED_ORIGINS.split(',')
-    : ['http://localhost:8080', 'http://localhost:5173', 'http://192.168.1.6:8080', 'https://taskaty-zeta.vercel.app'];
+    : ['http://localhost:8080', 'http://localhost:5173', 'http://192.168.1.6:8080', 'https://taskaty-zeta.vercel.app', 'https://taskaty-imrx7oguk-yousef-ebadas-projects.vercel.app'];
 
 // Configure CORS for Express
 app.use(cors({
